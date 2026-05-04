@@ -283,6 +283,19 @@
   }
   .error-msg.show { display: block; }
 
+  .section-heading {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin: 1.2rem 0 0.6rem;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-heading:first-child { margin-top: 0; }
+  .further-heading { color: #a09060; border-color: #e0d8c0; }
+
   footer {
     text-align: center;
     padding: 1.5rem;
@@ -335,6 +348,16 @@
           <option value="rating">Rating</option>
           <option value="reviews">Most reviewed</option>
           <option value="distance">Distance</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Search Radius</label>
+        <select id="radius">
+          <option value="5">Within 5 miles</option>
+          <option value="10" selected>Within 10 miles</option>
+          <option value="20">Within 20 miles</option>
+          <option value="35">Within 35 miles</option>
+          <option value="50">Within 50 miles</option>
         </select>
       </div>
     </div>
@@ -392,11 +415,11 @@ function normalizeAddress(raw) {
 
 function buildQueries(service, location) {
   return [
+    service + ' ' + location,
     service + ' TaskRabbit ' + location,
     service + ' Thumbtack ' + location,
     service + ' Angi ' + location,
-    service + ' near me ' + location,
-    'best ' + service + ' ' + location
+    'best ' + service + ' near ' + location
   ];
 }
 
@@ -421,27 +444,32 @@ function detectType(name, query) {
 
 async function fetchQuery(query) {
   var url = 'https://serpapi.com/search.json'
-    + '?engine=google_maps'
+    + '?engine=google_local'
     + '&q=' + encodeURIComponent(query)
     + '&api_key=' + encodeURIComponent(SERP_API_KEY)
-    + '&num=5';
+    + '&num=10'
+    + '&hl=en'
+    + '&gl=us';
   var res = await fetch(url);
   if (!res.ok) throw new Error('SerpAPI returned ' + res.status);
   var data = await res.json();
-  return (data.local_results || []).map(function(p) {
+  var raw = data.local_results || [];
+  return raw.map(function(p) {
     var type = detectType(p.title || '', query);
+    var distNum = parseFloat(p.distance) || null;
     return {
-      name:    p.title || 'Unknown',
-      type:    type,
-      source:  detectSource(p.title || '', query),
-      rating:  p.rating   ? parseFloat(p.rating).toFixed(1) : null,
-      reviews: p.reviews  || 0,
-      price:   p.price    || null,
-      distance:p.distance ? p.distance + ' mi' : null,
-      phone:   p.phone    || null,
-      website: p.website  || p.link || null,
-      address: p.address  || null,
-      desc:    p.description || p.type || ''
+      name:     p.title || 'Unknown',
+      type:     type,
+      source:   detectSource(p.title || '', query),
+      rating:   p.rating  ? parseFloat(p.rating).toFixed(1) : null,
+      reviews:  p.reviews || 0,
+      price:    p.price   || null,
+      distance: p.distance ? p.distance + ' mi' : null,
+      distNum:  distNum,
+      phone:    p.phone   || null,
+      website:  p.website || p.link || null,
+      address:  p.address || null,
+      desc:     p.description || p.type || ''
     };
   });
 }
@@ -478,10 +506,11 @@ function starsHtml(r) {
   return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(empty);
 }
 
-function renderCard(r, idx) {
+function renderCard(r, idx, dimmed) {
   var delay = (idx * 60) + 'ms';
   var typeClass = r.type === 'platform' ? 'pill-platform' : 'pill-local';
   var typeLabel = r.type === 'platform' ? r.source : 'Local';
+  var opacity = dimmed ? 'opacity:0.75;' : '';
 
   var ratingHtml = r.rating
     ? '<span class="stars">' + starsHtml(r.rating) + '</span> <span style="font-size:0.85rem;font-weight:600">' + r.rating + '</span> <span class="rating-count">(' + (r.reviews ? r.reviews.toLocaleString() : '0') + ' reviews)</span>'
@@ -496,7 +525,7 @@ function renderCard(r, idx) {
   if (r.website) actions += '<a class="btn-action" href="' + r.website + '" target="_blank" rel="noopener">🌐 Visit site</a>';
   if (r.address) actions += '<a class="btn-action" href="https://maps.google.com/?q=' + encodeURIComponent(r.address) + '" target="_blank" rel="noopener">📍 Map</a>';
 
-  return '<div class="result-card" style="animation-delay:' + delay + '">'
+  return '<div class="result-card" style="animation-delay:' + delay + ';' + opacity + '">'
     + '<div class="card-left">'
     +   '<div class="card-name">' + escHtml(r.name) + '</div>'
     +   (r.desc ? '<div class="card-desc">' + escHtml(r.desc) + '</div>' : '')
@@ -516,6 +545,7 @@ async function doSearch() {
   var address = document.getElementById('address').value.trim();
   var service  = document.getElementById('service').value;
   var sort     = document.getElementById('sort').value;
+  var radius   = parseInt(document.getElementById('radius').value) || 10;
 
   var noKeyMsg  = document.getElementById('noKeyMsg');
   var errorMsg  = document.getElementById('errorMsg');
@@ -558,20 +588,39 @@ async function doSearch() {
 
   if (all.length === 0) {
     statusEl.textContent = '';
-    errorMsg.textContent = 'No results found. Try a broader location or different service. Also check your SerpAPI key is valid.';
+    errorMsg.textContent = 'No results found. Try a broader location or different service.';
     errorMsg.classList.add('show');
     return;
   }
 
   all = dedup(all);
-  all = sortResults(all, sort);
+
+  // Split into nearby vs further
+  var nearby  = sortResults(all.filter(function(r) {
+    return r.distNum === null || r.distNum <= radius;
+  }), sort);
+  var further = sortResults(all.filter(function(r) {
+    return r.distNum !== null && r.distNum > radius;
+  }), sort);
 
   var serviceLabel = document.getElementById('service').options[document.getElementById('service').selectedIndex].text;
-  countEl.innerHTML = '<span>' + all.length + '</span> providers for ' + serviceLabel + ' near ' + location;
+  countEl.innerHTML = '<span>' + nearby.length + '</span> nearby · <span>' + further.length + '</span> further away — ' + serviceLabel + ' near ' + location;
 
-  grid.innerHTML = all.map(function(r, i) { return renderCard(r, i); }).join('');
+  var html = '';
+
+  if (nearby.length > 0) {
+    html += '<div class="section-heading">📍 Within ' + radius + ' miles</div>';
+    html += nearby.map(function(r, i) { return renderCard(r, i, false); }).join('');
+  }
+
+  if (further.length > 0) {
+    html += '<div class="section-heading further-heading">🔍 Worth the drive — beyond ' + radius + ' miles</div>';
+    html += further.map(function(r, i) { return renderCard(r, i, true); }).join('');
+  }
+
+  grid.innerHTML = html;
   resultsWrap.classList.add('visible');
-  statusEl.textContent = 'Done — ' + all.length + ' results found.';
+  statusEl.textContent = 'Done — ' + nearby.length + ' nearby, ' + further.length + ' further away.';
 }
 </script>
 </body>
