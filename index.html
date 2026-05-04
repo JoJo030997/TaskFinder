@@ -442,6 +442,30 @@ function detectType(name, query) {
   return 'local';
 }
 
+var jsonpCounter = 0;
+function fetchJsonp(url) {
+  return new Promise(function(resolve, reject) {
+    var cbName = '_serpcb_' + (jsonpCounter++);
+    var timeout = setTimeout(function() {
+      cleanup();
+      reject(new Error('Request timed out'));
+    }, 15000);
+    function cleanup() {
+      clearTimeout(timeout);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[cbName] = function(data) {
+      cleanup();
+      resolve(data);
+    };
+    var script = document.createElement('script');
+    script.src = url + '&callback=' + cbName;
+    script.onerror = function() { cleanup(); reject(new Error('Failed to fetch')); };
+    document.body.appendChild(script);
+  });
+}
+
 async function fetchQuery(query) {
   var url = 'https://serpapi.com/search.json'
     + '?engine=google_local'
@@ -449,10 +473,9 @@ async function fetchQuery(query) {
     + '&api_key=' + encodeURIComponent(SERP_API_KEY)
     + '&num=10'
     + '&hl=en'
-    + '&gl=us';
-  var res = await fetch(url);
-  if (!res.ok) throw new Error('SerpAPI returned ' + res.status);
-  var data = await res.json();
+    + '&gl=us'
+    + '&output=json';
+  var data = await fetchJsonp(url);
   var raw = data.local_results || [];
   return raw.map(function(p) {
     var type = detectType(p.title || '', query);
