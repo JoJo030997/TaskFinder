@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tasker — Local Services Finder</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0f0e0d;
+    --paper: #f7f4ef;
+    --cream: #ede9e2;
+    --accent: #c84b2f;
+    --accent2: #2f6fc8;
+    --muted: #7a7470;
+    --border: #d4cfc8;
+    --card: #ffffff;
+    --success-bg: #edf7f0;
+    --success: #1a7a40;
+    --platform-bg: #edf2fb;
+    --platform: #1a4a7a;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ---- HEADER ---- */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2.5rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.15;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 30%;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: var(--accent2);
+    opacity: 0.12;
+  }
+  .header-inner { max-width: 860px; margin: 0 auto; position: relative; z-index: 1; }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.4rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .logo span { color: var(--accent); font-style: italic; }
+  .tagline { font-size: 0.95rem; color: #a09890; font-weight: 300; }
+
+  /* ---- SEARCH PANEL ---- */
+  .search-wrap { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  .api-bar {
+    background: #fff8f0;
+    border: 1px solid #f0d8c0;
+    border-radius: 10px;
+    padding: 0.9rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .api-bar label { font-size: 0.8rem; font-weight: 600; color: var(--accent); white-space: nowrap; text-transform: uppercase; letter-spacing: 0.06em; }
+  .api-bar input {
+    flex: 1; min-width: 200px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 12px;
+    font-size: 0.85rem;
+    font-family: 'DM Sans', monospace;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .api-bar input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  .api-save {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 7px 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .api-save:hover { background: #b03d24; }
+  .api-status { font-size: 0.78rem; color: var(--success); font-weight: 500; display: none; }
+  .api-status.show { display: inline; }
+
+  .search-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.8rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  }
+
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media(max-width: 560px) { .fields { grid-template-columns: 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+
+  input[type=text], select {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    width: 100%;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input[type=text]:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(200,75,47,0.12);
+  }
+
+  .search-btn {
+    width: 100%;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 9px;
+    padding: 13px;
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: background 0.15s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .search-btn:hover { background: #2a2825; }
+  .search-btn:active { transform: scale(0.99); }
+  .search-btn:disabled { background: #b0aba6; cursor: not-allowed; }
+
+  /* ---- STATUS ---- */
+  .status-bar {
+    margin-top: 1rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+    min-height: 22px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .spinner.active { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---- RESULTS ---- */
+  .results-wrap { max-width: 860px; margin: 0 auto; padding: 0 1.5rem 3rem; display: none; }
+  .results-wrap.visible { display: block; }
+
+  .results-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem; flex-wrap: wrap; gap: 8px;
+  }
+  .results-count { font-family: 'DM Serif Display', serif; font-size: 1.4rem; }
+  .results-count span { color: var(--accent); }
+  .legend { display: flex; gap: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--muted); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .dot-platform { background: var(--accent2); }
+  .dot-local { background: var(--success); }
+
+  .results-grid { display: grid; gap: 12px; }
+
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    animation: fadeUp 0.3s ease both;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .result-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.09); transform: translateY(-1px); }
+  @keyframes fadeUp { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: none; } }
+
+  .card-left { min-width: 0; }
+  .card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+
+  .card-name { font-size: 1.05rem; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-desc { font-size: 0.83rem; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
+  .card-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+
+  .pill {
+    font-size: 0.74rem; font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+  }
+  .pill-platform { background: var(--platform-bg); color: var(--platform); border-color: #c0d0ee; }
+  .pill-local { background: var(--success-bg); color: var(--success); border-color: #b0ddc0; }
+  .pill-neutral { background: var(--cream); color: var(--muted); border-color: var(--border); }
+
+  .stars { color: #e8a020; font-size: 0.85rem; }
+  .rating-count { font-size: 0.78rem; color: var(--muted); }
+
+  .card-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+  .btn-action {
+    font-size: 0.8rem; font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 5px;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .btn-action:hover { background: var(--cream); border-color: #b0aba4; }
+  .btn-action.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .btn-action.primary:hover { background: #2a2825; }
+
+  .badge-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--cream);
+    color: var(--muted);
+    font-size: 0.75rem; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ---- NO KEY WARNING ---- */
+  .no-key-msg {
+    background: #fff3f0;
+    border: 1px solid #f0c8c0;
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-size: 0.88rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: none;
+  }
+  .no-key-msg.show { display: block; }
+
+  /* ---- ERROR ---- */
+  .error-msg {
+    background: #fff3f0;
+    border: 1px solid #f0c8c0;
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-size: 0.88rem;
+    color: var(--accent);
+    margin-top: 1rem;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+
+  footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">Task<span>r</span></div>
+    <div class="tagline">Find local service providers near any address — instantly</div>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <!-- API Key bar -->
+  <div class="api-bar">
+    <label>SerpAPI Key</label>
+    <input type="password" id="apiKeyInput" placeholder="Paste your SerpAPI key here..." />
+    <button class="api-save" onclick="saveKey()">Save Key</button>
+    <span class="api-status" id="apiStatus">✓ Key saved</span>
+  </div>
+  <div class="no-key-msg" id="noKeyMsg">Please enter and save your SerpAPI key above before searching.</div>
+
+  <div class="search-card">
+    <div class="fields">
+      <div class="field full">
+        <label>Address / City / ZIP / Neighborhood</label>
+        <input type="text" id="address" placeholder="e.g. Austin TX · 78701 · Downtown Chicago · 123 Main St Miami" />
+      </div>
+      <div class="field">
+        <label>Service Type</label>
+        <select id="service">
+          <option value="">Select a service...</option>
+          <option value="home cleaning">Home cleaning</option>
+          <option value="handyman repairs">Handyman / repairs</option>
+          <option value="moving help">Moving help</option>
+          <option value="furniture assembly">Furniture assembly</option>
+          <option value="yard work landscaping">Yard work / landscaping</option>
+          <option value="general tasks errands">General tasks</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Sort Results By</label>
+        <select id="sort">
+          <option value="rating">Rating</option>
+          <option value="reviews">Most reviewed</option>
+          <option value="distance">Distance</option>
+        </select>
+      </div>
+    </div>
+    <button class="search-btn" id="searchBtn" onclick="doSearch()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Find Providers
+    </button>
+    <div class="status-bar">
+      <div class="spinner" id="spinner"></div>
+      <span id="statusText"></span>
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+</div>
+
+<div class="results-wrap" id="resultsWrap">
+  <div class="results-meta">
+    <div class="results-count" id="resultsCount"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="dot dot-platform"></div> Platform</div>
+      <div class="legend-item"><div class="dot dot-local"></div> Local business</div>
+    </div>
+  </div>
+  <div class="results-grid" id="resultsGrid"></div>
+</div>
+
+<footer>Tasker · Powered by SerpAPI · Results are from Google Maps live data</footer>
+
+<script>
+var SERP_API_KEY = localStorage.getItem('tasker_api_key') || '';
+
+function saveKey() {
+  var val = document.getElementById('apiKeyInput').value.trim();
+  if (!val) return;
+  SERP_API_KEY = val;
+  localStorage.setItem('tasker_api_key', val);
+  var s = document.getElementById('apiStatus');
+  s.classList.add('show');
+  setTimeout(function() { s.classList.remove('show'); }, 2500);
+}
+
+// Pre-fill key if saved
+window.addEventListener('load', function() {
+  if (SERP_API_KEY) {
+    document.getElementById('apiKeyInput').value = SERP_API_KEY;
+  }
+});
+
+function normalizeAddress(raw) {
+  var cleaned = raw.trim();
+  var parts = cleaned.split(',');
+  if (parts.length >= 3) return parts.slice(-2).join(',').trim();
+  return cleaned;
+}
+
+function buildQueries(service, location) {
+  return [
+    service + ' TaskRabbit ' + location,
+    service + ' Thumbtack ' + location,
+    service + ' Angi ' + location,
+    service + ' near me ' + location,
+    'best ' + service + ' ' + location
+  ];
+}
+
+function detectSource(name, query) {
+  var s = (name + ' ' + query).toLowerCase();
+  if (s.indexOf('taskrabbit') > -1) return 'TaskRabbit';
+  if (s.indexOf('thumbtack') > -1)  return 'Thumbtack';
+  if (s.indexOf('angi') > -1)       return 'Angi';
+  if (s.indexOf('homeadvisor') > -1) return 'HomeAdvisor';
+  if (s.indexOf('handy') > -1)      return 'Handy';
+  return 'Local business';
+}
+
+function detectType(name, query) {
+  var platforms = ['taskrabbit','thumbtack','angi','homeadvisor','handy'];
+  var s = (name + ' ' + query).toLowerCase();
+  for (var i = 0; i < platforms.length; i++) {
+    if (s.indexOf(platforms[i]) > -1) return 'platform';
+  }
+  return 'local';
+}
+
+async function fetchQuery(query) {
+  var url = 'https://serpapi.com/search.json'
+    + '?engine=google_maps'
+    + '&q=' + encodeURIComponent(query)
+    + '&api_key=' + encodeURIComponent(SERP_API_KEY)
+    + '&num=5';
+  var res = await fetch(url);
+  if (!res.ok) throw new Error('SerpAPI returned ' + res.status);
+  var data = await res.json();
+  return (data.local_results || []).map(function(p) {
+    var type = detectType(p.title || '', query);
+    return {
+      name:    p.title || 'Unknown',
+      type:    type,
+      source:  detectSource(p.title || '', query),
+      rating:  p.rating   ? parseFloat(p.rating).toFixed(1) : null,
+      reviews: p.reviews  || 0,
+      price:   p.price    || null,
+      distance:p.distance ? p.distance + ' mi' : null,
+      phone:   p.phone    || null,
+      website: p.website  || p.link || null,
+      address: p.address  || null,
+      desc:    p.description || p.type || ''
+    };
+  });
+}
+
+function dedup(results) {
+  var seen = {};
+  return results.filter(function(r) {
+    var key = r.name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,20);
+    if (seen[key]) return false;
+    seen[key] = true;
+    return true;
+  });
+}
+
+function sortResults(results, by) {
+  return results.slice().sort(function(a, b) {
+    if (by === 'rating')  return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
+    if (by === 'reviews') return (b.reviews || 0) - (a.reviews || 0);
+    if (by === 'distance') {
+      var da = parseFloat(a.distance) || 999;
+      var db = parseFloat(b.distance) || 999;
+      return da - db;
+    }
+    return 0;
+  });
+}
+
+function starsHtml(r) {
+  if (!r) return '';
+  var n = parseFloat(r);
+  var full = Math.floor(n);
+  var half = n % 1 >= 0.5 ? 1 : 0;
+  var empty = 5 - full - half;
+  return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(empty);
+}
+
+function renderCard(r, idx) {
+  var delay = (idx * 60) + 'ms';
+  var typeClass = r.type === 'platform' ? 'pill-platform' : 'pill-local';
+  var typeLabel = r.type === 'platform' ? r.source : 'Local';
+
+  var ratingHtml = r.rating
+    ? '<span class="stars">' + starsHtml(r.rating) + '</span> <span style="font-size:0.85rem;font-weight:600">' + r.rating + '</span> <span class="rating-count">(' + (r.reviews ? r.reviews.toLocaleString() : '0') + ' reviews)</span>'
+    : '<span class="rating-count">No rating yet</span>';
+
+  var pills = '<span class="pill ' + typeClass + '">' + typeLabel + '</span>';
+  if (r.price)    pills += '<span class="pill pill-neutral">' + r.price + '</span>';
+  if (r.distance) pills += '<span class="pill pill-neutral">' + r.distance + '</span>';
+
+  var actions = '';
+  if (r.phone)   actions += '<a class="btn-action primary" href="tel:' + r.phone + '">📞 ' + r.phone + '</a>';
+  if (r.website) actions += '<a class="btn-action" href="' + r.website + '" target="_blank" rel="noopener">🌐 Visit site</a>';
+  if (r.address) actions += '<a class="btn-action" href="https://maps.google.com/?q=' + encodeURIComponent(r.address) + '" target="_blank" rel="noopener">📍 Map</a>';
+
+  return '<div class="result-card" style="animation-delay:' + delay + '">'
+    + '<div class="card-left">'
+    +   '<div class="card-name">' + escHtml(r.name) + '</div>'
+    +   (r.desc ? '<div class="card-desc">' + escHtml(r.desc) + '</div>' : '')
+    +   '<div class="card-meta">' + pills + '</div>'
+    +   '<div style="margin-bottom:10px">' + ratingHtml + '</div>'
+    +   '<div class="card-actions">' + actions + '</div>'
+    + '</div>'
+    + '<div class="card-right"><div class="badge-num">' + (idx + 1) + '</div></div>'
+    + '</div>';
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function doSearch() {
+  var address = document.getElementById('address').value.trim();
+  var service  = document.getElementById('service').value;
+  var sort     = document.getElementById('sort').value;
+
+  var noKeyMsg  = document.getElementById('noKeyMsg');
+  var errorMsg  = document.getElementById('errorMsg');
+  var statusEl  = document.getElementById('statusText');
+  var spinner   = document.getElementById('spinner');
+  var btn       = document.getElementById('searchBtn');
+  var resultsWrap = document.getElementById('resultsWrap');
+  var grid      = document.getElementById('resultsGrid');
+  var countEl   = document.getElementById('resultsCount');
+
+  noKeyMsg.classList.remove('show');
+  errorMsg.classList.remove('show');
+
+  if (!SERP_API_KEY) { noKeyMsg.classList.add('show'); return; }
+  if (!address)      { statusEl.textContent = 'Please enter an address or location.'; return; }
+  if (!service)      { statusEl.textContent = 'Please select a service type.'; return; }
+
+  btn.disabled = true;
+  spinner.classList.add('active');
+  statusEl.textContent = 'Searching near ' + address + '...';
+  resultsWrap.classList.remove('visible');
+  grid.innerHTML = '';
+
+  var location = normalizeAddress(address);
+  var queries  = buildQueries(service, location);
+  var all      = [];
+
+  for (var i = 0; i < queries.length; i++) {
+    statusEl.textContent = 'Searching source ' + (i + 1) + ' of ' + queries.length + '...';
+    try {
+      var items = await fetchQuery(queries[i]);
+      all = all.concat(items);
+    } catch(e) {
+      console.warn('Query failed:', queries[i], e.message);
+    }
+  }
+
+  btn.disabled = false;
+  spinner.classList.remove('active');
+
+  if (all.length === 0) {
+    statusEl.textContent = '';
+    errorMsg.textContent = 'No results found. Try a broader location or different service. Also check your SerpAPI key is valid.';
+    errorMsg.classList.add('show');
+    return;
+  }
+
+  all = dedup(all);
+  all = sortResults(all, sort);
+
+  var serviceLabel = document.getElementById('service').options[document.getElementById('service').selectedIndex].text;
+  countEl.innerHTML = '<span>' + all.length + '</span> providers for ' + serviceLabel + ' near ' + location;
+
+  grid.innerHTML = all.map(function(r, i) { return renderCard(r, i); }).join('');
+  resultsWrap.classList.add('visible');
+  statusEl.textContent = 'Done — ' + all.length + ' results found.';
+}
+</script>
+</body>
+</html>
