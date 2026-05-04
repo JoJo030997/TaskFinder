@@ -322,6 +322,12 @@
     <button class="api-save" onclick="saveKey()">Save Key</button>
     <span class="api-status" id="apiStatus">✓ Key saved</span>
   </div>
+  <div class="api-bar" style="background:#f0f4ff;border-color:#c0cef0;">
+    <label style="color:var(--accent2);">Worker URL</label>
+    <input type="text" id="workerInput" placeholder="e.g. https://serp-proxy.your-name.workers.dev" />
+    <button class="api-save" style="background:var(--accent2);" onclick="saveWorker()">Save URL</button>
+    <span class="api-status" id="workerStatus">✓ URL saved</span>
+  </div>
   <div class="no-key-msg" id="noKeyMsg">Please enter and save your SerpAPI key above before searching.</div>
 
   <div class="search-card">
@@ -388,6 +394,7 @@
 
 <script>
 var SERP_API_KEY = localStorage.getItem('tasker_api_key') || '';
+var WORKER_URL = localStorage.getItem('tasker_worker_url') || '';
 
 function saveKey() {
   var val = document.getElementById('apiKeyInput').value.trim();
@@ -399,11 +406,21 @@ function saveKey() {
   setTimeout(function() { s.classList.remove('show'); }, 2500);
 }
 
-// Pre-fill key if saved
+function saveWorker() {
+  var val = document.getElementById('workerInput').value.trim();
+  if (!val) return;
+  if (!val.startsWith('http')) val = 'https://' + val;
+  if (val.endsWith('/')) val = val.slice(0, -1);
+  WORKER_URL = val;
+  localStorage.setItem('tasker_worker_url', val);
+  var s = document.getElementById('workerStatus');
+  s.classList.add('show');
+  setTimeout(function() { s.classList.remove('show'); }, 2500);
+}
+
 window.addEventListener('load', function() {
-  if (SERP_API_KEY) {
-    document.getElementById('apiKeyInput').value = SERP_API_KEY;
-  }
+  if (SERP_API_KEY) document.getElementById('apiKeyInput').value = SERP_API_KEY;
+  if (WORKER_URL) document.getElementById('workerInput').value = WORKER_URL;
 });
 
 function normalizeAddress(raw) {
@@ -442,40 +459,14 @@ function detectType(name, query) {
   return 'local';
 }
 
-var jsonpCounter = 0;
-function fetchJsonp(url) {
-  return new Promise(function(resolve, reject) {
-    var cbName = '_serpcb_' + (jsonpCounter++);
-    var timeout = setTimeout(function() {
-      cleanup();
-      reject(new Error('Request timed out'));
-    }, 15000);
-    function cleanup() {
-      clearTimeout(timeout);
-      delete window[cbName];
-      if (script.parentNode) script.parentNode.removeChild(script);
-    }
-    window[cbName] = function(data) {
-      cleanup();
-      resolve(data);
-    };
-    var script = document.createElement('script');
-    script.src = url + '&callback=' + cbName;
-    script.onerror = function() { cleanup(); reject(new Error('Failed to fetch')); };
-    document.body.appendChild(script);
-  });
-}
-
 async function fetchQuery(query) {
-  var url = 'https://serpapi.com/search.json'
-    + '?engine=google_local'
-    + '&q=' + encodeURIComponent(query)
-    + '&api_key=' + encodeURIComponent(SERP_API_KEY)
-    + '&num=10'
-    + '&hl=en'
-    + '&gl=us'
-    + '&output=json';
-  var data = await fetchJsonp(url);
+  var url = WORKER_URL
+    + '?q=' + encodeURIComponent(query)
+    + '&api_key=' + encodeURIComponent(SERP_API_KEY);
+  var res = await fetch(url);
+  if (!res.ok) throw new Error('Worker returned ' + res.status);
+  var data = await res.json();
+  if (data.error) throw new Error(data.error);
   var raw = data.local_results || [];
   return raw.map(function(p) {
     var type = detectType(p.title || '', query);
@@ -583,6 +574,11 @@ async function doSearch() {
   errorMsg.classList.remove('show');
 
   if (!SERP_API_KEY) { noKeyMsg.classList.add('show'); return; }
+  if (!WORKER_URL) {
+    errorMsg.textContent = 'Please enter and save your Cloudflare Worker URL above.';
+    errorMsg.classList.add('show');
+    return;
+  }
   if (!address)      { statusEl.textContent = 'Please enter an address or location.'; return; }
   if (!service)      { statusEl.textContent = 'Please select a service type.'; return; }
 
