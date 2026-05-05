@@ -731,7 +731,8 @@ function renderCard(r,idx,dimmed){
   if(r.open===true)pills+='<span class="pill pill-open">Open now</span>';
   else if(r.open===false)pills+='<span class="pill pill-closed">Closed</span>';
   var acts='';
-  if(r.phone)acts+='<a class="btn-a primary" href="tel:'+esc(r.phone)+'">&#128222; '+esc(r.phone)+'</a>';
+  var phones=r.phones&&r.phones.length?r.phones:(r.phone?[r.phone]:[]);
+  phones.forEach(function(ph){acts+='<a class="btn-a primary" href="tel:'+esc(ph)+'">&#128222; '+esc(ph)+'</a><button class="btn-a" onclick="copyPhone(\''+ph.replace(/'/g,'')+'\',this)" title="Copy">&#128203;</button>';});
   if(r.website)acts+='<a class="btn-a" href="'+esc(r.website)+'" target="_blank">&#127760; Site</a>';
   if(r.address)acts+='<a class="btn-a" href="https://maps.google.com/maps/dir/?api=1&origin='+encodeURIComponent(originAddr)+'&destination='+encodeURIComponent(r.address)+'" target="_blank">&#128205; Directions</a>';
   var chk='<label class="map-check"><input type="checkbox" id="mc_'+idx+'" onchange="togglePin('+idx+')"/> Show on map</label>';
@@ -760,7 +761,8 @@ async function openReviews(idx){
     if(!pid){showNoReviews(r);return;}
     var det=await px({mode:'places_details',place_id:pid,key:C.mapsKey});
     var res=det.result;if(!res){showNoReviews(r);return;}
-    if(res.formatted_phone_number&&!r.phone)r.phone=res.formatted_phone_number;
+    if(res.formatted_phone_number&&!r.phone){r.phone=res.formatted_phone_number;if(!r.phones)r.phones=[r.phone];}
+    if(res.formatted_phone_number&&r.phones&&r.phones.indexOf(res.formatted_phone_number)===-1)r.phones.push(res.formatted_phone_number);
     if(res.website&&!r.website)r.website=res.website;
     var rvs=res.reviews||[];
     if(!rvs.length){showNoReviews(r);return;}
@@ -783,6 +785,7 @@ function showNoReviews(r){
   document.getElementById('rvBody').innerHTML='<div class="rv-none">No Google reviews found.'+(r.website?'<br><br><a href="'+esc(r.website)+'" target="_blank" style="color:var(--accent2)">Visit their website</a>':'')+'</div>';
 }
 function closeReviews(){document.getElementById('rvOverlay').classList.remove('open');}
+function copyPhone(ph,btn){navigator.clipboard.writeText(ph).then(function(){var orig=btn.innerHTML;btn.innerHTML='&#10003;';btn.style.color='var(--stx)';setTimeout(function(){btn.innerHTML=orig;btn.style.color='';},1500);}).catch(function(){});}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // ======================= INIT =======================
