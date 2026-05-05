@@ -437,28 +437,28 @@ var PLATFORMS={
     name:'TaskRabbit',color:'#6aa84f',
     url:function(svc,addr){
       var city=extractCity(addr);
-      return'https://www.taskrabbit.com/search?utf8=%E2%9C%93&q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city);
+      return'https://www.taskrabbit.com/search#?utf8=%E2%9C%93&q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city);
     }
   },
   thumbtack:{
     name:'Thumbtack',color:'#00b3a4',
     url:function(svc,addr){
       var city=extractCity(addr);
-      return'https://www.thumbtack.com/search?q='+encodeURIComponent(svc)+'&pl='+encodeURIComponent(city);
+      return'https://www.thumbtack.com/search/?q='+encodeURIComponent(svc)+'&requestPostalCode='+encodeURIComponent(city);
     }
   },
   angi:{
     name:'Angi',color:'#ff5a5f',
     url:function(svc,addr){
       var city=extractCity(addr);
-      return'https://www.angi.com/search?q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city);
+      return'https://www.angi.com/hire/'+encodeURIComponent(svc.toLowerCase().replace(/\s+/g,'-'))+'/?location='+encodeURIComponent(city);
     }
   },
   homeadvisor:{
     name:'HomeAdvisor',color:'#f5a623',
     url:function(svc,addr){
       var city=extractCity(addr);
-      return'https://www.homeadvisor.com/leads.html?q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city);
+      return'https://www.homeadvisor.com/task.html?q='+encodeURIComponent(svc)+'&loc='+encodeURIComponent(city);
     }
   }
 };
