@@ -557,14 +557,13 @@ async function doSearch(){
     rw=document.getElementById('resultsWrap'),grid=document.getElementById('resultsGrid');
 
   nk.classList.remove('show');em.classList.remove('show');
-  if(!C.workerUrl||!C.mapsKey){nk.classList.add('show');return;}
   if(!address){st.textContent='Enter an address.';return;}
   if(!service){st.textContent='Select a service.';return;}
 
   originAddr=address;originCoords=null;cardPins={};allFetched=[];meetsArr=[];othersArr=[];visibleResults=[];
   var svcLabel=document.getElementById('service').options[document.getElementById('service').selectedIndex].text;
 
-  // Platform source — redirect instead of searching
+  // Platform source — redirect instead of searching (no API keys needed)
   var source=document.getElementById('sourceSelect').value;
   if(source!=='google'){
     btn.disabled=false;sp.classList.remove('active');st.textContent='';
@@ -572,6 +571,9 @@ async function doSearch(){
     openPlatform(source,svcLabel,address);
     return;
   }
+
+  // Google — needs API keys
+  if(!C.workerUrl||!C.mapsKey){nk.classList.add('show');return;}
   btn.disabled=true;sp.classList.add('active');rw.classList.remove('visible');grid.innerHTML='';
   document.getElementById('mapContainer').style.display='none';
 
