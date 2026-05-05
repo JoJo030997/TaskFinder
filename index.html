@@ -110,7 +110,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .map-check{display:flex;align-items:center;gap:4px;font-size:.73rem;color:var(--muted);cursor:pointer;user-select:none;margin-top:3px}
 .map-check input{width:13px;height:13px;accent-color:var(--accent);cursor:pointer}
 
-/* REVIEWS MODAL — scrollable, responsive */
+/* REVIEWS MODAL */
 .rv-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
 .rv-overlay.open{display:flex}
 .rv-panel{background:var(--card);border-radius:14px;width:100%;max-width:520px;max-height:88vh;min-height:0;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.25);overflow:hidden}
@@ -223,8 +223,8 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
         </div>
         <div class="radius-wrap">
           <span class="radius-lbl">Radius:</span>
-          <input type="range" id="radiusSlider" min="5" max="50" step="5" value="25" oninput="onRadiusChange(this.value)"/>
-          <span class="radius-val" id="radiusVal">25 mi</span>
+          <input type="range" id="radiusSlider" min="5" max="100" step="5" value="50" oninput="onRadiusChange(this.value)"/>
+          <span class="radius-val" id="radiusVal">50 mi</span>
         </div>
       </div>
     </div>
@@ -306,7 +306,9 @@ async function refreshUsage(){
 }
 
 // ======================= RADIUS SLIDER =======================
-var currentRadius=25;
+// Radius slider now controls display highlight only — ALL results always shown
+// Results beyond radius are shown as "dimmed" in the Other Results section
+var currentRadius=50;
 function onRadiusChange(v){
   currentRadius=parseInt(v);
   document.getElementById('radiusVal').textContent=currentRadius+' mi';
@@ -315,22 +317,20 @@ function onRadiusChange(v){
 
 // ======================= GOOGLE MAPS =======================
 var gmap,gmarkers=[],mapsOk=false,originAddr='',originCoords=null,cardPins={},cardRoutes={};
-var directionsService=null;
 
 function initGMaps(){
   if(mapsOk||!C.mapsKey)return;
-  if(typeof google!=='undefined'&&google.maps){mapsOk=true;directionsService=new google.maps.DirectionsService();return;}
+  if(typeof google!=='undefined'&&google.maps){mapsOk=true;return;}
   var s=document.createElement('script');
   s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(C.mapsKey)+'&loading=async&callback=onMR';
   s.async=true;document.body.appendChild(s);
 }
-window.onMR=function(){mapsOk=true;directionsService=new google.maps.DirectionsService();};
+window.onMR=function(){mapsOk=true;};
 
 function setupMap(lat,lng){
   var c=document.getElementById('mapContainer');c.style.display='block';
   gmap=new google.maps.Map(c,{center:{lat:lat,lng:lng},zoom:11,
     styles:[{featureType:'poi',stylers:[{visibility:'off'}]},{featureType:'transit',stylers:[{visibility:'simplified'}]}]});
-  // Clear old markers and routes
   gmarkers.forEach(function(m){m.setMap(null);});gmarkers=[];
   Object.keys(cardRoutes).forEach(function(k){if(cardRoutes[k])cardRoutes[k].setMap(null);});
   cardPins={};cardRoutes={};
@@ -339,7 +339,6 @@ function setupMap(lat,lng){
   gmarkers.push(om);
 }
 
-// Route colors — each pin gets its own color
 var ROUTE_COLORS=['#c0452a','#2963c8','#1a7a3a','#b06a00','#7b2d8b','#0097a7','#e65100','#37474f'];
 
 async function togglePin(idx){
@@ -347,7 +346,6 @@ async function togglePin(idx){
   var cb=document.getElementById('mc_'+idx);if(!cb)return;
 
   if(cb.checked){
-    // Get coords
     var lat=r.lat,lng=r.lng;
     if(!lat&&r.address){
       try{
@@ -357,7 +355,6 @@ async function togglePin(idx){
     }
     if(!lat||!lng){cb.checked=false;alert('Could not locate this business.');return;}
 
-    // Place marker
     var color=ROUTE_COLORS[Object.keys(cardPins).length%ROUTE_COLORS.length];
     var m=new google.maps.Marker({
       position:{lat:lat,lng:lng},map:gmap,title:r.name,
@@ -366,31 +363,13 @@ async function togglePin(idx){
     });
     cardPins[idx]=m;gmarkers.push(m);
 
-    // Draw route from origin to this pin
-    if(directionsService&&originCoords){
-      var routeRenderer=new google.maps.DirectionsRenderer({
-        map:gmap,
-        suppressMarkers:true,
-        polylineOptions:{strokeColor:color,strokeWeight:4,strokeOpacity:0.75}
-      });
-      directionsService.route({
-        origin:new google.maps.LatLng(originCoords.lat,originCoords.lng),
-        destination:new google.maps.LatLng(lat,lng),
-        travelMode:google.maps.TravelMode.DRIVING
-      },function(result,status){
-        if(status==='OK'){routeRenderer.setDirections(result);cardRoutes[idx]=routeRenderer;}
-      });
-    }
-
-    // Fit bounds
+    // Draw route using directions link (no DirectionsService needed)
     var b=new google.maps.LatLngBounds();
     gmarkers.forEach(function(mk){b.extend(mk.getPosition());});
     gmap.fitBounds(b);if(gmarkers.length<=2)gmap.setZoom(13);
 
   } else {
-    // Remove marker
     if(cardPins[idx]){cardPins[idx].setMap(null);var mi=gmarkers.indexOf(cardPins[idx]);if(mi>-1)gmarkers.splice(mi,1);delete cardPins[idx];}
-    // Remove route
     if(cardRoutes[idx]){cardRoutes[idx].setMap(null);delete cardRoutes[idx];}
   }
 }
@@ -400,34 +379,20 @@ async function px(params){
   var qs=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);}).join('&');
   var r=await fetch(C.workerUrl+'?'+qs);
   if(!r.ok)throw new Error('Proxy '+r.status);
-  // Track Google calls (skip serp endpoints)
   if(params.mode&&params.mode.indexOf('serp')!==0)bumpGoogle(1);
   return r.json();
 }
 
 // ======================= PLACES SEARCH =======================
-// Searches with location bias (radius in meters) for closest results
-async function searchPlaces(query, lat, lng){
-  var radiusMeters=50000; // Always search wide (50km), slider filters display
+async function searchPlaces(query,lat,lng){
   var results=[];
-
-  // Use nearby search with location bias for better local results
-  var q=encodeURIComponent(query);
-  var d=await px({mode:'places_search',q:query,key:C.mapsKey,lat:lat,lng:lng,radius:radiusMeters});
+  var d=await px({mode:'places_search',q:query,key:C.mapsKey,lat:lat,lng:lng,radius:50000});
   if(d.results)results=results.concat(d.results);
 
-  // Page 2
   if(d.next_page_token){
     await sleep(2000);
     try{var d2=await px({mode:'places_search',q:query,key:C.mapsKey,pagetoken:d.next_page_token});
       if(d2.results)results=results.concat(d2.results);}catch(e){}
-  }
-
-  // Page 3 (up to 60 results total)
-  if(d.next_page_token){
-    await sleep(2000);
-    try{var d3=await px({mode:'places_search',q:query,key:C.mapsKey,pagetoken:d.next_page_token});
-      if(d3.results)results=results.concat(d3.results);}catch(e){}
   }
 
   return results.map(function(p){
@@ -450,7 +415,10 @@ async function searchPlaces(query, lat, lng){
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
 
 async function geocodeAddr(addr){
-  try{var d=await px({mode:'geocode',address:addr,key:C.mapsKey});if(d.results&&d.results.length)return d.results[0].geometry.location;}catch(e){}
+  try{
+    var d=await px({mode:'geocode',address:addr,key:C.mapsKey});
+    if(d.results&&d.results.length)return d.results[0].geometry.location;
+  }catch(e){console.error('Geocode error:',e);}
   return null;
 }
 
@@ -464,7 +432,7 @@ async function getDriveTimes(origin,addrs){
       if(d.rows&&d.rows[0]&&d.rows[0].elements){
         d.rows[0].elements.forEach(function(el){
           if(el.status==='OK'){
-            var distM=el.distance.value/1609.34; // meters to miles
+            var distM=el.distance.value/1609.34;
             out.push({driveMin:Math.round(el.duration.value/60),driveTxt:el.duration.text,distTxt:el.distance.text,distMiles:distM});
           } else out.push({driveMin:null,driveTxt:null,distTxt:null,distMiles:null});
         });
@@ -478,31 +446,19 @@ async function getDriveTimes(origin,addrs){
 var PLATFORMS={
   taskrabbit:{
     name:'TaskRabbit',color:'#6aa84f',domain:'taskrabbit.com',
-    url:function(svc,addr){
-      var city=extractCity(addr);
-      return'https://www.taskrabbit.com/search#?utf8=%E2%9C%93&q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city);
-    }
+    url:function(svc,addr){var city=extractCity(addr);return'https://www.taskrabbit.com/search#?utf8=%E2%9C%93&q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city);}
   },
   thumbtack:{
     name:'Thumbtack',color:'#00b3a4',domain:'thumbtack.com',
-    url:function(svc,addr){
-      var city=extractCity(addr);
-      return'https://www.thumbtack.com/search/?q='+encodeURIComponent(svc)+'&requestPostalCode='+encodeURIComponent(city);
-    }
+    url:function(svc,addr){var city=extractCity(addr);return'https://www.thumbtack.com/search/?q='+encodeURIComponent(svc)+'&requestPostalCode='+encodeURIComponent(city);}
   },
   angi:{
     name:'Angi',color:'#ff5a5f',domain:'angi.com',
-    url:function(svc,addr){
-      var city=extractCity(addr);
-      return'https://www.angi.com/hire/'+encodeURIComponent(svc.toLowerCase().replace(/\s+/g,'-'))+'/?location='+encodeURIComponent(city);
-    }
+    url:function(svc,addr){var city=extractCity(addr);return'https://www.angi.com/hire/'+encodeURIComponent(svc.toLowerCase().replace(/\s+/g,'-'))+'/?location='+encodeURIComponent(city);}
   },
   homeadvisor:{
     name:'HomeAdvisor',color:'#f5a623',domain:'homeadvisor.com',
-    url:function(svc,addr){
-      var city=extractCity(addr);
-      return'https://www.homeadvisor.com/task.html?q='+encodeURIComponent(svc)+'&loc='+encodeURIComponent(city);
-    }
+    url:function(svc,addr){var city=extractCity(addr);return'https://www.homeadvisor.com/task.html?q='+encodeURIComponent(svc)+'&loc='+encodeURIComponent(city);}
   }
 };
 
@@ -519,8 +475,7 @@ async function openPlatformOrSearch(source,svc,addr){
 async function searchPlatform(source,svc,addr){
   var p=PLATFORMS[source];if(!p)return;
   if(!C.serpKey){
-    // Fallback to redirect if no SerpAPI key
-    var url=p.url(svc,addr),city=extractCity(addr);
+    var url=p.url(svc,addr);
     var grid=document.getElementById('resultsGrid');
     document.getElementById('mapContainer').style.display='none';
     document.getElementById('resultsCount').innerHTML='Search on <span>'+esc(p.name)+'</span>';
@@ -536,28 +491,53 @@ async function searchPlatform(source,svc,addr){
 
   var st=document.getElementById('statusText'),sp=document.getElementById('spinner'),btn=document.getElementById('searchBtn'),
       em=document.getElementById('errorMsg'),rw=document.getElementById('resultsWrap'),grid=document.getElementById('resultsGrid');
-  btn.disabled=true;sp.classList.add('active');st.textContent='Searching '+p.name+' via SerpAPI...';
-  rw.classList.remove('visible');grid.innerHTML='';
+  btn.disabled=true;sp.classList.add('active');st.textContent='Searching '+p.name+'...';
+  rw.classList.remove('visible');grid.innerHTML='';em.classList.remove('show');
 
+  // FIX: Use a cleaner query that SerpAPI handles better
   var city=extractCity(addr);
-  var query=svc+' site:'+p.domain+' '+city;
+  var query=svc+' '+p.name+' '+city;
   try{
     var d=await px({mode:'serp',q:query,api_key:C.serpKey});
     if(d.error)throw new Error(d.error);
     var organic=d.organic_results||[];
 
-    if(!organic.length){
-      st.textContent='';em.textContent='No '+p.name+' listings found via SerpAPI for "'+svc+'" near '+city+'.';em.classList.add('show');
+    // Also try local results if available
+    var localResults=d.local_results||[];
+
+    if(!organic.length&&!localResults.length){
+      // Fallback: try direct platform URL search
+      query=svc+' '+city+' '+p.domain;
+      var d2=await px({mode:'serp',q:query,api_key:C.serpKey});
+      if(!d2.error)organic=(d2.organic_results||[]);
+    }
+
+    if(!organic.length&&!localResults.length){
+      st.textContent='';
+      em.textContent='No '+p.name+' listings found for "'+svc+'" near '+city+'. Try Google (Local) source instead.';
+      em.classList.add('show');
       btn.disabled=false;sp.classList.remove('active');return;
     }
 
     document.getElementById('mapContainer').style.display='none';
-    document.getElementById('resultsCount').innerHTML='<span>'+organic.length+'</span> results from '+esc(p.name);
+    var total=organic.length+localResults.length;
+    document.getElementById('resultsCount').innerHTML='<span>'+total+'</span> results from '+esc(p.name);
 
     var html='<div class="cards-grid">';
+    // Render local results first
+    html+=localResults.map(function(o,i){
+      return '<div class="result-card">'
+        +'<div class="card-top"><div class="card-name">'+esc(o.title||o.name||'Untitled')+'</div><div class="badge-num">'+(i+1)+'</div></div>'
+        +(o.address?'<div class="card-desc">'+esc(o.address)+'</div>':'')
+        +'<div class="card-meta"><span class="pill" style="background:'+p.color+';color:#fff">'+esc(p.name)+'</span>'
+        +(o.rating?'<span class="pill pill-neutral">&#9733; '+o.rating+'</span>':'')+'</div>'
+        +(o.phone?'<div class="card-actions"><a class="btn-a primary" href="tel:'+esc(o.phone)+'">&#128222; '+esc(o.phone)+'</a></div>':'')
+        +(o.links&&o.links.website?'<div class="card-actions"><a class="btn-a" href="'+esc(o.links.website)+'" target="_blank">&#127760; View Listing</a></div>':'')
+        +'</div>';
+    }).join('');
     html+=organic.map(function(o,i){
       return '<div class="result-card">'
-        +'<div class="card-top"><div class="card-name">'+esc(o.title||'Untitled')+'</div><div class="badge-num">'+(i+1)+'</div></div>'
+        +'<div class="card-top"><div class="card-name">'+esc(o.title||'Untitled')+'</div><div class="badge-num">'+(localResults.length+i+1)+'</div></div>'
         +(o.snippet?'<div class="card-desc">'+esc(o.snippet)+'</div>':'')
         +'<div class="card-meta"><span class="pill" style="background:'+p.color+';color:#fff">'+esc(p.name)+'</span></div>'
         +'<div class="card-actions"><a class="btn-a primary" href="'+esc(o.link)+'" target="_blank" rel="noopener">&#127760; View Listing</a></div>'
@@ -566,13 +546,14 @@ async function searchPlatform(source,svc,addr){
     html+='</div>';
     grid.innerHTML=html;
     rw.classList.add('visible');
-    btn.disabled=false;sp.classList.remove('active');st.textContent='Done — '+organic.length+' '+p.name+' listings found.';
+    btn.disabled=false;sp.classList.remove('active');st.textContent='Done — '+total+' results found.';
     refreshUsage();
   }catch(e){
     btn.disabled=false;sp.classList.remove('active');st.textContent='';
     em.textContent='SerpAPI error: '+e.message;em.classList.add('show');
   }
 }
+
 var allFetched=[],visibleResults=[],meetsArr=[],othersArr=[];
 
 function normAddr(r){var c=r.trim(),p=c.split(',');if(p.length>=3)return p.slice(-2).join(',').trim();return c;}
@@ -583,7 +564,8 @@ function sortArr(arr,by){
     if(by==='rating')return(b.rating||0)-(a.rating||0);
     if(by==='reviews')return(b.reviews||0)-(a.reviews||0);
     if(by==='distance'){
-      var da=a.driveMin!==null?a.driveMin:9999,db=b.driveMin!==null?b.driveMin:9999;
+      var da=a.distMiles!==null&&a.distMiles!==undefined?a.distMiles:9999;
+      var db=b.distMiles!==null&&b.distMiles!==undefined?b.distMiles:9999;
       return da-db;
     }
     return 0;
@@ -591,31 +573,27 @@ function sortArr(arr,by){
 }
 
 // ======================= LIVE FILTER + RADIUS =======================
+// FIX: Show ALL results always. Radius slider dims/highlights but never hides.
 function applyFilter(){
   var by=document.getElementById('liveFilter').value;
   var radiusMiles=currentRadius;
 
-  // Strict radius: only show results within the selected miles
-  // Results with no distance data are always included (can't determine)
-  var inRadius=allFetched.filter(function(r){
-    if(r.distMiles===null||r.distMiles===undefined)return true;
-    return r.distMiles<=radiusMiles;
-  });
-
-  // Split meets/others
+  // Split meets/others based on requirements — no radius hiding
   meetsArr=[];othersArr=[];
-  inRadius.forEach(function(r){
+  allFetched.forEach(function(r){
     var pr=r.rating!==null&&r.rating>=C.minRating;
     var pv=r.reviews>=C.minReviews;
     var pd=r.driveMin===null||r.driveMin<=C.maxDrive;
-    if(pr&&pv&&pd)meetsArr.push(r);else othersArr.push(r);
+    // Within radius OR no distance data → qualifies for meets (if rating/reviews ok)
+    var inR=r.distMiles===null||r.distMiles===undefined||r.distMiles<=radiusMiles;
+    if(pr&&pv&&pd&&inR)meetsArr.push(r);else othersArr.push(r);
   });
 
   meetsArr=sortArr(meetsArr,by);
   othersArr=sortArr(othersArr,by);
   visibleResults=meetsArr.concat(othersArr);
 
-  // Clear any pins/routes that are no longer visible
+  // Clear pins that are no longer in visible list
   Object.keys(cardPins).forEach(function(k){
     var stillVisible=visibleResults.some(function(r,i){return i===parseInt(k);});
     if(!stillVisible&&cardPins[k]){
@@ -628,9 +606,9 @@ function applyFilter(){
   var cnt=document.getElementById('resultsCount');
   var sel=document.getElementById('service');
   var svcLabel=sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'';
-  var hiddenCount=allFetched.length-inRadius.length;
-  cnt.innerHTML='<span>'+visibleResults.length+'</span> providers &mdash; '+esc(svcLabel)+' &mdash; within '+radiusMiles+' mi'
-    +(hiddenCount>0?' <span style="font-size:.75rem;color:var(--muted)">(+'+hiddenCount+' beyond radius)</span>':'');
+  cnt.innerHTML='<span>'+allFetched.length+'</span> providers &mdash; '+esc(svcLabel)
+    +' &mdash; <span style="font-size:.85rem;font-weight:400;color:var(--muted)">'
+    +meetsArr.length+' meet requirements within '+radiusMiles+' mi</span>';
 
   renderGrid(meetsArr,othersArr);
 }
@@ -649,7 +627,6 @@ async function doSearch(){
   originAddr=address;originCoords=null;cardPins={};allFetched=[];meetsArr=[];othersArr=[];visibleResults=[];
   var svcLabel=document.getElementById('service').options[document.getElementById('service').selectedIndex].text;
 
-  // Platform source — redirect instead of searching (no API keys needed)
   var source=document.getElementById('sourceSelect').value;
   if(source!=='google'){
     btn.disabled=false;sp.classList.remove('active');st.textContent='';
@@ -658,7 +635,6 @@ async function doSearch(){
     return;
   }
 
-  // Google — needs API keys
   if(!C.workerUrl||!C.mapsKey){nk.classList.add('show');return;}
   btn.disabled=true;sp.classList.add('active');rw.classList.remove('visible');grid.innerHTML='';
   document.getElementById('mapContainer').style.display='none';
@@ -671,7 +647,6 @@ async function doSearch(){
   }
 
   st.textContent='Searching Google Places for '+svcLabel+'...';
-
   var all=[];
   try{all=await searchPlaces(svcLabel,originCoords.lat,originCoords.lng);}catch(e){
     btn.disabled=false;sp.classList.remove('active');
@@ -695,10 +670,10 @@ async function doSearch(){
   else if(C.mapsKey)initGMaps();
 
   rw.classList.add('visible');
-  applyFilter(); // renders grid with current radius + sort
+  applyFilter();
 
   btn.disabled=false;sp.classList.remove('active');
-  st.textContent=allFetched.length+' total results fetched. Showing within '+currentRadius+' mi.';
+  st.textContent='Done — '+allFetched.length+' results found.';
 }
 
 // ======================= RENDER =======================
@@ -715,7 +690,7 @@ function renderGrid(meets,others){
     html+='</div>';
   }
   if(!meets.length&&!others.length){
-    html='<div style="padding:2rem;text-align:center;color:var(--muted);font-size:.9rem">No results within '+currentRadius+' miles.<br>Try sliding the radius wider.</div>';
+    html='<div style="padding:2rem;text-align:center;color:var(--muted);font-size:.9rem">No results found.</div>';
   }
   document.getElementById('resultsGrid').innerHTML=html;
 }
