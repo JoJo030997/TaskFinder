@@ -187,6 +187,13 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
     <div class="fields">
       <div class="field full"><label>Address / City / ZIP / Neighborhood</label><input type="text" id="address" placeholder="e.g. 49127 or 4564 Cleveland Ave., Stevensville MI"/></div>
       <div class="field"><label>Service Type</label><select id="service"></select></div>
+      <div class="field"><label>Search Source</label><select id="sourceSelect">
+        <option value="google">Google (Local)</option>
+        <option value="taskrabbit">TaskRabbit</option>
+        <option value="thumbtack">Thumbtack</option>
+        <option value="angi">Angi</option>
+        <option value="homeadvisor">HomeAdvisor</option>
+      </select></div>
     </div>
     <div class="filter-info" id="filterInfo"></div>
     <button class="search-btn" id="searchBtn" onclick="doSearch()">
@@ -424,7 +431,62 @@ async function getDriveTimes(origin,addrs){
   return out;
 }
 
-// ======================= STATE =======================
+// ======================= PLATFORM URLS =======================
+var PLATFORMS={
+  taskrabbit:{
+    name:'TaskRabbit',
+    url:function(svc,addr){
+      var city=extractCity(addr).toLowerCase().replace(/\s+/g,'-').replace(/,/g,'');
+      var s=svc.toLowerCase().replace(/\s+/g,'-').replace(/\//g,'');
+      return'https://www.taskrabbit.com/services/'+encodeURIComponent(s)+'/'+city;
+    }
+  },
+  thumbtack:{
+    name:'Thumbtack',
+    url:function(svc,addr){
+      var city=extractCity(addr);
+      return'https://www.thumbtack.com/k/'+encodeURIComponent(svc.toLowerCase())+'/near-me/?q='+encodeURIComponent(svc)+'&sa='+encodeURIComponent(city);
+    }
+  },
+  angi:{
+    name:'Angi',
+    url:function(svc,addr){
+      var city=extractCity(addr);
+      return'https://www.angi.com/companylist/us/'+encodeURIComponent(city.toLowerCase().replace(/[\s,]+/g,'-'))+'/'+encodeURIComponent(svc.toLowerCase().replace(/\s+/g,'-'))+'.htm';
+    }
+  },
+  homeadvisor:{
+    name:'HomeAdvisor',
+    url:function(svc,addr){
+      return'https://www.homeadvisor.com/c.'+encodeURIComponent(svc.replace(/\s+/g,'-'))+'.'+encodeURIComponent(extractCity(addr).replace(/[\s,]+/g,'-'))+'.html';
+    }
+  }
+};
+
+function extractCity(addr){
+  var p=addr.trim().split(',');
+  if(p.length>=2)return p.slice(-2).join(',').trim();
+  return addr.trim();
+}
+
+function openPlatform(source,svc,addr){
+  var p=PLATFORMS[source];if(!p)return;
+  var url=p.url(svc,addr);
+  // Show info panel
+  var grid=document.getElementById('resultsGrid');
+  var rw=document.getElementById('resultsWrap');
+  document.getElementById('mapContainer').style.display='none';
+  document.getElementById('resultsCount').innerHTML='Opening <span>'+esc(p.name)+'</span> for '+esc(svc);
+  grid.innerHTML='<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;text-align:center;">'
+    +'<div style="font-size:1rem;font-weight:600;margin-bottom:.5rem;">Searching '+esc(p.name)+'</div>'
+    +'<div style="font-size:.85rem;color:var(--muted);margin-bottom:1rem;">Opening '+esc(p.name)+' pre-filtered for <strong>'+esc(svc)+'</strong> near <strong>'+esc(extractCity(addr))+'</strong></div>'
+    +'<a href="'+esc(url)+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border:none;border-radius:9px;padding:10px 22px;font-size:.9rem;font-weight:600;text-decoration:none;cursor:pointer;">Open '+esc(p.name)+' &rarr;</a>'
+    +'<div style="font-size:.75rem;color:var(--muted);margin-top:1rem;">Results will open in a new tab on '+esc(p.name)+'\'s website</div>'
+    +'</div>';
+  rw.classList.add('visible');
+  // Auto open
+  setTimeout(function(){window.open(url,'_blank','noopener');},300);
+}
 var allFetched=[],visibleResults=[],meetsArr=[],othersArr=[];
 
 function normAddr(r){var c=r.trim(),p=c.split(',');if(p.length>=3)return p.slice(-2).join(',').trim();return c;}
@@ -500,6 +562,15 @@ async function doSearch(){
   if(!service){st.textContent='Select a service.';return;}
 
   originAddr=address;originCoords=null;cardPins={};allFetched=[];meetsArr=[];othersArr=[];visibleResults=[];
+
+  // Platform source — redirect instead of searching
+  var source=document.getElementById('sourceSelect').value;
+  if(source!=='google'){
+    btn.disabled=false;sp.classList.remove('active');st.textContent='';
+    rw.classList.remove('visible');grid.innerHTML='';
+    openPlatform(source,svcLabel,address);
+    return;
+  }
   btn.disabled=true;sp.classList.add('active');rw.classList.remove('visible');grid.innerHTML='';
   document.getElementById('mapContainer').style.display='none';
 
