@@ -7,22 +7,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--ink:#101014;--paper:#f5f3ef;--cream:#eae7e0;--accent:#c0452a;--accent2:#2963c8;--muted:#78756e;--border:#d6d1c9;--card:#ffffff;--sbg:#e8f5ec;--stx:#1a7a3a;--pbg:#e8eef8;--ptx:#1a4a7a;--wbg:#fff4e8;--wtx:#b06a00;--shadow:0 2px 12px rgba(0,0,0,0.07)}
+:root{--ink:#101014;--paper:#f5f3ef;--cream:#eae7e0;--accent:#c0452a;--accent2:#2963c8;--muted:#78756e;--border:#d6d1c9;--card:#fff;--sbg:#e8f5ec;--stx:#1a7a3a;--pbg:#e8eef8;--ptx:#1a4a7a;--wbg:#fff4e8;--wtx:#b06a00;--shadow:0 2px 12px rgba(0,0,0,.07)}
 body{font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
 
-header{background:var(--ink);padding:1.5rem;position:relative;overflow:hidden}
-header::before{content:'';position:absolute;top:-80px;right:-60px;width:260px;height:260px;border-radius:50%;background:var(--accent);opacity:.12}
-.h-inner{max-width:920px;margin:0 auto;position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
+header{background:var(--ink);padding:1.4rem 1.5rem;position:relative;overflow:hidden}
+header::before{content:'';position:absolute;top:-80px;right:-60px;width:240px;height:240px;border-radius:50%;background:var(--accent);opacity:.12}
+.h-inner{max-width:960px;margin:0 auto;position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
 .logo{font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700;color:#fff;letter-spacing:-.03em}
 .logo span{color:var(--accent)}
-.tagline{font-size:.8rem;color:#a09888;margin-top:2px}
+.tagline{font-size:.78rem;color:#a09888;margin-top:2px}
 .gear-btn{background:rgba(255,255,255,.1);border:none;color:#fff;width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center}
 .gear-btn:hover{background:rgba(255,255,255,.2)}
 
 /* OVERLAY */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:center;justify-content:center}
 .overlay.open{display:flex}
-.s-panel{background:var(--card);border-radius:14px;width:95%;max-width:600px;max-height:85vh;overflow-y:auto;padding:1.8rem;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.s-panel{background:var(--card);border-radius:14px;width:95%;max-width:580px;max-height:85vh;overflow-y:auto;padding:1.8rem;box-shadow:0 8px 40px rgba(0,0,0,.2)}
 .s-title{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between}
 .s-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted)}
 .s-sec{margin-bottom:1.3rem}
@@ -40,80 +40,83 @@ header::before{content:'';position:absolute;top:-80px;right:-60px;width:260px;he
 .key-hidden{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--stx)}
 
 /* MAIN */
-.wrap{max-width:920px;margin:0 auto;padding:1.5rem}
-.search-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.4rem;box-shadow:var(--shadow);margin-bottom:1rem}
-.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-@media(max-width:560px){.fields{grid-template-columns:1fr}}
+.wrap{max-width:960px;margin:0 auto;padding:1.4rem}
+.search-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.3rem;box-shadow:var(--shadow);margin-bottom:1rem}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:10px}
+@media(max-width:540px){.fields{grid-template-columns:1fr}}
 .field{display:flex;flex-direction:column;gap:4px}.field.full{grid-column:1/-1}
-.field label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
-input[type=text],input[type=number],input[type=password],select{border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.92rem;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);width:100%}
+.field label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+input[type=text],input[type=number],input[type=password],select{border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:.9rem;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);width:100%}
 input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(192,69,42,.1)}
-.filter-info{font-size:.78rem;color:var(--muted);margin-bottom:10px}
-
-.search-btn{width:100%;background:var(--ink);color:#fff;border:none;border-radius:9px;padding:12px;font-size:.95rem;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.filter-info{font-size:.76rem;color:var(--muted);margin-bottom:10px}
+.search-btn{width:100%;background:var(--ink);color:#fff;border:none;border-radius:9px;padding:11px;font-size:.93rem;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
 .search-btn:hover{background:#28282e}.search-btn:disabled{background:#b0aba4;cursor:not-allowed}
-.status-bar{margin-top:10px;font-size:.85rem;color:var(--muted);min-height:20px;display:flex;align-items:center;gap:8px}
-.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.status-bar{margin-top:9px;font-size:.83rem;color:var(--muted);min-height:20px;display:flex;align-items:center;gap:8px}
+.spinner{width:15px;height:15px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:none}
 .spinner.active{display:block}
 @keyframes spin{to{transform:rotate(360deg)}}
-.error-msg{background:#fff3f0;border:1px solid #f0c8c0;border-radius:10px;padding:.9rem;font-size:.85rem;color:var(--accent);margin-top:10px;display:none}.error-msg.show{display:block}
-.no-key-msg{background:#fff3f0;border:1px solid #f0c8c0;border-radius:10px;padding:.9rem;font-size:.85rem;color:var(--accent);margin-bottom:1rem;display:none}.no-key-msg.show{display:block}
+.error-msg{background:#fff3f0;border:1px solid #f0c8c0;border-radius:10px;padding:.85rem;font-size:.84rem;color:var(--accent);margin-top:9px;display:none}.error-msg.show{display:block}
+.no-key-msg{background:#fff3f0;border:1px solid #f0c8c0;border-radius:10px;padding:.85rem;font-size:.84rem;color:var(--accent);margin-bottom:1rem;display:none}.no-key-msg.show{display:block}
 
-/* MAP */
+/* RESULTS */
 .results-wrap{display:none}.results-wrap.visible{display:block}
-.results-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:8px}
-.results-count{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700}.results-count span{color:var(--accent)}
-.map-container{border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:1rem;height:350px;background:var(--cream)}
-.section-heading{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:1.2rem 0 .5rem;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.results-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:8px}
+.results-count{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700}.results-count span{color:var(--accent)}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:8px}
+.filter-bar label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+.filter-select{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:.83rem;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);cursor:pointer}
+.filter-select:focus{outline:none;border-color:var(--accent)}
+
+.map-container{border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:1rem;height:300px;background:var(--cream)}
+.section-heading{font-size:.76rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:1rem 0 .5rem;padding-bottom:5px;border-bottom:1px solid var(--border)}
 .section-heading:first-child{margin-top:0}
 .other-heading{color:#a09060;border-color:#e0d8c0}
 
-/* CARDS */
-.result-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:10px;animation:fadeUp .3s ease both;transition:box-shadow .15s,transform .15s}
-.result-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.09);transform:translateY(-1px)}
-.result-card.dimmed{opacity:.65}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px}
-.card-name{font-size:1rem;font-weight:600}
-.card-desc{font-size:.8rem;color:var(--muted);margin-bottom:6px;line-height:1.45}
-.card-meta{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
-.pill{font-size:.72rem;font-weight:500;padding:3px 9px;border-radius:20px}
+/* 2-COL CARD GRID */
+.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:620px){.cards-grid{grid-template-columns:1fr}}
+
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:.85rem 1rem;animation:fadeUp .3s ease both;transition:box-shadow .15s,transform .15s;display:flex;flex-direction:column;gap:5px}
+.result-card:hover{box-shadow:0 3px 16px rgba(0,0,0,.09);transform:translateY(-1px)}
+.result-card.dimmed{opacity:.62}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.card-name{font-size:.92rem;font-weight:600;line-height:1.3}
+.badge-num{width:22px;height:22px;border-radius:50%;background:var(--cream);color:var(--muted);font-size:.68rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-desc{font-size:.75rem;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{display:flex;flex-wrap:wrap;gap:4px}
+.pill{font-size:.68rem;font-weight:500;padding:2px 8px;border-radius:20px}
 .pill-platform{background:var(--pbg);color:var(--ptx)}.pill-local{background:var(--sbg);color:var(--stx)}
 .pill-neutral{background:var(--cream);color:var(--muted)}.pill-drive{background:var(--wbg);color:var(--wtx)}
-.stars{color:#e0a020;font-size:.82rem}
-.rating-line{margin-bottom:6px;font-size:.82rem}
-.rating-line .rv-link{color:var(--accent2);cursor:pointer;text-decoration:underline;font-size:.8rem}
-.rating-line .rv-link:hover{color:var(--accent)}
-
-.card-bottom{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
-.card-actions{display:flex;flex-wrap:wrap;gap:6px;flex:1}
-.card-minimap{width:140px;height:90px;border-radius:8px;border:1px solid var(--border);overflow:hidden;flex-shrink:0;background:var(--cream)}
-.card-minimap img{width:100%;height:100%;object-fit:cover}
-
-.btn-a{font-size:.78rem;font-weight:500;padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:var(--paper);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:background .12s}
+.stars{color:#e0a020;font-size:.78rem}
+.rating-line{font-size:.78rem;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.rv-link{color:var(--accent2);cursor:pointer;text-decoration:underline;font-size:.75rem}
+.rv-link:hover{color:var(--accent)}
+.card-actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.btn-a{font-size:.73rem;font-weight:500;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--paper);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:3px;transition:background .12s}
 .btn-a:hover{background:var(--cream)}
 .btn-a.primary{background:var(--ink);color:#fff;border-color:var(--ink)}.btn-a.primary:hover{background:#2a2a30}
-.badge-num{width:24px;height:24px;border-radius:50%;background:var(--cream);color:var(--muted);font-size:.72rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-
-.map-check{display:flex;align-items:center;gap:4px;font-size:.78rem;color:var(--muted);cursor:pointer;user-select:none;margin-top:4px}
-.map-check input{width:14px;height:14px;accent-color:var(--accent)}
+.map-check{display:flex;align-items:center;gap:4px;font-size:.73rem;color:var(--muted);cursor:pointer;user-select:none;margin-top:3px}
+.map-check input{width:13px;height:13px;accent-color:var(--accent);cursor:pointer}
 
 /* REVIEWS MODAL */
 .rv-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center}
 .rv-overlay.open{display:flex}
-.rv-panel{background:var(--card);border-radius:14px;width:95%;max-width:550px;max-height:80vh;overflow-y:auto;padding:1.6rem;box-shadow:0 8px 40px rgba(0,0,0,.25)}
-.rv-title{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between}
-.rv-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted)}
-.rv-item{border-bottom:1px solid var(--border);padding:.8rem 0}
+.rv-panel{background:var(--card);border-radius:14px;width:95%;max-width:520px;max-height:80vh;overflow-y:auto;padding:1.5rem;box-shadow:0 8px 40px rgba(0,0,0,.25)}
+.rv-title{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.9rem;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.rv-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);flex-shrink:0}
+.rv-item{border-bottom:1px solid var(--border);padding:.7rem 0}
 .rv-item:last-child{border-bottom:none}
-.rv-author{font-weight:600;font-size:.88rem;margin-bottom:2px}
-.rv-date{font-size:.75rem;color:var(--muted);margin-bottom:4px}
-.rv-stars{font-size:.82rem;color:#e0a020;margin-bottom:4px}
-.rv-text{font-size:.85rem;line-height:1.5;color:var(--ink)}
-.rv-loading{text-align:center;padding:2rem;color:var(--muted);font-size:.9rem}
-.rv-none{text-align:center;padding:1.5rem;color:var(--muted);font-size:.88rem}
+.rv-author{font-weight:600;font-size:.85rem}
+.rv-date{font-size:.72rem;color:var(--muted);margin-bottom:3px}
+.rv-stars{font-size:.78rem;color:#e0a020;margin-bottom:3px}
+.rv-text{font-size:.83rem;line-height:1.5}
+.rv-loading,.rv-none{text-align:center;padding:1.5rem;color:var(--muted);font-size:.88rem}
 
-footer{text-align:center;padding:1.5rem;font-size:.75rem;color:var(--muted);border-top:1px solid var(--border);margin-top:2rem}
+footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);border-top:1px solid var(--border);margin-top:2rem}
 </style>
 </head>
 <body>
@@ -126,12 +129,12 @@ footer{text-align:center;padding:1.5rem;font-size:.75rem;color:var(--muted);bord
 <div class="s-title">Settings<button class="s-close" onclick="toggleSettings()">&times;</button></div>
 <div class="s-sec"><div class="s-lbl">API Keys</div><div id="keysArea"></div></div>
 <div class="s-sec"><div class="s-lbl">Filter Requirements</div>
-<div class="s-row"><span style="font-size:.85rem;min-width:110px">Min Rating:</span><input type="number" class="s-inp s-inp-sm" id="setMinRating" step="0.1" min="1" max="5"/></div>
-<div class="s-row"><span style="font-size:.85rem;min-width:110px">Min Reviews:</span><input type="number" class="s-inp s-inp-sm" id="setMinReviews" min="0"/></div>
-<div class="s-row"><span style="font-size:.85rem;min-width:110px">Max Drive Time:</span><input type="number" class="s-inp s-inp-sm" id="setMaxDrive" min="1"/><span style="font-size:.82rem;color:var(--muted)">minutes</span></div>
+<div class="s-row"><span style="font-size:.85rem;min-width:115px">Min Rating:</span><input type="number" class="s-inp s-inp-sm" id="setMinRating" step="0.1" min="1" max="5"/></div>
+<div class="s-row"><span style="font-size:.85rem;min-width:115px">Min Reviews:</span><input type="number" class="s-inp s-inp-sm" id="setMinReviews" min="0"/></div>
+<div class="s-row"><span style="font-size:.85rem;min-width:115px">Max Drive Time:</span><input type="number" class="s-inp s-inp-sm" id="setMaxDrive" min="1"/><span style="font-size:.8rem;color:var(--muted)">min</span></div>
 <div class="s-row" style="margin-top:6px"><button class="s-btn s-btn-save" onclick="saveReq()">Save Requirements</button><span class="s-saved" id="reqSaved">&#10003; Saved</span></div>
 </div>
-<div class="s-sec"><div class="s-lbl">Service Types</div><div id="serviceChips"></div>
+<div class="s-sec"><div class="s-lbl">Service Types</div><div id="svcChips"></div>
 <div class="s-row" style="margin-top:8px"><input type="text" class="s-inp" id="newSvcInput" placeholder="Add new service type..."/><button class="s-btn s-btn-add" onclick="addSvc()">+ Add</button></div>
 </div>
 </div></div>
@@ -140,16 +143,15 @@ footer{text-align:center;padding:1.5rem;font-size:.75rem;color:var(--muted);bord
 <div class="rv-overlay" id="rvOverlay" onclick="if(event.target===this)closeReviews()">
 <div class="rv-panel">
 <div class="rv-title"><span id="rvTitle">Reviews</span><button class="rv-close" onclick="closeReviews()">&times;</button></div>
-<div id="rvBody"><div class="rv-loading">Loading reviews...</div></div>
+<div id="rvBody"></div>
 </div></div>
 
 <div class="wrap">
 <div class="no-key-msg" id="noKeyMsg">Configure your API keys in &#9881; Settings first.</div>
 <div class="search-card">
 <div class="fields">
-<div class="field full"><label>Address / City / ZIP / Neighborhood</label><input type="text" id="address" placeholder="e.g. 103 Riverwood Dr, Hendersonville TN 37075"/></div>
+<div class="field full"><label>Address / City / ZIP / Neighborhood</label><input type="text" id="address" placeholder="e.g. 4564 Cleveland Ave., Stevensville MI 49127"/></div>
 <div class="field"><label>Service Type</label><select id="service"></select></div>
-<div class="field"><label>Sort Results By</label><select id="sort"><option value="rating">Rating</option><option value="reviews">Most reviewed</option></select></div>
 </div>
 <div class="filter-info" id="filterInfo"></div>
 <button class="search-btn" id="searchBtn" onclick="doSearch()"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Find Providers</button>
@@ -158,7 +160,17 @@ footer{text-align:center;padding:1.5rem;font-size:.75rem;color:var(--muted);bord
 </div>
 
 <div class="results-wrap" id="resultsWrap">
-<div class="results-meta"><div class="results-count" id="resultsCount"></div></div>
+<div class="results-top">
+<div class="results-count" id="resultsCount"></div>
+<div class="filter-bar">
+<label>Sort by:</label>
+<select class="filter-select" id="liveFilter" onchange="applyFilter()">
+<option value="rating">Best Rated</option>
+<option value="reviews">Most Reviews</option>
+<option value="distance">Closest</option>
+</select>
+</div>
+</div>
 <div class="map-container" id="mapContainer" style="display:none"></div>
 <div id="resultsGrid"></div>
 </div>
@@ -173,7 +185,7 @@ function lc(){try{var s=localStorage.getItem('tf_config');if(s)Object.assign(C,J
 function sc(){localStorage.setItem('tf_config',JSON.stringify(C));}
 lc();
 
-// -- settings --
+// ---- SETTINGS ----
 function toggleSettings(){var o=document.getElementById('overlay');o.classList.toggle('open');if(o.classList.contains('open'))renderS();}
 function renderS(){
   var ka=document.getElementById('keysArea');
@@ -183,28 +195,34 @@ function renderS(){
     +'<div class="s-row"><span style="font-size:.85rem;min-width:90px">Google Maps:</span><input type="password" class="s-inp" id="sk3" value="'+(C.mapsKey||'')+'" placeholder="Google Maps API key"/></div>'
     +'<div class="s-row" style="margin-top:6px"><button class="s-btn s-btn-save" onclick="saveKeys()">Save &amp; Hide Keys</button><span class="s-saved" id="keySaved">&#10003; Saved</span></div>';
   } else {
-    ka.innerHTML='<div class="key-hidden">&#128274; Keys saved <button class="s-btn s-btn-add" onclick="C.keysVisible=true;renderS();">Edit</button></div>';
+    ka.innerHTML='<div class="key-hidden">&#128274; Keys saved &nbsp;<button class="s-btn s-btn-add" onclick="C.keysVisible=true;renderS()">Edit</button></div>';
   }
   document.getElementById('setMinRating').value=C.minRating;
   document.getElementById('setMinReviews').value=C.minReviews;
   document.getElementById('setMaxDrive').value=C.maxDrive;
   renderChips();updateFI();
 }
-function saveKeys(){C.serpKey=document.getElementById('sk1').value.trim();C.workerUrl=document.getElementById('sk2').value.trim().replace(/\/$/,'');C.mapsKey=document.getElementById('sk3').value.trim();C.keysVisible=false;sc();flash('keySaved');renderS();loadMap();}
+function saveKeys(){C.serpKey=document.getElementById('sk1').value.trim();C.workerUrl=document.getElementById('sk2').value.trim().replace(/\/$/,'');C.mapsKey=document.getElementById('sk3').value.trim();C.keysVisible=false;sc();flash('keySaved');renderS();initGMaps();}
 function saveReq(){C.minRating=parseFloat(document.getElementById('setMinRating').value)||4.7;C.minReviews=parseInt(document.getElementById('setMinReviews').value)||50;C.maxDrive=parseInt(document.getElementById('setMaxDrive').value)||20;sc();flash('reqSaved');updateFI();}
-function renderChips(){document.getElementById('serviceChips').innerHTML=C.services.map(function(s,i){return '<span class="s-chip">'+esc(s)+' <button onclick="rmSvc('+i+')">&times;</button></span>';}).join('');}
+function renderChips(){document.getElementById('svcChips').innerHTML=C.services.map(function(s,i){return'<span class="s-chip">'+esc(s)+' <button onclick="rmSvc('+i+')">&times;</button></span>';}).join('');}
 function addSvc(){var inp=document.getElementById('newSvcInput'),v=inp.value.trim();if(!v)return;if(C.services.indexOf(v)===-1)C.services.push(v);inp.value='';sc();renderChips();popSvc();}
 function rmSvc(i){C.services.splice(i,1);sc();renderChips();popSvc();}
 function flash(id){var e=document.getElementById(id);e.classList.add('show');setTimeout(function(){e.classList.remove('show');},2000);}
-function updateFI(){var e=document.getElementById('filterInfo');if(e)e.textContent='Filters: Rating \u2265 '+C.minRating+' \u00b7 Reviews \u2265 '+C.minReviews+' \u00b7 Drive \u2264 '+C.maxDrive+' min';}
+function updateFI(){var e=document.getElementById('filterInfo');if(e)e.textContent='Requirements: Rating \u2265 '+C.minRating+' \u00b7 Reviews \u2265 '+C.minReviews+' \u00b7 Drive \u2264 '+C.maxDrive+' min';}
 function popSvc(){var s=document.getElementById('service'),p=s.value;s.innerHTML='<option value="">Select a service...</option>';C.services.forEach(function(v){var o=document.createElement('option');o.value=v.toLowerCase();o.textContent=v;s.appendChild(o);});s.value=p;}
 
-// -- Google Maps --
-var gmap,gmarkers=[],mapsOk=false,originAddr='';
-function loadMap(){if(mapsOk||!C.mapsKey)return;var s=document.createElement('script');s.src='https://maps.googleapis.com/maps/api/js?key='+C.mapsKey+'&callback=onMR';s.async=true;document.body.appendChild(s);}
+// ---- GOOGLE MAPS ----
+var gmap,gmarkers=[],mapsOk=false,originAddr='',originCoords=null;
+function initGMaps(){
+  if(mapsOk||!C.mapsKey)return;
+  if(typeof google!=='undefined'&&google.maps){mapsOk=true;return;}
+  var s=document.createElement('script');
+  s.src='https://maps.googleapis.com/maps/api/js?key='+C.mapsKey+'&callback=onMR';
+  s.async=true;document.body.appendChild(s);
+}
 window.onMR=function(){mapsOk=true;};
 
-function initMap(lat,lng){
+function setupMap(lat,lng){
   var c=document.getElementById('mapContainer');c.style.display='block';
   gmap=new google.maps.Map(c,{center:{lat:lat,lng:lng},zoom:11,styles:[{featureType:'poi',stylers:[{visibility:'off'}]}]});
   gmarkers.forEach(function(m){m.setMap(null);});gmarkers=[];
@@ -212,95 +230,117 @@ function initMap(lat,lng){
   gmarkers.push(om);
 }
 
-var cardMarkers={};
+var cardPins={};
 function togglePin(idx){
-  var r=allResults[idx];
-  if(!r||!gmap)return;
-  var cb=document.getElementById('mcheck_'+idx);
+  var r=allResults[idx];if(!r)return;
+  var cb=document.getElementById('mc_'+idx);
+  if(!cb)return;
   if(cb.checked){
-    if(r.gps&&r.gps.latitude){
+    if(r.gps&&r.gps.latitude&&r.gps.longitude&&gmap){
       var m=new google.maps.Marker({position:{lat:r.gps.latitude,lng:r.gps.longitude},map:gmap,title:r.name,
         label:{text:String(idx+1),color:'#fff',fontSize:'11px',fontWeight:'600'}});
-      cardMarkers[idx]=m;gmarkers.push(m);
+      cardPins[idx]=m;gmarkers.push(m);
       var b=new google.maps.LatLngBounds();gmarkers.forEach(function(mk){b.extend(mk.getPosition());});gmap.fitBounds(b);
     }
   } else {
-    if(cardMarkers[idx]){cardMarkers[idx].setMap(null);var mi=gmarkers.indexOf(cardMarkers[idx]);if(mi>-1)gmarkers.splice(mi,1);delete cardMarkers[idx];}
+    if(cardPins[idx]){cardPins[idx].setMap(null);var mi=gmarkers.indexOf(cardPins[idx]);if(mi>-1)gmarkers.splice(mi,1);delete cardPins[idx];}
   }
 }
 
-// -- Proxy helpers --
-async function proxyFetch(params){
-  var url=C.workerUrl+'?'+Object.keys(params).map(function(k){return k+'='+encodeURIComponent(params[k]);}).join('&');
-  var r=await fetch(url);if(!r.ok)throw new Error('Proxy '+r.status);return r.json();
+// ---- PROXY ----
+async function px(params){
+  var qs=Object.keys(params).map(function(k){return k+'='+encodeURIComponent(params[k]);}).join('&');
+  var r=await fetch(C.workerUrl+'?'+qs);
+  if(!r.ok)throw new Error('Proxy '+r.status);
+  return r.json();
 }
 
 async function geocode(addr){
   if(!C.mapsKey)return null;
-  var d=await proxyFetch({mode:'geocode',address:addr,key:C.mapsKey});
-  if(d.results&&d.results.length>0)return d.results[0].geometry.location;
+  try{var d=await px({mode:'geocode',address:addr,key:C.mapsKey});if(d.results&&d.results.length)return d.results[0].geometry.location;}catch(e){}
   return null;
 }
 
 async function getDriveTimes(origin,addrs){
-  if(!C.mapsKey||addrs.length===0)return[];
-  var results=[];
+  if(!C.mapsKey||!addrs.length)return[];
+  var out=[];
   for(var i=0;i<addrs.length;i+=25){
     var batch=addrs.slice(i,i+25);
-    var dests=batch.join('|');
     try{
-      var d=await proxyFetch({mode:'distance',origins:origin,destinations:dests,key:C.mapsKey});
+      var d=await px({mode:'distance',origins:origin,destinations:batch.join('|'),key:C.mapsKey});
       if(d.rows&&d.rows[0]&&d.rows[0].elements){
         d.rows[0].elements.forEach(function(el){
-          if(el.status==='OK')results.push({driveMin:Math.round(el.duration.value/60),driveTxt:el.duration.text,distTxt:el.distance.text});
-          else results.push({driveMin:null,driveTxt:null,distTxt:null});
+          out.push(el.status==='OK'?{driveMin:Math.round(el.duration.value/60),driveTxt:el.duration.text,distTxt:el.distance.text}:{driveMin:null,driveTxt:null,distTxt:null});
         });
       }
-    }catch(e){batch.forEach(function(){results.push({driveMin:null,driveTxt:null,distTxt:null});});}
+    }catch(e){batch.forEach(function(){out.push({driveMin:null,driveTxt:null,distTxt:null});});}
   }
-  return results;
+  return out;
 }
 
-// -- SerpAPI --
+// ---- SERP ----
 function normAddr(r){var c=r.trim(),p=c.split(',');if(p.length>=3)return p.slice(-2).join(',').trim();return c;}
 function buildQ(svc,loc){return[svc+' '+loc,svc+' TaskRabbit '+loc,svc+' Thumbtack '+loc,svc+' Angi '+loc,'best '+svc+' near '+loc];}
 function detSrc(n,q){var s=(n+' '+q).toLowerCase();if(s.indexOf('taskrabbit')>-1)return'TaskRabbit';if(s.indexOf('thumbtack')>-1)return'Thumbtack';if(s.indexOf('angi')>-1)return'Angi';if(s.indexOf('homeadvisor')>-1)return'HomeAdvisor';if(s.indexOf('handy')>-1)return'Handy';return'Local';}
 function detType(n,q){var pl=['taskrabbit','thumbtack','angi','homeadvisor','handy'],s=(n+' '+q).toLowerCase();for(var i=0;i<pl.length;i++){if(s.indexOf(pl[i])>-1)return'platform';}return'local';}
 
 async function fetchQ(query){
-  var d=await proxyFetch({mode:'serp',q:query,api_key:C.serpKey});
+  var d=await px({mode:'serp',q:query,api_key:C.serpKey});
   if(d.error)throw new Error(d.error);
   return(d.local_results||[]).map(function(p){
     return{name:p.title||'Unknown',type:detType(p.title||'',query),source:detSrc(p.title||'',query),
       rating:p.rating?parseFloat(p.rating):null,reviews:p.reviews||0,price:p.price||null,
-      distance:p.distance||null,phone:p.phone||null,website:p.website||p.link||null,
-      address:p.address||null,desc:p.description||p.type||'',gps:p.gps_coordinates||null,
-      driveMin:null,driveTxt:null,distTxt:null,placeId:p.place_id||null};
+      distance:p.distance?parseFloat(p.distance):null,distanceRaw:p.distance||null,
+      phone:p.phone||null,website:p.website||p.link||null,address:p.address||null,
+      desc:p.description||p.type||'',gps:p.gps_coordinates||null,
+      driveMin:null,driveTxt:null,distTxt:null,
+      snippetReviews:p.reviews_data||[]};
   });
 }
+
 function dedup(r){var s={};return r.filter(function(x){var k=x.name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,20);if(s[k])return false;s[k]=true;return true;});}
-function sortR(r,by){return r.slice().sort(function(a,b){if(by==='rating')return(b.rating||0)-(a.rating||0);if(by==='reviews')return(b.reviews||0)-(a.reviews||0);return 0;});}
 
-// -- MAIN --
-var allResults=[];
+function sortArr(arr,by){
+  return arr.slice().sort(function(a,b){
+    if(by==='rating')return(b.rating||0)-(a.rating||0);
+    if(by==='reviews')return(b.reviews||0)-(a.reviews||0);
+    if(by==='distance'){
+      var da=a.driveMin!==null?a.driveMin:(a.distance!==null?a.distance*10:9999);
+      var db=b.driveMin!==null?b.driveMin:(b.distance!==null?b.distance*10:9999);
+      return da-db;
+    }
+    return 0;
+  });
+}
 
+// ---- STATE ----
+var allResults=[],meetsArr=[],othersArr=[];
+
+// ---- LIVE FILTER ----
+function applyFilter(){
+  var by=document.getElementById('liveFilter').value;
+  var sm=sortArr(meetsArr,by),so=sortArr(othersArr,by);
+  allResults=sm.concat(so);
+  renderGrid(sm,so);
+}
+
+// ---- MAIN ----
 async function doSearch(){
-  var address=document.getElementById('address').value.trim(),service=document.getElementById('service').value,sort=document.getElementById('sort').value;
+  var address=document.getElementById('address').value.trim(),service=document.getElementById('service').value;
   var st=document.getElementById('statusText'),sp=document.getElementById('spinner'),btn=document.getElementById('searchBtn'),
-    em=document.getElementById('errorMsg'),nk=document.getElementById('noKeyMsg'),rw=document.getElementById('resultsWrap'),
-    grid=document.getElementById('resultsGrid'),cnt=document.getElementById('resultsCount');
+    em=document.getElementById('errorMsg'),nk=document.getElementById('noKeyMsg'),
+    rw=document.getElementById('resultsWrap'),grid=document.getElementById('resultsGrid'),cnt=document.getElementById('resultsCount');
 
   nk.classList.remove('show');em.classList.remove('show');
   if(!C.serpKey||!C.workerUrl){nk.classList.add('show');return;}
   if(!address){st.textContent='Enter an address.';return;}
   if(!service){st.textContent='Select a service.';return;}
 
-  originAddr=address;
+  originAddr=address;originCoords=null;cardPins={};
   btn.disabled=true;sp.classList.add('active');rw.classList.remove('visible');grid.innerHTML='';
-  document.getElementById('mapContainer').style.display='none';cardMarkers={};
+  document.getElementById('mapContainer').style.display='none';
 
-  var oc=null;
-  if(C.mapsKey){st.textContent='Locating address...';oc=await geocode(address);}
+  if(C.mapsKey){st.textContent='Locating address...';originCoords=await geocode(address);}
 
   var loc=normAddr(address),qs=buildQ(service,loc),all=[];
   for(var i=0;i<qs.length;i++){
@@ -309,124 +349,138 @@ async function doSearch(){
   }
   all=dedup(all);
 
-  if(all.length===0){btn.disabled=false;sp.classList.remove('active');st.textContent='';em.textContent='No results found. Try a broader location.';em.classList.add('show');return;}
+  if(!all.length){btn.disabled=false;sp.classList.remove('active');st.textContent='';em.textContent='No results found. Try a broader location.';em.classList.add('show');return;}
 
-  if(C.mapsKey&&all.length>0){
+  if(C.mapsKey&&all.length){
     st.textContent='Calculating drive times...';
     var addrs=all.map(function(r){return r.address||r.name+' '+loc;});
     var times=await getDriveTimes(address,addrs);
-    times.forEach(function(t,idx){if(idx<all.length){all[idx].driveMin=t.driveMin;all[idx].driveTxt=t.driveTxt;all[idx].distTxt=t.distTxt;}});
+    times.forEach(function(t,i){if(i<all.length){all[i].driveMin=t.driveMin;all[i].driveTxt=t.driveTxt;all[i].distTxt=t.distTxt;}});
   }
 
-  // split
-  var meets=[],others=[];
+  // split meets / others
+  meetsArr=[];othersArr=[];
   all.forEach(function(r){
     var pr=r.rating!==null&&r.rating>=C.minRating,pv=r.reviews>=C.minReviews,pd=r.driveMin===null||r.driveMin<=C.maxDrive;
     r._meets=pr&&pv&&pd;
-    if(r._meets)meets.push(r);else others.push(r);
+    if(r._meets)meetsArr.push(r);else othersArr.push(r);
   });
-  meets=sortR(meets,sort);others=sortR(others,sort);
-  allResults=meets.concat(others);
 
-  if(mapsOk&&oc)initMap(oc.lat,oc.lng);
+  var by=document.getElementById('liveFilter').value;
+  meetsArr=sortArr(meetsArr,by);othersArr=sortArr(othersArr,by);
+  allResults=meetsArr.concat(othersArr);
+
+  if(mapsOk&&originCoords)setupMap(originCoords.lat,originCoords.lng);
 
   var svcLabel=document.getElementById('service').options[document.getElementById('service').selectedIndex].text;
-  var html='';
-  if(meets.length>0){
-    html+='<div class="section-heading">&#10003; Meets Requirements ('+meets.length+')</div>';
-    html+=meets.map(function(r,i){return renderCard(r,i,false);}).join('');
-  }
-  if(others.length>0){
-    html+='<div class="section-heading other-heading">&#128203; Other Results ('+others.length+')</div>';
-    html+=others.map(function(r,i){return renderCard(r,meets.length+i,true);}).join('');
-  }
-
-  cnt.innerHTML='<span>'+allResults.length+'</span> providers &mdash; '+svcLabel;
-  grid.innerHTML=html;rw.classList.add('visible');
+  cnt.innerHTML='<span>'+allResults.length+'</span> providers &mdash; '+esc(svcLabel);
+  renderGrid(meetsArr,othersArr);
+  rw.classList.add('visible');
   btn.disabled=false;sp.classList.remove('active');
-  st.textContent=meets.length+' meet requirements, '+others.length+' others.';
+  st.textContent=meetsArr.length+' meet requirements, '+othersArr.length+' others.';
 }
 
-// -- RENDER CARD --
+function renderGrid(meets,others){
+  var html='';
+  if(meets.length){
+    html+='<div class="section-heading">&#10003; Meets Requirements ('+meets.length+')</div><div class="cards-grid">';
+    html+=meets.map(function(r){return renderCard(r,allResults.indexOf(r),false);}).join('');
+    html+='</div>';
+  }
+  if(others.length){
+    html+='<div class="section-heading other-heading">&#128203; Other Results ('+others.length+')</div><div class="cards-grid">';
+    html+=others.map(function(r){return renderCard(r,allResults.indexOf(r),true);}).join('');
+    html+='</div>';
+  }
+  document.getElementById('resultsGrid').innerHTML=html;
+}
+
+// ---- RENDER CARD ----
 function starsH(r){if(!r)return'';var n=parseFloat(r),f=Math.floor(n),h=n%1>=.5?1:0;return'\u2605'.repeat(f)+(h?'\u00BD':'')+'\u2606'.repeat(5-f-h);}
 
 function renderCard(r,idx,dimmed){
-  var cls='result-card'+(dimmed?' dimmed':''),delay=(idx%20*40)+'ms';
+  var delay=(idx%10*30)+'ms',cls='result-card'+(dimmed?' dimmed':'');
   var tc=r.type==='platform'?'pill-platform':'pill-local',tl=r.type==='platform'?r.source:'Local';
-  var rh=r.rating?'<span class="stars">'+starsH(r.rating)+'</span> <strong>'+r.rating.toFixed(1)+'</strong> <span class="rv-link" onclick="openReviews('+idx+')">('+r.reviews.toLocaleString()+' reviews)</span>':'<span style="color:var(--muted)">No rating</span>';
+  var rh=r.rating
+    ?'<span class="stars">'+starsH(r.rating)+'</span><strong>'+r.rating.toFixed(1)+'</strong> <span class="rv-link" onclick="openReviews('+idx+')">('+r.reviews.toLocaleString()+')</span>'
+    :'<span style="color:var(--muted)">No rating</span>';
 
   var pills='<span class="pill '+tc+'">'+tl+'</span>';
   if(r.price)pills+='<span class="pill pill-neutral">'+esc(r.price)+'</span>';
   if(r.driveTxt)pills+='<span class="pill pill-drive">\uD83D\uDE97 '+esc(r.driveTxt)+'</span>';
   if(r.distTxt)pills+='<span class="pill pill-neutral">'+esc(r.distTxt)+'</span>';
-  else if(r.distance)pills+='<span class="pill pill-neutral">'+esc(r.distance)+'</span>';
+  else if(r.distanceRaw)pills+='<span class="pill pill-neutral">'+esc(r.distanceRaw)+' mi</span>';
 
   var acts='';
   if(r.phone)acts+='<a class="btn-a primary" href="tel:'+r.phone+'">&#128222; '+esc(r.phone)+'</a>';
   if(r.website)acts+='<a class="btn-a" href="'+esc(r.website)+'" target="_blank">&#127760; Site</a>';
   if(r.address)acts+='<a class="btn-a" href="https://maps.google.com/maps/dir/?api=1&origin='+encodeURIComponent(originAddr)+'&destination='+encodeURIComponent(r.address)+'" target="_blank">&#128205; Directions</a>';
 
-  // mini static map
-  var minimap='';
-  if(C.mapsKey&&r.address){
-    var src='https://maps.googleapis.com/maps/api/staticmap?size=280x180&markers=color:red|'+encodeURIComponent(r.address)+'&markers=color:blue|'+encodeURIComponent(originAddr)+'&key='+C.mapsKey+'&zoom=11';
-    minimap='<div class="card-minimap"><img src="'+src+'" alt="Map" loading="lazy"/></div>';
-  }
+  // checkbox — always render, works once map loads
+  var chk='<label class="map-check"><input type="checkbox" id="mc_'+idx+'" onchange="togglePin('+idx+')"/> Show on map</label>';
 
-  var mapCheck='';
-  if(mapsOk&&r.gps&&r.gps.latitude){
-    mapCheck='<label class="map-check"><input type="checkbox" id="mcheck_'+idx+'" onchange="togglePin('+idx+')"/> Show on map</label>';
-  }
-
-  return '<div class="'+cls+'" style="animation-delay:'+delay+'"><div class="card-top"><div class="card-name">'+esc(r.name)+'</div><div class="badge-num">'+(idx+1)+'</div></div>'
+  return '<div class="'+cls+'" style="animation-delay:'+delay+'">'
+    +'<div class="card-top"><div class="card-name">'+esc(r.name)+'</div><div class="badge-num">'+(idx+1)+'</div></div>'
     +(r.desc?'<div class="card-desc">'+esc(r.desc)+'</div>':'')
     +'<div class="card-meta">'+pills+'</div>'
     +'<div class="rating-line">'+rh+'</div>'
-    +'<div class="card-bottom"><div><div class="card-actions">'+acts+'</div>'+mapCheck+'</div>'+minimap+'</div>'
+    +'<div class="card-actions">'+acts+'</div>'
+    +chk
     +'</div>';
 }
 
-// -- REVIEWS --
+// ---- REVIEWS ----
 async function openReviews(idx){
   var r=allResults[idx];if(!r)return;
-  document.getElementById('rvTitle').textContent=r.name+' \u2014 Reviews';
+  document.getElementById('rvTitle').textContent=r.name;
   document.getElementById('rvBody').innerHTML='<div class="rv-loading">Loading reviews...</div>';
   document.getElementById('rvOverlay').classList.add('open');
 
-  try{
-    // 1. Find place_id
-    var searchName=r.name+(r.address?' '+r.address:'');
-    var findRes=await proxyFetch({mode:'places_find',q:searchName,key:C.mapsKey});
-    var pid=null;
-    if(findRes.candidates&&findRes.candidates.length>0)pid=findRes.candidates[0].place_id;
+  // Try Google Places
+  if(C.mapsKey){
+    try{
+      // Build a targeted search: name + city from address
+      var city='';
+      if(r.address){var parts=r.address.split(',');city=parts.length>1?parts.slice(-2).join(','):'';} 
+      var searchQ=r.name+(city?' '+city.trim():'')+(r.address?' '+r.address:'');
 
-    if(!pid){document.getElementById('rvBody').innerHTML='<div class="rv-none">Could not find this place on Google Maps.</div>';return;}
+      var findRes=await px({mode:'places_find',q:searchQ,key:C.mapsKey});
+      var pid=null;
+      if(findRes.candidates&&findRes.candidates.length)pid=findRes.candidates[0].place_id;
 
-    // 2. Get details with reviews
-    var det=await proxyFetch({mode:'places_details',place_id:pid,key:C.mapsKey});
-    if(!det.result||!det.result.reviews||det.result.reviews.length===0){
-      document.getElementById('rvBody').innerHTML='<div class="rv-none">No reviews found for this business.</div>';return;
-    }
-
-    var reviews=det.result.reviews;
-    var html=reviews.map(function(rv){
-      return '<div class="rv-item">'
-        +'<div class="rv-author">'+esc(rv.author_name||'Anonymous')+'</div>'
-        +'<div class="rv-date">'+esc(rv.relative_time_description||'')+'</div>'
-        +'<div class="rv-stars">'+starsH(rv.rating)+'</div>'
-        +'<div class="rv-text">'+esc(rv.text||'No comment')+'</div>'
-        +'</div>';
-    }).join('');
-
-    document.getElementById('rvBody').innerHTML=html;
-  }catch(e){
-    document.getElementById('rvBody').innerHTML='<div class="rv-none">Error loading reviews: '+esc(e.message)+'</div>';
+      if(pid){
+        var det=await px({mode:'places_details',place_id:pid,key:C.mapsKey});
+        if(det.result&&det.result.reviews&&det.result.reviews.length){
+          renderReviews(det.result.reviews);return;
+        }
+      }
+    }catch(e){console.warn('Places reviews failed',e);}
   }
-}
-function closeReviews(){document.getElementById('rvOverlay').classList.remove('open');}
 
+  // Fallback: show snippet reviews from SerpAPI
+  if(r.snippetReviews&&r.snippetReviews.length){
+    renderReviews(r.snippetReviews.map(function(rv){
+      return{author_name:rv.username||rv.user||'Anonymous',relative_time_description:rv.date||'',rating:rv.rating||null,text:rv.snippet||rv.text||''};
+    }));
+    return;
+  }
+
+  document.getElementById('rvBody').innerHTML='<div class="rv-none">No reviews available for this business.<br><br>'+(r.website?'<a href="'+esc(r.website)+'" target="_blank" style="color:var(--accent2)">Visit their website</a>':'')+'</div>';
+}
+
+function renderReviews(reviews){
+  document.getElementById('rvBody').innerHTML=reviews.map(function(rv){
+    return'<div class="rv-item"><div class="rv-author">'+esc(rv.author_name||'Anonymous')+'</div>'
+      +'<div class="rv-date">'+esc(rv.relative_time_description||'')+'</div>'
+      +(rv.rating?'<div class="rv-stars">'+starsH(rv.rating)+'</div>':'')
+      +'<div class="rv-text">'+esc(rv.text||'No comment')+'</div></div>';
+  }).join('');
+}
+
+function closeReviews(){document.getElementById('rvOverlay').classList.remove('open');}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-popSvc();updateFI();if(C.mapsKey)loadMap();
+
+popSvc();updateFI();initGMaps();
 </script>
 </body>
 </html>
