@@ -562,6 +562,7 @@ async function doSearch(){
   if(!service){st.textContent='Select a service.';return;}
 
   originAddr=address;originCoords=null;cardPins={};allFetched=[];meetsArr=[];othersArr=[];visibleResults=[];
+  var svcLabel=document.getElementById('service').options[document.getElementById('service').selectedIndex].text;
 
   // Platform source — redirect instead of searching
   var source=document.getElementById('sourceSelect').value;
@@ -581,7 +582,6 @@ async function doSearch(){
     em.textContent='Could not locate that address. Try a full address or city, state.';em.classList.add('show');return;
   }
 
-  var svcLabel=document.getElementById('service').options[document.getElementById('service').selectedIndex].text;
   st.textContent='Searching Google Places for '+svcLabel+'...';
 
   var all=[];
