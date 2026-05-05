@@ -266,44 +266,84 @@ function onRadiusChange(v){
 }
 
 // ======================= GOOGLE MAPS =======================
-var gmap,gmarkers=[],mapsOk=false,originAddr='',originCoords=null,cardPins={};
+var gmap,gmarkers=[],mapsOk=false,originAddr='',originCoords=null,cardPins={},cardRoutes={};
+var directionsService=null;
 
 function initGMaps(){
   if(mapsOk||!C.mapsKey)return;
-  if(typeof google!=='undefined'&&google.maps){mapsOk=true;return;}
+  if(typeof google!=='undefined'&&google.maps){mapsOk=true;directionsService=new google.maps.DirectionsService();return;}
   var s=document.createElement('script');
-  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(C.mapsKey)+'&callback=onMR';
+  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(C.mapsKey)+'&libraries=directions&callback=onMR';
   s.async=true;document.body.appendChild(s);
 }
-window.onMR=function(){mapsOk=true;};
+window.onMR=function(){mapsOk=true;directionsService=new google.maps.DirectionsService();};
 
 function setupMap(lat,lng){
   var c=document.getElementById('mapContainer');c.style.display='block';
   gmap=new google.maps.Map(c,{center:{lat:lat,lng:lng},zoom:11,
     styles:[{featureType:'poi',stylers:[{visibility:'off'}]},{featureType:'transit',stylers:[{visibility:'simplified'}]}]});
-  gmarkers.forEach(function(m){m.setMap(null);});gmarkers=[];cardPins={};
+  // Clear old markers and routes
+  gmarkers.forEach(function(m){m.setMap(null);});gmarkers=[];
+  Object.keys(cardRoutes).forEach(function(k){if(cardRoutes[k])cardRoutes[k].setMap(null);});
+  cardPins={};cardRoutes={};
   var om=new google.maps.Marker({position:{lat:lat,lng:lng},map:gmap,
     icon:{url:'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'},title:'Your location'});
   gmarkers.push(om);
 }
 
+// Route colors — each pin gets its own color
+var ROUTE_COLORS=['#c0452a','#2963c8','#1a7a3a','#b06a00','#7b2d8b','#0097a7','#e65100','#37474f'];
+
 async function togglePin(idx){
   var r=visibleResults[idx];if(!r||!gmap)return;
   var cb=document.getElementById('mc_'+idx);if(!cb)return;
+
   if(cb.checked){
+    // Get coords
     var lat=r.lat,lng=r.lng;
     if(!lat&&r.address){
-      try{var d=await px({mode:'geocode',address:r.address,key:C.mapsKey});if(d.results&&d.results.length){lat=d.results[0].geometry.location.lat;lng=d.results[0].geometry.location.lng;r.lat=lat;r.lng=lng;}}catch(e){}
+      try{
+        var d=await px({mode:'geocode',address:r.address,key:C.mapsKey});
+        if(d.results&&d.results.length){lat=d.results[0].geometry.location.lat;lng=d.results[0].geometry.location.lng;r.lat=lat;r.lng=lng;}
+      }catch(e){}
     }
-    if(lat&&lng){
-      var m=new google.maps.Marker({position:{lat:lat,lng:lng},map:gmap,title:r.name,
-        label:{text:String(idx+1),color:'#fff',fontSize:'11px',fontWeight:'600'}});
-      cardPins[idx]=m;gmarkers.push(m);
-      var b=new google.maps.LatLngBounds();gmarkers.forEach(function(mk){b.extend(mk.getPosition());});
-      gmap.fitBounds(b);if(gmarkers.length<=2)gmap.setZoom(13);
-    } else {cb.checked=false;alert('Could not locate this business on the map.');}
+    if(!lat||!lng){cb.checked=false;alert('Could not locate this business.');return;}
+
+    // Place marker
+    var color=ROUTE_COLORS[Object.keys(cardPins).length%ROUTE_COLORS.length];
+    var m=new google.maps.Marker({
+      position:{lat:lat,lng:lng},map:gmap,title:r.name,
+      label:{text:String(idx+1),color:'#fff',fontSize:'11px',fontWeight:'600'},
+      icon:{path:google.maps.SymbolPath.CIRCLE,scale:14,fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
+    });
+    cardPins[idx]=m;gmarkers.push(m);
+
+    // Draw route from origin to this pin
+    if(directionsService&&originCoords){
+      var routeRenderer=new google.maps.DirectionsRenderer({
+        map:gmap,
+        suppressMarkers:true,
+        polylineOptions:{strokeColor:color,strokeWeight:4,strokeOpacity:0.75}
+      });
+      directionsService.route({
+        origin:new google.maps.LatLng(originCoords.lat,originCoords.lng),
+        destination:new google.maps.LatLng(lat,lng),
+        travelMode:google.maps.TravelMode.DRIVING
+      },function(result,status){
+        if(status==='OK'){routeRenderer.setDirections(result);cardRoutes[idx]=routeRenderer;}
+      });
+    }
+
+    // Fit bounds
+    var b=new google.maps.LatLngBounds();
+    gmarkers.forEach(function(mk){b.extend(mk.getPosition());});
+    gmap.fitBounds(b);if(gmarkers.length<=2)gmap.setZoom(13);
+
   } else {
+    // Remove marker
     if(cardPins[idx]){cardPins[idx].setMap(null);var mi=gmarkers.indexOf(cardPins[idx]);if(mi>-1)gmarkers.splice(mi,1);delete cardPins[idx];}
+    // Remove route
+    if(cardRoutes[idx]){cardRoutes[idx].setMap(null);delete cardRoutes[idx];}
   }
 }
 
@@ -407,17 +447,14 @@ function applyFilter(){
   var by=document.getElementById('liveFilter').value;
   var radiusMiles=currentRadius;
 
-  // Filter allFetched by radius first
+  // Strict radius: only show results within the selected miles
+  // Results with no distance data are always included (can't determine)
   var inRadius=allFetched.filter(function(r){
-    if(r.distMiles===null)return true; // include if no distance data
+    if(r.distMiles===null||r.distMiles===undefined)return true;
     return r.distMiles<=radiusMiles;
   });
-  var outside=allFetched.filter(function(r){
-    if(r.distMiles===null)return false;
-    return r.distMiles>radiusMiles;
-  });
 
-  // Split meets/others within radius
+  // Split meets/others
   meetsArr=[];othersArr=[];
   inRadius.forEach(function(r){
     var pr=r.rating!==null&&r.rating>=C.minRating;
@@ -425,16 +462,27 @@ function applyFilter(){
     var pd=r.driveMin===null||r.driveMin<=C.maxDrive;
     if(pr&&pv&&pd)meetsArr.push(r);else othersArr.push(r);
   });
-  // Also add outside-radius to others (dimmed further)
-  outside.forEach(function(r){othersArr.push(r);});
 
   meetsArr=sortArr(meetsArr,by);
   othersArr=sortArr(othersArr,by);
   visibleResults=meetsArr.concat(othersArr);
 
+  // Clear any pins/routes that are no longer visible
+  Object.keys(cardPins).forEach(function(k){
+    var stillVisible=visibleResults.some(function(r,i){return i===parseInt(k);});
+    if(!stillVisible&&cardPins[k]){
+      cardPins[k].setMap(null);
+      if(cardRoutes[k])cardRoutes[k].setMap(null);
+      delete cardPins[k];delete cardRoutes[k];
+    }
+  });
+
   var cnt=document.getElementById('resultsCount');
-  var svcLabel=document.getElementById('service').options[document.getElementById('service').selectedIndex]?document.getElementById('service').options[document.getElementById('service').selectedIndex].text:'';
-  cnt.innerHTML='<span>'+visibleResults.length+'</span> providers &mdash; '+esc(svcLabel)+' &mdash; within '+radiusMiles+' mi';
+  var sel=document.getElementById('service');
+  var svcLabel=sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'';
+  var hiddenCount=allFetched.length-inRadius.length;
+  cnt.innerHTML='<span>'+visibleResults.length+'</span> providers &mdash; '+esc(svcLabel)+' &mdash; within '+radiusMiles+' mi'
+    +(hiddenCount>0?' <span style="font-size:.75rem;color:var(--muted)">(+'+hiddenCount+' beyond radius)</span>':'');
 
   renderGrid(meetsArr,othersArr);
 }
