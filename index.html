@@ -434,31 +434,31 @@ async function getDriveTimes(origin,addrs){
 // ======================= PLATFORM URLS =======================
 var PLATFORMS={
   taskrabbit:{
-    name:'TaskRabbit',
+    name:'TaskRabbit',color:'#6aa84f',
     url:function(svc,addr){
-      var city=extractCity(addr).toLowerCase().replace(/\s+/g,'-').replace(/,/g,'');
-      var s=svc.toLowerCase().replace(/\s+/g,'-').replace(/\//g,'');
-      return'https://www.taskrabbit.com/services/'+encodeURIComponent(s)+'/'+city;
+      var city=extractCity(addr);
+      return'https://www.taskrabbit.com/search?utf8=%E2%9C%93&q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city);
     }
   },
   thumbtack:{
-    name:'Thumbtack',
+    name:'Thumbtack',color:'#00b3a4',
     url:function(svc,addr){
       var city=extractCity(addr);
-      return'https://www.thumbtack.com/k/'+encodeURIComponent(svc.toLowerCase())+'/near-me/?q='+encodeURIComponent(svc)+'&sa='+encodeURIComponent(city);
+      return'https://www.thumbtack.com/search?q='+encodeURIComponent(svc)+'&pl='+encodeURIComponent(city);
     }
   },
   angi:{
-    name:'Angi',
+    name:'Angi',color:'#ff5a5f',
     url:function(svc,addr){
       var city=extractCity(addr);
-      return'https://www.angi.com/companylist/us/'+encodeURIComponent(city.toLowerCase().replace(/[\s,]+/g,'-'))+'/'+encodeURIComponent(svc.toLowerCase().replace(/\s+/g,'-'))+'.htm';
+      return'https://www.angi.com/search?q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city);
     }
   },
   homeadvisor:{
-    name:'HomeAdvisor',
+    name:'HomeAdvisor',color:'#f5a623',
     url:function(svc,addr){
-      return'https://www.homeadvisor.com/c.'+encodeURIComponent(svc.replace(/\s+/g,'-'))+'.'+encodeURIComponent(extractCity(addr).replace(/[\s,]+/g,'-'))+'.html';
+      var city=extractCity(addr);
+      return'https://www.homeadvisor.com/leads.html?q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city);
     }
   }
 };
@@ -472,20 +472,21 @@ function extractCity(addr){
 function openPlatform(source,svc,addr){
   var p=PLATFORMS[source];if(!p)return;
   var url=p.url(svc,addr);
-  // Show info panel
-  var grid=document.getElementById('resultsGrid');
+  var city=extractCity(addr);
   var rw=document.getElementById('resultsWrap');
+  var grid=document.getElementById('resultsGrid');
   document.getElementById('mapContainer').style.display='none';
-  document.getElementById('resultsCount').innerHTML='Opening <span>'+esc(p.name)+'</span> for '+esc(svc);
-  grid.innerHTML='<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;text-align:center;">'
-    +'<div style="font-size:1rem;font-weight:600;margin-bottom:.5rem;">Searching '+esc(p.name)+'</div>'
-    +'<div style="font-size:.85rem;color:var(--muted);margin-bottom:1rem;">Opening '+esc(p.name)+' pre-filtered for <strong>'+esc(svc)+'</strong> near <strong>'+esc(extractCity(addr))+'</strong></div>'
-    +'<a href="'+esc(url)+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border:none;border-radius:9px;padding:10px 22px;font-size:.9rem;font-weight:600;text-decoration:none;cursor:pointer;">Open '+esc(p.name)+' &rarr;</a>'
-    +'<div style="font-size:.75rem;color:var(--muted);margin-top:1rem;">Results will open in a new tab on '+esc(p.name)+'\'s website</div>'
+  document.getElementById('resultsCount').innerHTML='Search on <span>'+esc(p.name)+'</span>';
+
+  grid.innerHTML='<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;text-align:center;">'
+    +'<div style="font-size:2rem;margin-bottom:.8rem;">&#128279;</div>'
+    +'<div style="font-family:\'Space Grotesk\',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">'+esc(p.name)+'</div>'
+    +'<div style="font-size:.88rem;color:var(--muted);margin-bottom:1.2rem;">Click below to search <strong>'+esc(svc)+'</strong> near <strong>'+esc(city)+'</strong> on '+esc(p.name)+'</div>'
+    +'<a href="'+url+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:'+p.color+';color:#fff;border-radius:9px;padding:12px 28px;font-size:.95rem;font-weight:600;text-decoration:none;">Open '+esc(p.name)+' &rarr;</a>'
+    +'<div style="margin-top:1rem;font-size:.75rem;color:var(--muted)">Or copy this link:<br><a href="'+url+'" target="_blank" style="color:var(--accent2);word-break:break-all;font-size:.75rem;">'+url+'</a></div>'
     +'</div>';
+
   rw.classList.add('visible');
-  // Auto open
-  setTimeout(function(){window.open(url,'_blank','noopener');},300);
 }
 var allFetched=[],visibleResults=[],meetsArr=[],othersArr=[];
 
