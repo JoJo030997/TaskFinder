@@ -322,7 +322,7 @@ function initGMaps(){
   if(mapsOk||!C.mapsKey)return;
   if(typeof google!=='undefined'&&google.maps){mapsOk=true;return;}
   var s=document.createElement('script');
-  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(C.mapsKey)+'&loading=async&callback=onMR';
+  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(C.mapsKey)+'&libraries=geometry&loading=async&callback=onMR';
   s.async=true;document.body.appendChild(s);
 }
 window.onMR=function(){mapsOk=true;};
@@ -363,7 +363,29 @@ async function togglePin(idx){
     });
     cardPins[idx]=m;gmarkers.push(m);
 
-    // Draw route using directions link (no DirectionsService needed)
+    // Draw route using Routes API
+    if(originCoords){
+      try{
+        var routeResp=await fetch('https://routes.googleapis.com/directions/v2:computeRoutes',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','X-Goog-Api-Key':C.mapsKey,'X-Goog-FieldMask':'routes.polyline.encodedPolyline'},
+          body:JSON.stringify({
+            origin:{location:{latLng:{latitude:originCoords.lat,longitude:originCoords.lng}}},
+            destination:{location:{latLng:{latitude:lat,longitude:lng}}},
+            travelMode:'DRIVE',routingPreference:'TRAFFIC_AWARE'
+          })
+        });
+        var routeData=await routeResp.json();
+        if(routeData.routes&&routeData.routes[0]&&routeData.routes[0].polyline){
+          var poly=new google.maps.Polyline({
+            path:google.maps.geometry.encoding.decodePath(routeData.routes[0].polyline.encodedPolyline),
+            map:gmap,strokeColor:color,strokeWeight:4,strokeOpacity:0.75
+          });
+          cardRoutes[idx]=poly;
+        }
+      }catch(e){console.warn('Route draw failed:',e);}
+    }
+
     var b=new google.maps.LatLngBounds();
     gmarkers.forEach(function(mk){b.extend(mk.getPosition());});
     gmap.fitBounds(b);if(gmarkers.length<=2)gmap.setZoom(13);
