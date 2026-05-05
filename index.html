@@ -20,11 +20,13 @@ header::before{content:'';position:absolute;top:-80px;right:-60px;width:240px;he
 .gear-btn:hover{background:rgba(255,255,255,.2)}
 
 /* OVERLAY / SETTINGS */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:center;justify-content:center}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem}
 .overlay.open{display:flex}
-.s-panel{background:var(--card);border-radius:14px;width:95%;max-width:580px;max-height:85vh;overflow-y:auto;padding:1.8rem;box-shadow:0 8px 40px rgba(0,0,0,.2)}
-.s-title{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between}
+.s-panel{background:var(--card);border-radius:14px;width:100%;max-width:580px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.s-header{padding:1.5rem 1.8rem 1rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.s-title{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;display:flex;align-items:center;justify-content:space-between}
 .s-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted)}
+.s-body{overflow-y:auto;flex:1;padding:1.2rem 1.8rem 1.8rem}
 .s-sec{margin-bottom:1.3rem;padding-bottom:1.3rem;border-bottom:1px solid var(--border)}
 .s-sec:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
 .s-lbl{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
@@ -59,21 +61,33 @@ input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
 .error-msg{background:#fff3f0;border:1px solid #f0c8c0;border-radius:10px;padding:.85rem;font-size:.84rem;color:var(--accent);margin-top:9px;display:none}.error-msg.show{display:block}
 .no-key-msg{background:#fff3f0;border:1px solid #f0c8c0;border-radius:10px;padding:.85rem;font-size:.84rem;color:var(--accent);margin-bottom:1rem;display:none}.no-key-msg.show{display:block}
 
-/* RESULTS */
+/* RESULTS TOP BAR */
 .results-wrap{display:none}.results-wrap.visible{display:block}
 .results-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:8px}
 .results-count{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700}.results-count span{color:var(--accent)}
-.filter-bar{display:flex;align-items:center;gap:8px}
-.filter-bar label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
-.filter-select{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:.83rem;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);cursor:pointer}
-.filter-select:focus{outline:none;border-color:var(--accent)}
+.controls-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 
+/* SORT */
+.ctrl-group{display:flex;align-items:center;gap:6px}
+.ctrl-label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+.ctrl-select{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:.83rem;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);cursor:pointer}
+.ctrl-select:focus{outline:none;border-color:var(--accent)}
+
+/* RADIUS SLIDER */
+.radius-wrap{display:flex;align-items:center;gap:7px}
+.radius-lbl{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+.radius-val{font-size:.82rem;font-weight:700;color:var(--accent);min-width:48px;text-align:right}
+input[type=range]{-webkit-appearance:none;appearance:none;width:110px;height:4px;border-radius:2px;background:var(--border);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;border:none}
+
+/* MAP */
 .map-container{border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:1rem;height:300px;background:var(--cream)}
 .section-heading{font-size:.76rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:1rem 0 .5rem;padding-bottom:5px;border-bottom:1px solid var(--border)}
 .section-heading:first-child{margin-top:0}
 .other-heading{color:#a09060;border-color:#e0d8c0}
 
-/* 2-COL GRID */
+/* 2-COL CARDS */
 .cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:620px){.cards-grid{grid-template-columns:1fr}}
 .result-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:.85rem 1rem;animation:fadeUp .3s ease both;transition:box-shadow .15s,transform .15s;display:flex;flex-direction:column;gap:5px}
@@ -86,7 +100,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
 .card-desc{font-size:.75rem;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .card-meta{display:flex;flex-wrap:wrap;gap:4px}
 .pill{font-size:.68rem;font-weight:500;padding:2px 8px;border-radius:20px}
-.pill-local{background:var(--sbg);color:var(--stx)}.pill-neutral{background:var(--cream);color:var(--muted)}.pill-drive{background:var(--wbg);color:var(--wtx)}
+.pill-local{background:var(--sbg);color:var(--stx)}.pill-neutral{background:var(--cream);color:var(--muted)}.pill-drive{background:var(--wbg);color:var(--wtx)}.pill-open{background:var(--sbg);color:var(--stx)}.pill-closed{background:#fde8e8;color:var(--accent)}
 .stars{color:#e0a020;font-size:.78rem}
 .rating-line{font-size:.78rem;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
 .rv-link{color:var(--accent2);cursor:pointer;text-decoration:underline;font-size:.75rem}.rv-link:hover{color:var(--accent)}
@@ -96,21 +110,22 @@ input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
 .map-check{display:flex;align-items:center;gap:4px;font-size:.73rem;color:var(--muted);cursor:pointer;user-select:none;margin-top:3px}
 .map-check input{width:13px;height:13px;accent-color:var(--accent);cursor:pointer}
 
-/* REVIEWS MODAL — fixed scrollable */
-.rv-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
+/* REVIEWS MODAL — scrollable, responsive */
+.rv-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
 .rv-overlay.open{display:flex}
-.rv-panel{background:var(--card);border-radius:14px;width:100%;max-width:520px;height:auto;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.25)}
-.rv-header{padding:1.3rem 1.5rem 1rem;border-bottom:1px solid var(--border);flex-shrink:0}
-.rv-title{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.rv-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);flex-shrink:0}
+.rv-panel{background:var(--card);border-radius:14px;width:100%;max-width:520px;max-height:88vh;min-height:0;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.25);overflow:hidden}
+.rv-head{padding:1.2rem 1.4rem .9rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.rv-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.rv-name{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;line-height:1.3}
+.rv-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);flex-shrink:0;padding:0 2px;line-height:1}
 .rv-summary{font-size:.8rem;color:var(--muted);margin-top:4px}
-.rv-body{overflow-y:auto;flex:1;padding:0 1.5rem}
+.rv-scroll{overflow-y:auto;flex:1;padding:0 1.4rem;-webkit-overflow-scrolling:touch}
 .rv-item{border-bottom:1px solid var(--border);padding:.75rem 0}
 .rv-item:last-child{border-bottom:none;padding-bottom:1rem}
 .rv-author{font-weight:600;font-size:.86rem}
 .rv-date{font-size:.72rem;color:var(--muted);margin-bottom:3px}
 .rv-stars{font-size:.78rem;color:#e0a020;margin-bottom:4px}
-.rv-text{font-size:.84rem;line-height:1.55;color:var(--ink)}
+.rv-text{font-size:.84rem;line-height:1.55}
 .rv-loading,.rv-none{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.88rem}
 
 footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);border-top:1px solid var(--border);margin-top:2rem}
@@ -125,37 +140,44 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
   </div>
 </header>
 
-<!-- SETTINGS -->
+<!-- SETTINGS OVERLAY -->
 <div class="overlay" id="overlay" onclick="if(event.target===this)toggleSettings()">
-<div class="s-panel">
-  <div class="s-title">Settings <button class="s-close" onclick="toggleSettings()">&times;</button></div>
-  <div class="s-sec">
-    <div class="s-lbl">API Keys</div>
-    <div id="keysArea"></div>
+  <div class="s-panel">
+    <div class="s-header">
+      <div class="s-title">Settings <button class="s-close" onclick="toggleSettings()">&times;</button></div>
+    </div>
+    <div class="s-body">
+      <div class="s-sec">
+        <div class="s-lbl">API Keys</div>
+        <div id="keysArea"></div>
+      </div>
+      <div class="s-sec">
+        <div class="s-lbl">Filter Requirements</div>
+        <div class="s-row"><span style="font-size:.85rem;min-width:115px">Min Rating:</span><input type="number" class="s-inp s-inp-sm" id="setMinRating" step="0.1" min="1" max="5"/></div>
+        <div class="s-row"><span style="font-size:.85rem;min-width:115px">Min Reviews:</span><input type="number" class="s-inp s-inp-sm" id="setMinReviews" min="0"/></div>
+        <div class="s-row"><span style="font-size:.85rem;min-width:115px">Max Drive Time:</span><input type="number" class="s-inp s-inp-sm" id="setMaxDrive" min="1"/><span style="font-size:.8rem;color:var(--muted)">min</span></div>
+        <div class="s-row" style="margin-top:6px"><button class="s-btn s-btn-save" onclick="saveReq()">Save Requirements</button><span class="s-saved" id="reqSaved">&#10003; Saved</span></div>
+      </div>
+      <div class="s-sec">
+        <div class="s-lbl">Service Types</div>
+        <div id="svcChips"></div>
+        <div class="s-row" style="margin-top:8px"><input type="text" class="s-inp" id="newSvcInput" placeholder="Add new service type..."/><button class="s-btn s-btn-add" onclick="addSvc()">+ Add</button></div>
+      </div>
+    </div>
   </div>
-  <div class="s-sec">
-    <div class="s-lbl">Filter Requirements</div>
-    <div class="s-row"><span style="font-size:.85rem;min-width:115px">Min Rating:</span><input type="number" class="s-inp s-inp-sm" id="setMinRating" step="0.1" min="1" max="5"/></div>
-    <div class="s-row"><span style="font-size:.85rem;min-width:115px">Min Reviews:</span><input type="number" class="s-inp s-inp-sm" id="setMinReviews" min="0"/></div>
-    <div class="s-row"><span style="font-size:.85rem;min-width:115px">Max Drive Time:</span><input type="number" class="s-inp s-inp-sm" id="setMaxDrive" min="1"/><span style="font-size:.8rem;color:var(--muted)">min</span></div>
-    <div class="s-row" style="margin-top:6px"><button class="s-btn s-btn-save" onclick="saveReq()">Save Requirements</button><span class="s-saved" id="reqSaved">&#10003; Saved</span></div>
-  </div>
-  <div class="s-sec">
-    <div class="s-lbl">Service Types</div>
-    <div id="svcChips"></div>
-    <div class="s-row" style="margin-top:8px"><input type="text" class="s-inp" id="newSvcInput" placeholder="Add new service type..."/><button class="s-btn s-btn-add" onclick="addSvc()">+ Add</button></div>
-  </div>
-</div>
 </div>
 
 <!-- REVIEWS MODAL -->
 <div class="rv-overlay" id="rvOverlay" onclick="if(event.target===this)closeReviews()">
   <div class="rv-panel">
-    <div class="rv-header">
-      <div class="rv-title"><span id="rvTitle">Reviews</span><button class="rv-close" onclick="closeReviews()">&times;</button></div>
+    <div class="rv-head">
+      <div class="rv-title-row">
+        <div class="rv-name" id="rvTitle">Reviews</div>
+        <button class="rv-close" onclick="closeReviews()">&times;</button>
+      </div>
       <div class="rv-summary" id="rvSummary"></div>
     </div>
-    <div class="rv-body" id="rvBody"></div>
+    <div class="rv-scroll" id="rvBody"></div>
   </div>
 </div>
 
@@ -163,7 +185,7 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
   <div class="no-key-msg" id="noKeyMsg">Configure your API keys in &#9881; Settings first.</div>
   <div class="search-card">
     <div class="fields">
-      <div class="field full"><label>Address / City / ZIP / Neighborhood</label><input type="text" id="address" placeholder="e.g. 4564 Cleveland Ave., Stevensville MI 49127"/></div>
+      <div class="field full"><label>Address / City / ZIP / Neighborhood</label><input type="text" id="address" placeholder="e.g. 49127 or 4564 Cleveland Ave., Stevensville MI"/></div>
       <div class="field"><label>Service Type</label><select id="service"></select></div>
     </div>
     <div class="filter-info" id="filterInfo"></div>
@@ -178,13 +200,20 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
   <div class="results-wrap" id="resultsWrap">
     <div class="results-top">
       <div class="results-count" id="resultsCount"></div>
-      <div class="filter-bar">
-        <label>Sort:</label>
-        <select class="filter-select" id="liveFilter" onchange="applyFilter()">
-          <option value="rating">Best Rated</option>
-          <option value="reviews">Most Reviews</option>
-          <option value="distance">Closest</option>
-        </select>
+      <div class="controls-bar">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Sort:</span>
+          <select class="ctrl-select" id="liveFilter" onchange="applyFilter()">
+            <option value="rating">Best Rated</option>
+            <option value="reviews">Most Reviews</option>
+            <option value="distance">Closest</option>
+          </select>
+        </div>
+        <div class="radius-wrap">
+          <span class="radius-lbl">Radius:</span>
+          <input type="range" id="radiusSlider" min="5" max="50" step="5" value="25" oninput="onRadiusChange(this.value)"/>
+          <span class="radius-val" id="radiusVal">25 mi</span>
+        </div>
       </div>
     </div>
     <div class="map-container" id="mapContainer" style="display:none"></div>
@@ -195,14 +224,14 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
 <footer>TaskFinder &middot; Powered by Google Places</footer>
 
 <script>
-// ======================== CONFIG ========================
+// ======================= CONFIG =======================
 var DS=['Home cleaning','Handyman / repairs','Moving help','Furniture assembly','Yard work / landscaping','General tasks','Mobile Notary','Dumpster rental','Junk Removal','Storage units'];
 var C={workerUrl:'',mapsKey:'',minRating:4.7,minReviews:50,maxDrive:20,services:DS.slice(),keysVisible:true};
-function lc(){try{var s=localStorage.getItem('tf2_config');if(s)Object.assign(C,JSON.parse(s));}catch(e){}}
-function sc(){localStorage.setItem('tf2_config',JSON.stringify(C));}
+function lc(){try{var s=localStorage.getItem('tf3_config');if(s)Object.assign(C,JSON.parse(s));}catch(e){}}
+function sc(){localStorage.setItem('tf3_config',JSON.stringify(C));}
 lc();
 
-// ======================== SETTINGS ========================
+// ======================= SETTINGS =======================
 function toggleSettings(){var o=document.getElementById('overlay');o.classList.toggle('open');if(o.classList.contains('open'))renderS();}
 function renderS(){
   var ka=document.getElementById('keysArea');
@@ -219,11 +248,7 @@ function renderS(){
   document.getElementById('setMaxDrive').value=C.maxDrive;
   renderChips();updateFI();
 }
-function saveKeys(){
-  C.workerUrl=document.getElementById('sk1').value.trim().replace(/\/$/,'');
-  C.mapsKey=document.getElementById('sk2').value.trim();
-  C.keysVisible=false;sc();flash('keySaved');renderS();initGMaps();
-}
+function saveKeys(){C.workerUrl=document.getElementById('sk1').value.trim().replace(/\/$/,'');C.mapsKey=document.getElementById('sk2').value.trim();C.keysVisible=false;sc();flash('keySaved');renderS();initGMaps();}
 function saveReq(){C.minRating=parseFloat(document.getElementById('setMinRating').value)||4.7;C.minReviews=parseInt(document.getElementById('setMinReviews').value)||50;C.maxDrive=parseInt(document.getElementById('setMaxDrive').value)||20;sc();flash('reqSaved');updateFI();}
 function renderChips(){document.getElementById('svcChips').innerHTML=C.services.map(function(s,i){return'<span class="s-chip">'+esc(s)+' <button onclick="rmSvc('+i+')">&times;</button></span>';}).join('');}
 function addSvc(){var inp=document.getElementById('newSvcInput'),v=inp.value.trim();if(!v)return;if(C.services.indexOf(v)===-1)C.services.push(v);inp.value='';sc();renderChips();popSvc();}
@@ -232,7 +257,15 @@ function flash(id){var e=document.getElementById(id);e.classList.add('show');set
 function updateFI(){var e=document.getElementById('filterInfo');if(e)e.textContent='Requirements: Rating \u2265 '+C.minRating+' \u00b7 Reviews \u2265 '+C.minReviews+' \u00b7 Drive \u2264 '+C.maxDrive+' min';}
 function popSvc(){var s=document.getElementById('service'),p=s.value;s.innerHTML='<option value="">Select a service...</option>';C.services.forEach(function(v){var o=document.createElement('option');o.value=v.toLowerCase();o.textContent=v;s.appendChild(o);});s.value=p;}
 
-// ======================== GOOGLE MAPS ========================
+// ======================= RADIUS SLIDER =======================
+var currentRadius=25;
+function onRadiusChange(v){
+  currentRadius=parseInt(v);
+  document.getElementById('radiusVal').textContent=currentRadius+' mi';
+  applyFilter();
+}
+
+// ======================= GOOGLE MAPS =======================
 var gmap,gmarkers=[],mapsOk=false,originAddr='',originCoords=null,cardPins={};
 
 function initGMaps(){
@@ -255,18 +288,12 @@ function setupMap(lat,lng){
 }
 
 async function togglePin(idx){
-  var r=allResults[idx];if(!r||!gmap)return;
+  var r=visibleResults[idx];if(!r||!gmap)return;
   var cb=document.getElementById('mc_'+idx);if(!cb)return;
-
   if(cb.checked){
-    // Get coords — prefer from Places result, fallback geocode
-    var lat=null,lng=null;
-    if(r.lat&&r.lng){lat=r.lat;lng=r.lng;}
-    else if(r.address){
-      try{
-        var d=await px({mode:'geocode',address:r.address,key:C.mapsKey});
-        if(d.results&&d.results.length){lat=d.results[0].geometry.location.lat;lng=d.results[0].geometry.location.lng;r.lat=lat;r.lng=lng;}
-      }catch(e){}
+    var lat=r.lat,lng=r.lng;
+    if(!lat&&r.address){
+      try{var d=await px({mode:'geocode',address:r.address,key:C.mapsKey});if(d.results&&d.results.length){lat=d.results[0].geometry.location.lat;lng=d.results[0].geometry.location.lng;r.lat=lat;r.lng=lng;}}catch(e){}
     }
     if(lat&&lng){
       var m=new google.maps.Marker({position:{lat:lat,lng:lng},map:gmap,title:r.name,
@@ -274,52 +301,57 @@ async function togglePin(idx){
       cardPins[idx]=m;gmarkers.push(m);
       var b=new google.maps.LatLngBounds();gmarkers.forEach(function(mk){b.extend(mk.getPosition());});
       gmap.fitBounds(b);if(gmarkers.length<=2)gmap.setZoom(13);
-    } else {cb.checked=false;alert('Could not find location for this business.');}
+    } else {cb.checked=false;alert('Could not locate this business on the map.');}
   } else {
     if(cardPins[idx]){cardPins[idx].setMap(null);var mi=gmarkers.indexOf(cardPins[idx]);if(mi>-1)gmarkers.splice(mi,1);delete cardPins[idx];}
   }
 }
 
-// ======================== PROXY ========================
+// ======================= PROXY =======================
 async function px(params){
   var qs=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);}).join('&');
   var r=await fetch(C.workerUrl+'?'+qs);
-  if(!r.ok)throw new Error('Proxy error '+r.status);
+  if(!r.ok)throw new Error('Proxy '+r.status);
   return r.json();
 }
 
-// ======================== GOOGLE PLACES SEARCH ========================
-async function searchPlaces(query, location){
-  // Text search with location bias
-  var q=query+' near '+location;
+// ======================= PLACES SEARCH =======================
+// Searches with location bias (radius in meters) for closest results
+async function searchPlaces(query, lat, lng){
+  var radiusMeters=50000; // Always search wide (50km), slider filters display
   var results=[];
 
-  // First page
-  var d=await px({mode:'places_search',q:q,key:C.mapsKey});
+  // Use nearby search with location bias for better local results
+  var q=encodeURIComponent(query);
+  var d=await px({mode:'places_search',q:query,key:C.mapsKey,lat:lat,lng:lng,radius:radiusMeters});
   if(d.results)results=results.concat(d.results);
 
-  // Second page (next_page_token gives up to 20 more results)
+  // Page 2
   if(d.next_page_token){
-    await sleep(2000); // Google requires ~2s delay before next_page_token is valid
-    try{
-      var d2=await px({mode:'places_search',q:q,key:C.mapsKey,pagetoken:d.next_page_token});
-      if(d2.results)results=results.concat(d2.results);
-    }catch(e){}
+    await sleep(2000);
+    try{var d2=await px({mode:'places_search',q:query,key:C.mapsKey,pagetoken:d.next_page_token});
+      if(d2.results)results=results.concat(d2.results);}catch(e){}
+  }
+
+  // Page 3 (up to 60 results total)
+  if(d.next_page_token){
+    await sleep(2000);
+    try{var d3=await px({mode:'places_search',q:query,key:C.mapsKey,pagetoken:d.next_page_token});
+      if(d3.results)results=results.concat(d3.results);}catch(e){}
   }
 
   return results.map(function(p){
     var loc=p.geometry&&p.geometry.location;
     return{
-      name:p.name||'Unknown',
-      placeId:p.place_id||null,
+      name:p.name||'Unknown',placeId:p.place_id||null,
       address:p.formatted_address||p.vicinity||null,
       rating:p.rating?parseFloat(p.rating):null,
       reviews:p.user_ratings_total||0,
       price:p.price_level?'$'.repeat(p.price_level):null,
       phone:null,website:null,
       lat:loc?loc.lat:null,lng:loc?loc.lng:null,
-      desc:p.types?p.types.slice(0,2).map(function(t){return t.replace(/_/g,' ');}).join(', '):'',
-      driveMin:null,driveTxt:null,distTxt:null,
+      desc:p.types?p.types.filter(function(t){return t!=='establishment'&&t!=='point_of_interest';}).slice(0,2).map(function(t){return t.replace(/_/g,' ');}).join(', '):'',
+      driveMin:null,driveTxt:null,distTxt:null,distMiles:null,
       open:p.opening_hours?p.opening_hours.open_now:null
     };
   });
@@ -327,7 +359,7 @@ async function searchPlaces(query, location){
 
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
 
-async function geocodeOrigin(addr){
+async function geocodeAddr(addr){
   try{var d=await px({mode:'geocode',address:addr,key:C.mapsKey});if(d.results&&d.results.length)return d.results[0].geometry.location;}catch(e){}
   return null;
 }
@@ -341,26 +373,22 @@ async function getDriveTimes(origin,addrs){
       var d=await px({mode:'distance',origins:origin,destinations:batch.join('|'),key:C.mapsKey});
       if(d.rows&&d.rows[0]&&d.rows[0].elements){
         d.rows[0].elements.forEach(function(el){
-          out.push(el.status==='OK'?{driveMin:Math.round(el.duration.value/60),driveTxt:el.duration.text,distTxt:el.distance.text}:{driveMin:null,driveTxt:null,distTxt:null});
+          if(el.status==='OK'){
+            var distM=el.distance.value/1609.34; // meters to miles
+            out.push({driveMin:Math.round(el.duration.value/60),driveTxt:el.duration.text,distTxt:el.distance.text,distMiles:distM});
+          } else out.push({driveMin:null,driveTxt:null,distTxt:null,distMiles:null});
         });
-      }else{batch.forEach(function(){out.push({driveMin:null,driveTxt:null,distTxt:null});});}
-    }catch(e){batch.forEach(function(){out.push({driveMin:null,driveTxt:null,distTxt:null});});}
+      } else batch.forEach(function(){out.push({driveMin:null,driveTxt:null,distTxt:null,distMiles:null});});
+    }catch(e){batch.forEach(function(){out.push({driveMin:null,driveTxt:null,distTxt:null,distMiles:null});});}
   }
   return out;
 }
 
-// ======================== STATE ========================
-var allResults=[],meetsArr=[],othersArr=[];
+// ======================= STATE =======================
+var allFetched=[],visibleResults=[],meetsArr=[],othersArr=[];
 
 function normAddr(r){var c=r.trim(),p=c.split(',');if(p.length>=3)return p.slice(-2).join(',').trim();return c;}
-
-function dedup(arr){
-  var seen={};
-  return arr.filter(function(x){
-    var k=(x.placeId||x.name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,25));
-    if(seen[k])return false;seen[k]=true;return true;
-  });
-}
+function dedup(arr){var s={};return arr.filter(function(x){var k=x.placeId||x.name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,25);if(s[k])return false;s[k]=true;return true;});}
 
 function sortArr(arr,by){
   return arr.slice().sort(function(a,b){
@@ -374,169 +402,169 @@ function sortArr(arr,by){
   });
 }
 
-// ======================== LIVE FILTER ========================
+// ======================= LIVE FILTER + RADIUS =======================
 function applyFilter(){
   var by=document.getElementById('liveFilter').value;
-  var sm=sortArr(meetsArr,by),so=sortArr(othersArr,by);
-  allResults=sm.concat(so);
-  renderGrid(sm,so);
+  var radiusMiles=currentRadius;
+
+  // Filter allFetched by radius first
+  var inRadius=allFetched.filter(function(r){
+    if(r.distMiles===null)return true; // include if no distance data
+    return r.distMiles<=radiusMiles;
+  });
+  var outside=allFetched.filter(function(r){
+    if(r.distMiles===null)return false;
+    return r.distMiles>radiusMiles;
+  });
+
+  // Split meets/others within radius
+  meetsArr=[];othersArr=[];
+  inRadius.forEach(function(r){
+    var pr=r.rating!==null&&r.rating>=C.minRating;
+    var pv=r.reviews>=C.minReviews;
+    var pd=r.driveMin===null||r.driveMin<=C.maxDrive;
+    if(pr&&pv&&pd)meetsArr.push(r);else othersArr.push(r);
+  });
+  // Also add outside-radius to others (dimmed further)
+  outside.forEach(function(r){othersArr.push(r);});
+
+  meetsArr=sortArr(meetsArr,by);
+  othersArr=sortArr(othersArr,by);
+  visibleResults=meetsArr.concat(othersArr);
+
+  var cnt=document.getElementById('resultsCount');
+  var svcLabel=document.getElementById('service').options[document.getElementById('service').selectedIndex]?document.getElementById('service').options[document.getElementById('service').selectedIndex].text:'';
+  cnt.innerHTML='<span>'+visibleResults.length+'</span> providers &mdash; '+esc(svcLabel)+' &mdash; within '+radiusMiles+' mi';
+
+  renderGrid(meetsArr,othersArr);
 }
 
-// ======================== MAIN SEARCH ========================
+// ======================= MAIN SEARCH =======================
 async function doSearch(){
   var address=document.getElementById('address').value.trim(),service=document.getElementById('service').value;
   var st=document.getElementById('statusText'),sp=document.getElementById('spinner'),btn=document.getElementById('searchBtn'),
     em=document.getElementById('errorMsg'),nk=document.getElementById('noKeyMsg'),
-    rw=document.getElementById('resultsWrap'),grid=document.getElementById('resultsGrid'),cnt=document.getElementById('resultsCount');
+    rw=document.getElementById('resultsWrap'),grid=document.getElementById('resultsGrid');
 
   nk.classList.remove('show');em.classList.remove('show');
   if(!C.workerUrl||!C.mapsKey){nk.classList.add('show');return;}
   if(!address){st.textContent='Enter an address.';return;}
   if(!service){st.textContent='Select a service.';return;}
 
-  originAddr=address;originCoords=null;cardPins={};
+  originAddr=address;originCoords=null;cardPins={};allFetched=[];meetsArr=[];othersArr=[];visibleResults=[];
   btn.disabled=true;sp.classList.add('active');rw.classList.remove('visible');grid.innerHTML='';
   document.getElementById('mapContainer').style.display='none';
 
-  // Geocode origin
   st.textContent='Locating your address...';
-  originCoords=await geocodeOrigin(address);
+  originCoords=await geocodeAddr(address);
+  if(!originCoords){
+    btn.disabled=false;sp.classList.remove('active');
+    em.textContent='Could not locate that address. Try a full address or city, state.';em.classList.add('show');return;
+  }
 
-  // Search Google Places
-  var loc=normAddr(address);
   var svcLabel=document.getElementById('service').options[document.getElementById('service').selectedIndex].text;
+  st.textContent='Searching Google Places for '+svcLabel+'...';
 
-  st.textContent='Searching Google Places...';
   var all=[];
-  try{all=await searchPlaces(svcLabel,loc);}catch(e){
-    btn.disabled=false;sp.classList.remove('active');st.textContent='';
+  try{all=await searchPlaces(svcLabel,originCoords.lat,originCoords.lng);}catch(e){
+    btn.disabled=false;sp.classList.remove('active');
     em.textContent='Search failed: '+e.message;em.classList.add('show');return;
   }
   all=dedup(all);
 
   if(!all.length){
-    btn.disabled=false;sp.classList.remove('active');st.textContent='';
-    em.textContent='No results found. Try a different location or service.';em.classList.add('show');return;
+    btn.disabled=false;sp.classList.remove('active');
+    em.textContent='No results found. Try a different address or service type.';em.classList.add('show');return;
   }
 
-  // Drive times
   st.textContent='Calculating drive times for '+all.length+' results...';
-  var addrs=all.map(function(r){return r.address||r.name+' '+loc;});
+  var addrs=all.map(function(r){return r.address||r.name;});
   var times=await getDriveTimes(address,addrs);
-  times.forEach(function(t,i){if(i<all.length){all[i].driveMin=t.driveMin;all[i].driveTxt=t.driveTxt;all[i].distTxt=t.distTxt;}});
+  times.forEach(function(t,i){if(i<all.length){all[i].driveMin=t.driveMin;all[i].driveTxt=t.driveTxt;all[i].distTxt=t.distTxt;all[i].distMiles=t.distMiles;}});
 
-  // Split meets / others
-  meetsArr=[];othersArr=[];
-  all.forEach(function(r){
-    var pr=r.rating!==null&&r.rating>=C.minRating;
-    var pv=r.reviews>=C.minReviews;
-    var pd=r.driveMin===null||r.driveMin<=C.maxDrive;
-    r._meets=pr&&pv&&pd;
-    if(r._meets)meetsArr.push(r);else othersArr.push(r);
-  });
+  allFetched=all;
 
-  var by=document.getElementById('liveFilter').value;
-  meetsArr=sortArr(meetsArr,by);othersArr=sortArr(othersArr,by);
-  allResults=meetsArr.concat(othersArr);
+  if(mapsOk)setupMap(originCoords.lat,originCoords.lng);
+  else if(C.mapsKey)initGMaps();
 
-  // Setup map
-  if(mapsOk&&originCoords)setupMap(originCoords.lat,originCoords.lng);
-  else if(!mapsOk&&C.mapsKey)initGMaps();
-
-  cnt.innerHTML='<span>'+allResults.length+'</span> providers &mdash; '+esc(svcLabel);
-  renderGrid(meetsArr,othersArr);
   rw.classList.add('visible');
+  applyFilter(); // renders grid with current radius + sort
+
   btn.disabled=false;sp.classList.remove('active');
-  st.textContent=meetsArr.length+' meet requirements, '+othersArr.length+' others.';
+  st.textContent=allFetched.length+' total results fetched. Showing within '+currentRadius+' mi.';
 }
 
-// ======================== RENDER ========================
+// ======================= RENDER =======================
 function renderGrid(meets,others){
   var html='';
   if(meets.length){
     html+='<div class="section-heading">&#10003; Meets Requirements ('+meets.length+')</div><div class="cards-grid">';
-    html+=meets.map(function(r){return renderCard(r,allResults.indexOf(r),false);}).join('');
+    html+=meets.map(function(r,i){return renderCard(r,i,false);}).join('');
     html+='</div>';
   }
   if(others.length){
     html+='<div class="section-heading other-heading">&#128203; Other Results ('+others.length+')</div><div class="cards-grid">';
-    html+=others.map(function(r){return renderCard(r,allResults.indexOf(r),true);}).join('');
+    html+=others.map(function(r,i){return renderCard(r,meets.length+i,true);}).join('');
     html+='</div>';
   }
-  if(!meets.length&&!others.length)html='<div style="padding:2rem;text-align:center;color:var(--muted)">No results found.</div>';
+  if(!meets.length&&!others.length){
+    html='<div style="padding:2rem;text-align:center;color:var(--muted);font-size:.9rem">No results within '+currentRadius+' miles.<br>Try sliding the radius wider.</div>';
+  }
   document.getElementById('resultsGrid').innerHTML=html;
 }
 
 function starsH(r){if(!r)return'';var n=parseFloat(r),f=Math.floor(n),h=n%1>=.5?1:0;return'\u2605'.repeat(f)+(h?'\u00BD':'')+'\u2606'.repeat(5-f-h);}
 
 function renderCard(r,idx,dimmed){
-  var delay=(idx%10*30)+'ms',cls='result-card'+(dimmed?' dimmed':'');
-
+  var delay=(idx%10*25)+'ms',cls='result-card'+(dimmed?' dimmed':'');
   var rh=r.rating
-    ?'<span class="stars">'+starsH(r.rating)+'</span><strong>'+r.rating.toFixed(1)+'</strong> <span class="rv-link" onclick="openReviews('+idx+')">('+r.reviews.toLocaleString()+' reviews)</span>'
+    ?'<span class="stars">'+starsH(r.rating)+'</span><strong>'+r.rating.toFixed(1)+'</strong> <span class="rv-link" onclick="openReviews('+idx+')">('+r.reviews.toLocaleString()+')</span>'
     :'<span style="color:var(--muted)">No rating yet</span>';
-
   var pills='<span class="pill pill-local">Local</span>';
-  if(r.price)pills+='<span class="pill pill-neutral">'+esc(r.price)+'</span>';
   if(r.driveTxt)pills+='<span class="pill pill-drive">\uD83D\uDE97 '+esc(r.driveTxt)+'</span>';
   if(r.distTxt)pills+='<span class="pill pill-neutral">'+esc(r.distTxt)+'</span>';
-  if(r.open===true)pills+='<span class="pill" style="background:#e8f5ec;color:#1a7a3a">Open now</span>';
-  else if(r.open===false)pills+='<span class="pill" style="background:#fde8e8;color:#c0452a">Closed</span>';
-
+  if(r.price)pills+='<span class="pill pill-neutral">'+esc(r.price)+'</span>';
+  if(r.open===true)pills+='<span class="pill pill-open">Open now</span>';
+  else if(r.open===false)pills+='<span class="pill pill-closed">Closed</span>';
   var acts='';
   if(r.phone)acts+='<a class="btn-a primary" href="tel:'+esc(r.phone)+'">&#128222; '+esc(r.phone)+'</a>';
   if(r.website)acts+='<a class="btn-a" href="'+esc(r.website)+'" target="_blank">&#127760; Site</a>';
   if(r.address)acts+='<a class="btn-a" href="https://maps.google.com/maps/dir/?api=1&origin='+encodeURIComponent(originAddr)+'&destination='+encodeURIComponent(r.address)+'" target="_blank">&#128205; Directions</a>';
-
   var chk='<label class="map-check"><input type="checkbox" id="mc_'+idx+'" onchange="togglePin('+idx+')"/> Show on map</label>';
-
   return '<div class="'+cls+'" style="animation-delay:'+delay+'">'
     +'<div class="card-top"><div class="card-name">'+esc(r.name)+'</div><div class="badge-num">'+(idx+1)+'</div></div>'
     +(r.desc?'<div class="card-desc">'+esc(r.desc)+'</div>':'')
     +'<div class="card-meta">'+pills+'</div>'
     +'<div class="rating-line">'+rh+'</div>'
     +(acts?'<div class="card-actions">'+acts+'</div>':'')
-    +chk
-    +'</div>';
+    +chk+'</div>';
 }
 
-// ======================== REVIEWS ========================
+// ======================= REVIEWS =======================
 async function openReviews(idx){
-  var r=allResults[idx];if(!r)return;
+  var r=visibleResults[idx];if(!r)return;
   document.getElementById('rvTitle').textContent=r.name;
   document.getElementById('rvSummary').textContent='';
   document.getElementById('rvBody').innerHTML='<div class="rv-loading">&#8987; Loading reviews...</div>';
   document.getElementById('rvOverlay').classList.add('open');
-
   try{
     var pid=r.placeId;
-
-    // If no place_id from search, find it
     if(!pid){
-      var searchQ=r.name+(r.address?' '+r.address:'');
-      var fRes=await px({mode:'places_find',q:searchQ,key:C.mapsKey});
+      var fRes=await px({mode:'places_find',q:r.name+(r.address?' '+r.address:''),key:C.mapsKey});
       if(fRes.candidates&&fRes.candidates.length)pid=fRes.candidates[0].place_id;
     }
-
     if(!pid){showNoReviews(r);return;}
-
     var det=await px({mode:'places_details',place_id:pid,key:C.mapsKey});
-    var res=det.result;
-    if(!res){showNoReviews(r);return;}
-
-    // Update card phone/website from Places if we got richer data
-    if(res.formatted_phone_number&&!r.phone){r.phone=res.formatted_phone_number;}
-    if(res.website&&!r.website){r.website=res.website;}
-
+    var res=det.result;if(!res){showNoReviews(r);return;}
+    if(res.formatted_phone_number&&!r.phone)r.phone=res.formatted_phone_number;
+    if(res.website&&!r.website)r.website=res.website;
     var rvs=res.reviews||[];
     if(!rvs.length){showNoReviews(r);return;}
-
     document.getElementById('rvSummary').textContent=
       (res.rating?'\u2605 '+res.rating+' overall':'')+
       (res.user_ratings_total?' \u00b7 '+res.user_ratings_total.toLocaleString()+' total reviews':'');
-
     document.getElementById('rvBody').innerHTML=rvs.map(function(rv){
-      return '<div class="rv-item">'
+      return'<div class="rv-item">'
         +'<div class="rv-author">'+esc(rv.author_name||'Anonymous')+'</div>'
         +'<div class="rv-date">'+esc(rv.relative_time_description||'')+'</div>'
         +(rv.rating?'<div class="rv-stars">'+starsH(rv.rating)+' '+rv.rating+'</div>':'')
@@ -544,18 +572,16 @@ async function openReviews(idx){
         +'</div>';
     }).join('');
   }catch(e){
-    document.getElementById('rvBody').innerHTML='<div class="rv-none">Error loading reviews.<br><small>'+esc(e.message)+'</small></div>';
+    document.getElementById('rvBody').innerHTML='<div class="rv-none">Error: '+esc(e.message)+'</div>';
   }
 }
-
 function showNoReviews(r){
-  document.getElementById('rvBody').innerHTML='<div class="rv-none">No reviews found on Google for this business.'+(r.website?'<br><br><a href="'+esc(r.website)+'" target="_blank" style="color:var(--accent2)">Visit their website</a>':'')+'</div>';
+  document.getElementById('rvBody').innerHTML='<div class="rv-none">No Google reviews found.'+(r.website?'<br><br><a href="'+esc(r.website)+'" target="_blank" style="color:var(--accent2)">Visit their website</a>':'')+'</div>';
 }
-
 function closeReviews(){document.getElementById('rvOverlay').classList.remove('open');}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// ======================== INIT ========================
+// ======================= INIT =======================
 popSvc();updateFI();initGMaps();
 </script>
 </body>
