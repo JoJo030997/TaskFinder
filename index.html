@@ -163,6 +163,11 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
         <div id="svcChips"></div>
         <div class="s-row" style="margin-top:8px"><input type="text" class="s-inp" id="newSvcInput" placeholder="Add new service type..."/><button class="s-btn s-btn-add" onclick="addSvc()">+ Add</button></div>
       </div>
+      <div class="s-sec">
+        <div class="s-lbl">API Usage</div>
+        <div id="usageArea" style="font-size:.85rem"></div>
+        <div class="s-row" style="margin-top:6px"><button class="s-btn s-btn-add" onclick="refreshUsage()">Refresh Usage</button></div>
+      </div>
     </div>
   </div>
 </div>
@@ -233,19 +238,20 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
 <script>
 // ======================= CONFIG =======================
 var DS=['Home cleaning','Handyman / repairs','Moving help','Furniture assembly','Yard work / landscaping','General tasks','Mobile Notary','Dumpster rental','Junk Removal','Storage units'];
-var C={workerUrl:'',mapsKey:'',minRating:4.7,minReviews:50,maxDrive:20,services:DS.slice(),keysVisible:true};
+var C={workerUrl:'',mapsKey:'',serpKey:'',minRating:4.7,minReviews:50,maxDrive:20,services:DS.slice(),keysVisible:true,gMapsCalls:0,lastUsageDate:''};
 function lc(){try{var s=localStorage.getItem('tf3_config');if(s)Object.assign(C,JSON.parse(s));}catch(e){}}
 function sc(){localStorage.setItem('tf3_config',JSON.stringify(C));}
 lc();
 
 // ======================= SETTINGS =======================
-function toggleSettings(){var o=document.getElementById('overlay');o.classList.toggle('open');if(o.classList.contains('open'))renderS();}
+function toggleSettings(){var o=document.getElementById('overlay');o.classList.toggle('open');if(o.classList.contains('open')){renderS();refreshUsage();}}
 function renderS(){
   var ka=document.getElementById('keysArea');
   if(C.keysVisible||!C.mapsKey){
     ka.innerHTML=
       '<div class="s-row"><span style="font-size:.85rem;min-width:95px">Worker URL:</span><input type="text" class="s-inp" id="sk1" value="'+(C.workerUrl||'')+'" placeholder="https://your-worker.workers.dev"/></div>'+
       '<div class="s-row"><span style="font-size:.85rem;min-width:95px">Google Maps:</span><input type="password" class="s-inp" id="sk2" value="'+(C.mapsKey||'')+'" placeholder="Google Maps API key"/></div>'+
+      '<div class="s-row"><span style="font-size:.85rem;min-width:95px">SerpAPI:</span><input type="password" class="s-inp" id="sk3" value="'+(C.serpKey||'')+'" placeholder="SerpAPI key (optional)"/></div>'+
       '<div class="s-row" style="margin-top:6px"><button class="s-btn s-btn-save" onclick="saveKeys()">Save &amp; Hide</button><span class="s-saved" id="keySaved">&#10003; Saved</span></div>';
   } else {
     ka.innerHTML='<div class="key-hidden">&#128274; Keys saved &nbsp;<button class="s-btn s-btn-add" onclick="C.keysVisible=true;renderS()">Edit</button></div>';
@@ -255,7 +261,7 @@ function renderS(){
   document.getElementById('setMaxDrive').value=C.maxDrive;
   renderChips();updateFI();
 }
-function saveKeys(){C.workerUrl=document.getElementById('sk1').value.trim().replace(/\/$/,'');C.mapsKey=document.getElementById('sk2').value.trim();C.keysVisible=false;sc();flash('keySaved');renderS();initGMaps();}
+function saveKeys(){C.workerUrl=document.getElementById('sk1').value.trim().replace(/\/$/,'');C.mapsKey=document.getElementById('sk2').value.trim();C.serpKey=document.getElementById('sk3').value.trim();C.keysVisible=false;sc();flash('keySaved');renderS();initGMaps();refreshUsage();}
 function saveReq(){C.minRating=parseFloat(document.getElementById('setMinRating').value)||4.7;C.minReviews=parseInt(document.getElementById('setMinReviews').value)||50;C.maxDrive=parseInt(document.getElementById('setMaxDrive').value)||20;sc();flash('reqSaved');updateFI();}
 function renderChips(){document.getElementById('svcChips').innerHTML=C.services.map(function(s,i){return'<span class="s-chip">'+esc(s)+' <button onclick="rmSvc('+i+')">&times;</button></span>';}).join('');}
 function addSvc(){var inp=document.getElementById('newSvcInput'),v=inp.value.trim();if(!v)return;if(C.services.indexOf(v)===-1)C.services.push(v);inp.value='';sc();renderChips();popSvc();}
@@ -263,6 +269,41 @@ function rmSvc(i){C.services.splice(i,1);sc();renderChips();popSvc();}
 function flash(id){var e=document.getElementById(id);e.classList.add('show');setTimeout(function(){e.classList.remove('show');},2000);}
 function updateFI(){var e=document.getElementById('filterInfo');if(e)e.textContent='Requirements: Rating \u2265 '+C.minRating+' \u00b7 Reviews \u2265 '+C.minReviews+' \u00b7 Drive \u2264 '+C.maxDrive+' min';}
 function popSvc(){var s=document.getElementById('service'),p=s.value;s.innerHTML='<option value="">Select a service...</option>';C.services.forEach(function(v){var o=document.createElement('option');o.value=v.toLowerCase();o.textContent=v;s.appendChild(o);});s.value=p;}
+
+// ======================= USAGE TRACKING =======================
+function bumpGoogle(n){
+  var today=new Date().toISOString().slice(0,10);
+  if(C.lastUsageDate!==today){C.gMapsCalls=0;C.lastUsageDate=today;}
+  C.gMapsCalls=(C.gMapsCalls||0)+(n||1);
+  sc();
+}
+
+async function refreshUsage(){
+  var area=document.getElementById('usageArea');
+  if(!area)return;
+  var today=new Date().toISOString().slice(0,10);
+  if(C.lastUsageDate!==today){C.gMapsCalls=0;C.lastUsageDate=today;sc();}
+
+  var html='<div style="margin-bottom:8px"><strong>Google Maps</strong> (today): <span style="color:var(--accent)">'+(C.gMapsCalls||0)+' calls</span></div>';
+
+  if(C.serpKey&&C.workerUrl){
+    html+='<div id="serpUsage" style="color:var(--muted)">Loading SerpAPI usage...</div>';
+    area.innerHTML=html;
+    try{
+      var d=await px({mode:'serp_account',api_key:C.serpKey});
+      var used=d.this_month_usage||0,limit=d.searches_per_month||0,remaining=d.plan_searches_left||0;
+      document.getElementById('serpUsage').innerHTML='<strong>SerpAPI</strong>: '+used+' / '+limit+' used this month <span style="color:var(--stx)">('+remaining+' remaining)</span>';
+    }catch(e){
+      document.getElementById('serpUsage').innerHTML='<strong>SerpAPI</strong>: <span style="color:var(--accent)">could not fetch ('+esc(e.message)+')</span>';
+    }
+  } else if(C.serpKey){
+    html+='<div style="color:var(--muted)">Save Worker URL to view SerpAPI usage</div>';
+    area.innerHTML=html;
+  } else {
+    html+='<div style="color:var(--muted)">Add SerpAPI key in Settings to see its usage</div>';
+    area.innerHTML=html;
+  }
+}
 
 // ======================= RADIUS SLIDER =======================
 var currentRadius=25;
@@ -280,7 +321,7 @@ function initGMaps(){
   if(mapsOk||!C.mapsKey)return;
   if(typeof google!=='undefined'&&google.maps){mapsOk=true;directionsService=new google.maps.DirectionsService();return;}
   var s=document.createElement('script');
-  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(C.mapsKey)+'&libraries=directions&callback=onMR';
+  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(C.mapsKey)+'&loading=async&callback=onMR';
   s.async=true;document.body.appendChild(s);
 }
 window.onMR=function(){mapsOk=true;directionsService=new google.maps.DirectionsService();};
@@ -359,6 +400,8 @@ async function px(params){
   var qs=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);}).join('&');
   var r=await fetch(C.workerUrl+'?'+qs);
   if(!r.ok)throw new Error('Proxy '+r.status);
+  // Track Google calls (skip serp endpoints)
+  if(params.mode&&params.mode.indexOf('serp')!==0)bumpGoogle(1);
   return r.json();
 }
 
@@ -434,28 +477,28 @@ async function getDriveTimes(origin,addrs){
 // ======================= PLATFORM URLS =======================
 var PLATFORMS={
   taskrabbit:{
-    name:'TaskRabbit',color:'#6aa84f',
+    name:'TaskRabbit',color:'#6aa84f',domain:'taskrabbit.com',
     url:function(svc,addr){
       var city=extractCity(addr);
       return'https://www.taskrabbit.com/search#?utf8=%E2%9C%93&q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city);
     }
   },
   thumbtack:{
-    name:'Thumbtack',color:'#00b3a4',
+    name:'Thumbtack',color:'#00b3a4',domain:'thumbtack.com',
     url:function(svc,addr){
       var city=extractCity(addr);
       return'https://www.thumbtack.com/search/?q='+encodeURIComponent(svc)+'&requestPostalCode='+encodeURIComponent(city);
     }
   },
   angi:{
-    name:'Angi',color:'#ff5a5f',
+    name:'Angi',color:'#ff5a5f',domain:'angi.com',
     url:function(svc,addr){
       var city=extractCity(addr);
       return'https://www.angi.com/hire/'+encodeURIComponent(svc.toLowerCase().replace(/\s+/g,'-'))+'/?location='+encodeURIComponent(city);
     }
   },
   homeadvisor:{
-    name:'HomeAdvisor',color:'#f5a623',
+    name:'HomeAdvisor',color:'#f5a623',domain:'homeadvisor.com',
     url:function(svc,addr){
       var city=extractCity(addr);
       return'https://www.homeadvisor.com/task.html?q='+encodeURIComponent(svc)+'&loc='+encodeURIComponent(city);
@@ -469,24 +512,66 @@ function extractCity(addr){
   return addr.trim();
 }
 
-function openPlatform(source,svc,addr){
+async function openPlatformOrSearch(source,svc,addr){
+  await searchPlatform(source,svc,addr);
+}
+
+async function searchPlatform(source,svc,addr){
   var p=PLATFORMS[source];if(!p)return;
-  var url=p.url(svc,addr);
+  if(!C.serpKey){
+    // Fallback to redirect if no SerpAPI key
+    var url=p.url(svc,addr),city=extractCity(addr);
+    var grid=document.getElementById('resultsGrid');
+    document.getElementById('mapContainer').style.display='none';
+    document.getElementById('resultsCount').innerHTML='Search on <span>'+esc(p.name)+'</span>';
+    grid.innerHTML='<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;text-align:center;">'
+      +'<div style="font-size:2rem;margin-bottom:.8rem;">&#128279;</div>'
+      +'<div style="font-family:\'Space Grotesk\',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">'+esc(p.name)+'</div>'
+      +'<div style="font-size:.88rem;color:var(--muted);margin-bottom:1.2rem;">Add a SerpAPI key in Settings to see real results in-app, or click to open '+esc(p.name)+' directly.</div>'
+      +'<a href="'+url+'" target="_blank" rel="noopener" style="display:inline-flex;gap:8px;background:'+p.color+';color:#fff;border-radius:9px;padding:12px 28px;font-size:.95rem;font-weight:600;text-decoration:none;">Open '+esc(p.name)+' &rarr;</a>'
+      +'</div>';
+    document.getElementById('resultsWrap').classList.add('visible');
+    return;
+  }
+
+  var st=document.getElementById('statusText'),sp=document.getElementById('spinner'),btn=document.getElementById('searchBtn'),
+      em=document.getElementById('errorMsg'),rw=document.getElementById('resultsWrap'),grid=document.getElementById('resultsGrid');
+  btn.disabled=true;sp.classList.add('active');st.textContent='Searching '+p.name+' via SerpAPI...';
+  rw.classList.remove('visible');grid.innerHTML='';
+
   var city=extractCity(addr);
-  var rw=document.getElementById('resultsWrap');
-  var grid=document.getElementById('resultsGrid');
-  document.getElementById('mapContainer').style.display='none';
-  document.getElementById('resultsCount').innerHTML='Search on <span>'+esc(p.name)+'</span>';
+  var query=svc+' site:'+p.domain+' '+city;
+  try{
+    var d=await px({mode:'serp',q:query,api_key:C.serpKey});
+    if(d.error)throw new Error(d.error);
+    var organic=d.organic_results||[];
 
-  grid.innerHTML='<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;text-align:center;">'
-    +'<div style="font-size:2rem;margin-bottom:.8rem;">&#128279;</div>'
-    +'<div style="font-family:\'Space Grotesk\',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">'+esc(p.name)+'</div>'
-    +'<div style="font-size:.88rem;color:var(--muted);margin-bottom:1.2rem;">Click below to search <strong>'+esc(svc)+'</strong> near <strong>'+esc(city)+'</strong> on '+esc(p.name)+'</div>'
-    +'<a href="'+url+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:'+p.color+';color:#fff;border-radius:9px;padding:12px 28px;font-size:.95rem;font-weight:600;text-decoration:none;">Open '+esc(p.name)+' &rarr;</a>'
-    +'<div style="margin-top:1rem;font-size:.75rem;color:var(--muted)">Or copy this link:<br><a href="'+url+'" target="_blank" style="color:var(--accent2);word-break:break-all;font-size:.75rem;">'+url+'</a></div>'
-    +'</div>';
+    if(!organic.length){
+      st.textContent='';em.textContent='No '+p.name+' listings found via SerpAPI for "'+svc+'" near '+city+'.';em.classList.add('show');
+      btn.disabled=false;sp.classList.remove('active');return;
+    }
 
-  rw.classList.add('visible');
+    document.getElementById('mapContainer').style.display='none';
+    document.getElementById('resultsCount').innerHTML='<span>'+organic.length+'</span> results from '+esc(p.name);
+
+    var html='<div class="cards-grid">';
+    html+=organic.map(function(o,i){
+      return '<div class="result-card">'
+        +'<div class="card-top"><div class="card-name">'+esc(o.title||'Untitled')+'</div><div class="badge-num">'+(i+1)+'</div></div>'
+        +(o.snippet?'<div class="card-desc">'+esc(o.snippet)+'</div>':'')
+        +'<div class="card-meta"><span class="pill" style="background:'+p.color+';color:#fff">'+esc(p.name)+'</span></div>'
+        +'<div class="card-actions"><a class="btn-a primary" href="'+esc(o.link)+'" target="_blank" rel="noopener">&#127760; View Listing</a></div>'
+        +'</div>';
+    }).join('');
+    html+='</div>';
+    grid.innerHTML=html;
+    rw.classList.add('visible');
+    btn.disabled=false;sp.classList.remove('active');st.textContent='Done — '+organic.length+' '+p.name+' listings found.';
+    refreshUsage();
+  }catch(e){
+    btn.disabled=false;sp.classList.remove('active');st.textContent='';
+    em.textContent='SerpAPI error: '+e.message;em.classList.add('show');
+  }
 }
 var allFetched=[],visibleResults=[],meetsArr=[],othersArr=[];
 
@@ -569,7 +654,7 @@ async function doSearch(){
   if(source!=='google'){
     btn.disabled=false;sp.classList.remove('active');st.textContent='';
     rw.classList.remove('visible');grid.innerHTML='';
-    openPlatform(source,svcLabel,address);
+    openPlatformOrSearch(source,svcLabel,address);
     return;
   }
 
