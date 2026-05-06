@@ -947,6 +947,9 @@ window.addEventListener('resize',function(){
   var maxW=Math.min(700,Math.floor(availW*0.5));
   var curW=sidebar.offsetWidth;
   if(curW>maxW)sidebar.style.width=Math.max(0,maxW)+'px';
+  var maxH=Math.min(700,Math.floor(window.innerHeight*0.7));
+  var curH=sidebar.offsetHeight;
+  if(curH>maxH)sidebar.style.height=Math.max(200,maxH)+'px';
   if(window.google&&window.gmap)google.maps.event.trigger(gmap,'resize');
 });
 popSvc();updateFI();initGMaps();renderSourceCheckboxes();refreshUsage();
