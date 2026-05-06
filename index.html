@@ -393,7 +393,26 @@ function initGMaps(){
   s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(C.mapsKey)+'&libraries=geometry&loading=async&callback=onMR';
   s.async=true;document.body.appendChild(s);
 }
-window.onMR=function(){mapsOk=true;var p=document.getElementById('mapPlaceholder');if(p)p.style.display='none';};
+window.onMR=function(){
+  mapsOk=true;
+  var p=document.getElementById('mapPlaceholder');if(p)p.style.display='none';
+  // Initialize an empty map immediately so the map is visible from the start
+  var c=document.getElementById('mapContainer');
+  if(c&&!gmap){
+    gmap=new google.maps.Map(c,{
+      center:{lat:39.8283,lng:-98.5795}, // center of US
+      zoom:4,
+      styles:[{featureType:'poi',stylers:[{visibility:'off'}]},{featureType:'transit',stylers:[{visibility:'simplified'}]}]
+    });
+  }
+  // If a search has already been done, recenter map on origin
+  if(originCoords&&gmap){
+    gmap.setCenter({lat:originCoords.lat,lng:originCoords.lng});
+    gmap.setZoom(11);
+    var om=new google.maps.Marker({position:{lat:originCoords.lat,lng:originCoords.lng},map:gmap,icon:{url:'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'},title:'Your location'});
+    gmarkers.push(om);
+  }
+};
 
 function setupMap(lat,lng){
   var c=document.getElementById('mapContainer');
