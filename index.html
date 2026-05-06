@@ -705,30 +705,36 @@ async function doSearch(){
 }
 
 // ======================= BACKGROUND PHONE FETCH =======================
-// Fetches place details for up to 20 results (to limit API calls), updates phone on each result
+// Fetches place details for each result, updates phone & re-renders incrementally
 async function fetchPhonesBackground(results, onDone){
-  var limit=Math.min(results.length, 20);
-  var updated=0;
+  console.log('[Phones] Starting fetch for', results.length, 'results');
+  var limit=Math.min(results.length, 30);
   for(var i=0;i<limit;i++){
     var r=results[i];
-    if(r.phone)continue; // already has phone
+    if(r.phone){console.log('[Phones]', i, r.name, '- already has phone');continue;}
     try{
       var pid=r.placeId;
       if(!pid){
+        console.log('[Phones]', i, r.name, '- no placeId, finding...');
         var fRes=await px({mode:'places_find',q:r.name+(r.address?' '+r.address:''),key:C.mapsKey});
         if(fRes.candidates&&fRes.candidates.length){pid=fRes.candidates[0].place_id;r.placeId=pid;}
       }
-      if(!pid)continue;
+      if(!pid){console.log('[Phones]', i, r.name, '- still no pid');continue;}
       var det=await px({mode:'places_details',place_id:pid,key:C.mapsKey});
       var res=det.result;
       if(res&&res.formatted_phone_number){
         r.phone=res.formatted_phone_number;
         r.phones=[r.phone];
-        updated++;
+        console.log('[Phones]', i, r.name, '✓', r.phone);
+        // Re-render so the new phone appears immediately
+        applyFilter();
+      } else {
+        console.log('[Phones]', i, r.name, '- details OK but no phone in response', res);
       }
       if(res&&res.website&&!r.website)r.website=res.website;
-    }catch(e){}
+    }catch(e){console.warn('[Phones] error for', r.name, e);}
   }
+  console.log('[Phones] Done');
   if(onDone)onDone();
 }
 
