@@ -9,11 +9,11 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--ink:#101014;--paper:#f5f3ef;--cream:#eae7e0;--accent:#c0452a;--accent2:#2963c8;--muted:#78756e;--border:#d6d1c9;--card:#fff;--sbg:#e8f5ec;--stx:#1a7a3a;--pbg:#e8eef8;--ptx:#1a4a7a;--wbg:#fff4e8;--wtx:#b06a00;--shadow:0 2px 12px rgba(0,0,0,.07)}
 body{font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
-.page-body{display:flex;flex:1;overflow:hidden;height:calc(100vh - 62px)}
+.page-body{display:flex;flex:1;height:calc(100vh - 62px);overflow:hidden}
 .left-col{flex:0 0 480px;overflow-y:auto;overflow-x:hidden;padding:1.2rem;display:flex;flex-direction:column;gap:.8rem}
-.right-col{flex:1;min-width:0;position:sticky;top:0;height:calc(100vh - 62px);background:var(--cream);align-self:flex-start}
+.right-col{flex:1;min-width:0;height:100%;position:relative;background:var(--cream)}
 #mapContainer{width:100%;height:100%;border-radius:0}
-@media(max-width:860px){.page-body{flex-direction:column;height:auto;overflow:visible}.left-col{flex:none;width:100%;overflow-y:visible;padding:1rem}.right-col{position:static;height:50vw;min-height:260px;max-height:480px}}
+@media(max-width:860px){.page-body{flex-direction:column;height:auto}.left-col{flex:none;width:100%;overflow-y:visible;padding:1rem}.right-col{height:50vw;min-height:260px;max-height:480px}}
 
 header{background:var(--ink);padding:1.4rem 1.5rem;position:relative;overflow:hidden}
 header::before{content:'';position:absolute;top:-80px;right:-60px;width:240px;height:240px;border-radius:50%;background:var(--accent);opacity:.12}
@@ -195,7 +195,22 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
     <div class="search-card">
       <div class="fields">
         <div class="field"><label>Address / City / ZIP / Neighborhood</label><input type="text" id="address" placeholder="e.g. 49127 or 4564 Cleveland Ave., Stevensville MI"/></div>
-        <div class="field"><label>Service Type</label><select id="service"></select></div>
+        <div class="field">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <label>Service Type</label>
+            <div style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--muted)">
+              <span>Dropdown</span>
+              <label style="position:relative;display:inline-block;width:34px;height:18px;cursor:pointer">
+                <input type="checkbox" id="searchModeToggle" onchange="toggleSearchMode()" style="opacity:0;width:0;height:0;position:absolute"/>
+                <span id="toggleTrack" style="position:absolute;inset:0;border-radius:18px;background:var(--border);transition:.2s"></span>
+                <span id="toggleThumb" style="position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
+              </label>
+              <span>Free search</span>
+            </div>
+          </div>
+          <div id="modeDropdown"><select id="service"></select></div>
+          <div id="modeFreetext" style="display:none"><input type="text" id="serviceFreetext" placeholder="e.g. moving and storage, notary near me..."/></div>
+        </div>
         <div class="field"><label>Search Sources (pick one or more)</label>
           <div class="src-grid" id="srcGrid"></div>
         </div>
@@ -304,6 +319,27 @@ function rmSvc(i){C.services.splice(i,1);sc();renderChips();popSvc();}
 function flash(id){var e=document.getElementById(id);e.classList.add('show');setTimeout(function(){e.classList.remove('show');},2000);}
 function updateFI(){var e=document.getElementById('filterInfo');if(e)e.textContent='Requirements: Rating \u2265 '+C.minRating+' \u00b7 Reviews \u2265 '+C.minReviews+' \u00b7 Drive \u2264 '+C.maxDrive+' min';}
 function popSvc(){var s=document.getElementById('service'),p=s.value;s.innerHTML='<option value="">Select a service...</option>';C.services.forEach(function(v){var o=document.createElement('option');o.value=v.toLowerCase();o.textContent=v;s.appendChild(o);});s.value=p;}
+
+function toggleSearchMode(){
+  var tog=document.getElementById('searchModeToggle');
+  var isFree=tog.checked;
+  document.getElementById('modeDropdown').style.display=isFree?'none':'block';
+  document.getElementById('modeFreetext').style.display=isFree?'block':'none';
+  // Update toggle visual
+  var track=document.getElementById('toggleTrack');
+  var thumb=document.getElementById('toggleThumb');
+  if(track)track.style.background=isFree?'var(--accent)':'var(--border)';
+  if(thumb)thumb.style.left=isFree?'18px':'2px';
+}
+
+function getServiceQuery(){
+  var tog=document.getElementById('searchModeToggle');
+  if(tog&&tog.checked){
+    return document.getElementById('serviceFreetext').value.trim();
+  }
+  var sel=document.getElementById('service');
+  return sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'';
+}
 
 function bumpGoogle(n){var t=new Date().toISOString().slice(0,10);if(C.lastUsageDate!==t){C.gMapsCalls=0;C.apifyRuns=0;C.lastUsageDate=t;}C.gMapsCalls=(C.gMapsCalls||0)+(n||1);sc();}
 function bumpApify(n){var t=new Date().toISOString().slice(0,10);if(C.lastUsageDate!==t){C.gMapsCalls=0;C.apifyRuns=0;C.lastUsageDate=t;}C.apifyRuns=(C.apifyRuns||0)+(n||1);sc();}
@@ -678,11 +714,12 @@ async function doSearch(){
     em=document.getElementById('errorMsg'),nk=document.getElementById('noKeyMsg'),
     rw=document.getElementById('resultsWrap'),grid=document.getElementById('resultsGrid');
   nk.classList.remove('show');em.classList.remove('show');
+  var svcQuery=getServiceQuery();
   if(!address){st.textContent='Enter an address.';return;}
-  if(!service){st.textContent='Select a service.';return;}
+  if(!svcQuery){st.textContent='Enter or select a service type.';return;}
   if(!C.selectedSources.length){st.textContent='Pick at least one source.';return;}
 
-  var svcLabel=document.getElementById('service').options[document.getElementById('service').selectedIndex].text;
+  var svcLabel=svcQuery;
   originAddr=address;originCoords=null;cardPins={};sourceResults={};globalIdCounter=0;showAllActive=false;clearAllPins();var bsa=document.getElementById('btnShowAll');if(bsa){bsa.classList.remove('active');bsa.innerHTML='&#128205; Show All Pins';}showAllActive=false;clearAllPins();var btnSA=document.getElementById('btnShowAll');if(btnSA){btnSA.classList.remove('active');btnSA.textContent='📍 Show All Pins';}
 
   var needsGoogle=C.selectedSources.indexOf('google')>-1;
@@ -699,7 +736,7 @@ async function doSearch(){
   rw.classList.add('visible');
 
   st.textContent='Searching '+C.selectedSources.length+' source'+(C.selectedSources.length>1?'s':'')+'...';
-  var promises=C.selectedSources.map(function(srcKey){return runSource(srcKey,svcLabel,address);});
+  var promises=C.selectedSources.map(function(srcKey){return runSource(srcKey,svcQuery,address);});
   await Promise.all(promises);
 
   if(needsGoogle&&originCoords&&mapsOk)setupMap(originCoords.lat,originCoords.lng);
@@ -829,7 +866,12 @@ function renderCard(r,idx,dimmed){
   if(r._isTopPro)pills+='<span class="pill" style="background:#ffd700;color:#333">&#11088; Top Pro</span>';
   if(r.driveTxt)pills+='<span class="pill pill-drive">\uD83D\uDE97 '+esc(r.driveTxt)+'</span>';
   if(r.distTxt)pills+='<span class="pill pill-neutral">'+esc(r.distTxt)+'</span>';
-  if(r.price)pills+='<span class="pill pill-neutral">'+esc(r.price)+'</span>';
+  if(r.price){
+    var priceStr=r.price;
+    // Convert numeric price_level to dollar signs
+    if(typeof r.price==='number')priceStr='$'.repeat(Math.min(4,Math.max(1,r.price)));
+    pills+='<span class="price-tag">'+esc(priceStr)+'</span>';
+  }
   if(r.open===true)pills+='<span class="pill pill-open">Open now</span>';
   else if(r.open===false)pills+='<span class="pill pill-closed">Closed</span>';
   var acts='';
