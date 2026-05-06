@@ -136,7 +136,10 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
 <header>
   <div class="h-inner">
     <div><div class="logo">Task<span>Finder</span></div><div class="tagline">Find local service providers near any address</div></div>
-    <button class="gear-btn" onclick="toggleSettings()">&#9881;</button>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div id="headerUsage" style="font-size:.72rem;color:#a09888;display:flex;gap:14px;align-items:center"></div>
+      <button class="gear-btn" onclick="toggleSettings()">&#9881;</button>
+    </div>
   </div>
 </header>
 
@@ -162,11 +165,7 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
         <div id="svcChips"></div>
         <div class="s-row" style="margin-top:8px"><input type="text" class="s-inp" id="newSvcInput" placeholder="Add new service type..."/><button class="s-btn s-btn-add" onclick="addSvc()">+ Add</button></div>
       </div>
-      <div class="s-sec">
-        <div class="s-lbl">API Usage</div>
-        <div id="usageArea" style="font-size:.85rem"></div>
-        <div class="s-row" style="margin-top:6px"><button class="s-btn s-btn-add" onclick="refreshUsage()">Refresh Usage</button></div>
-      </div>
+
     </div>
   </div>
 </div>
@@ -270,7 +269,7 @@ function toggleSource(key,cb){
   sc();
 }
 
-function toggleSettings(){var o=document.getElementById('overlay');o.classList.toggle('open');if(o.classList.contains('open')){renderS();refreshUsage();}}
+function toggleSettings(){var o=document.getElementById('overlay');o.classList.toggle('open');if(o.classList.contains('open')){renderS();}}
 function renderS(){
   var ka=document.getElementById('keysArea');
   if(C.keysVisible||!C.mapsKey){
@@ -300,28 +299,40 @@ function bumpGoogle(n){var t=new Date().toISOString().slice(0,10);if(C.lastUsage
 function bumpApify(n){var t=new Date().toISOString().slice(0,10);if(C.lastUsageDate!==t){C.gMapsCalls=0;C.apifyRuns=0;C.lastUsageDate=t;}C.apifyRuns=(C.apifyRuns||0)+(n||1);sc();}
 
 async function refreshUsage(){
-  var area=document.getElementById('usageArea');if(!area)return;
   var t=new Date().toISOString().slice(0,10);
   if(C.lastUsageDate!==t){C.gMapsCalls=0;C.apifyRuns=0;C.lastUsageDate=t;sc();}
-  var html='<div style="margin-bottom:8px"><strong>Google Maps</strong> (today): <span style="color:var(--accent)">'+(C.gMapsCalls||0)+' calls</span></div>';
-  html+='<div style="margin-bottom:8px"><strong>Apify</strong> (today, local count): <span style="color:var(--accent)">'+(C.apifyRuns||0)+' actor runs</span></div>';
+  var hu=document.getElementById('headerUsage');if(!hu)return;
+
+  // Base: always show Google calls
+  var parts=[];
+  parts.push('<span>&#127760; Google: <strong style="color:#7eb8f7">'+(C.gMapsCalls||0)+'</strong> calls today</span>');
+
   if(C.apifyToken&&C.workerUrl){
-    html+='<div id="apifyUsage" style="color:var(--muted);font-size:.82rem">Loading Apify monthly usage...</div>';
-    area.innerHTML=html;
+    parts.push('<span id="huApify" style="color:#a09888">Apify: loading...</span>');
+    hu.innerHTML=parts.join('<span style="opacity:.3">|</span>');
     try{
       var d=await pxGet({mode:'apify_account',token:C.apifyToken});
+      var apifyHtml='';
       if(d&&d.data&&d.data.monthlyUsageUsd!==undefined){
-        document.getElementById('apifyUsage').innerHTML='<strong>Apify monthly</strong>: $'+d.data.monthlyUsageUsd.toFixed(3)+' used this month';
+        var used=d.data.monthlyUsageUsd;
+        var limit=5; // free tier default, rough estimate
+        var pct=Math.min(100,(used/limit)*100);
+        var warn=pct>=80;
+        var color=warn?'#f5a623':pct>=60?'#e0c040':'#7eb8f7';
+        apifyHtml='<span style="color:'+color+'">Apify: $'+used.toFixed(3)+'/mo'+(warn?' &#9888;':'')+'</span>';
       } else {
-        document.getElementById('apifyUsage').innerHTML='<span style="color:var(--muted);font-size:.82rem">Apify usage data unavailable</span>';
+        apifyHtml='<span style="color:#a09888">Apify: connected</span>';
       }
+      var el=document.getElementById('huApify');if(el)el.outerHTML=apifyHtml;
     }catch(e){
-      document.getElementById('apifyUsage').innerHTML='<strong>Apify</strong>: <span style="color:var(--accent)">'+esc(e.message)+'</span>';
+      var el=document.getElementById('huApify');if(el)el.outerHTML='<span style="color:var(--accent)">Apify: error</span>';
     }
-  } else if(!C.apifyToken){
-    html+='<div style="color:var(--muted);font-size:.82rem">Add Apify token to use scrapers</div>';
-    area.innerHTML=html;
-  } else {area.innerHTML=html;}
+  } else if(C.apifyToken){
+    parts.push('<span style="color:#a09888">Apify: set Worker URL</span>');
+    hu.innerHTML=parts.join('<span style="opacity:.3">|</span>');
+  } else {
+    hu.innerHTML=parts.join('<span style="opacity:.3">|</span>');
+  }
 }
 
 var currentRadius=50;
@@ -591,6 +602,7 @@ async function doSearch(){
 
   applyFilter();
   btn.disabled=false;sp.classList.remove('active');st.textContent='Done.';
+  refreshUsage();
 
   if(sourceResults.google&&sourceResults.google.length){
     fetchPhonesBackground(sourceResults.google,function(){applyFilter();});
@@ -750,7 +762,7 @@ function closeReviews(){document.getElementById('rvOverlay').classList.remove('o
 function copyPhone(ph,btn){navigator.clipboard.writeText(ph).then(function(){var orig=btn.innerHTML;btn.innerHTML='&#10003; Copied!';setTimeout(function(){btn.innerHTML=orig;},1500);}).catch(function(){alert('Copy failed. Number: '+ph);});}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-popSvc();updateFI();initGMaps();renderSourceCheckboxes();
+popSvc();updateFI();initGMaps();renderSourceCheckboxes();refreshUsage();
 </script>
 </body>
 </html>
