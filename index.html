@@ -19,7 +19,6 @@ header::before{content:'';position:absolute;top:-80px;right:-60px;width:240px;he
 .gear-btn{background:rgba(255,255,255,.1);border:none;color:#fff;width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center}
 .gear-btn:hover{background:rgba(255,255,255,.2)}
 
-/* OVERLAY / SETTINGS */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem}
 .overlay.open{display:flex}
 .s-panel{background:var(--card);border-radius:14px;width:100%;max-width:580px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.2)}
@@ -42,12 +41,10 @@ header::before{content:'';position:absolute;top:-80px;right:-60px;width:240px;he
 .s-chip button{background:none;border:none;cursor:pointer;font-size:.9rem;color:var(--muted);padding:0 2px}.s-chip button:hover{color:var(--accent)}
 .key-hidden{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--stx)}
 
-/* MAIN */
 .wrap{max-width:960px;margin:0 auto;padding:1.4rem}
 .search-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.3rem;box-shadow:var(--shadow);margin-bottom:1rem}
-.fields{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:10px}
-@media(max-width:540px){.fields{grid-template-columns:1fr}}
-.field{display:flex;flex-direction:column;gap:4px}.field.full{grid-column:1/-1}
+.fields{display:grid;grid-template-columns:1fr;gap:11px;margin-bottom:10px}
+.field{display:flex;flex-direction:column;gap:4px}
 .field label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
 input[type=text],input[type=number],input[type=password],select{border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:.9rem;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);width:100%}
 input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(192,69,42,.1)}
@@ -61,19 +58,19 @@ input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
 .error-msg{background:#fff3f0;border:1px solid #f0c8c0;border-radius:10px;padding:.85rem;font-size:.84rem;color:var(--accent);margin-top:9px;display:none}.error-msg.show{display:block}
 .no-key-msg{background:#fff3f0;border:1px solid #f0c8c0;border-radius:10px;padding:.85rem;font-size:.84rem;color:var(--accent);margin-bottom:1rem;display:none}.no-key-msg.show{display:block}
 
-/* RESULTS TOP BAR */
+.src-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+.src-chk{display:flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--paper);cursor:pointer;font-size:.85rem;transition:background .12s,border-color .12s;user-select:none}
+.src-chk:hover{background:var(--cream)}
+.src-chk input{width:14px;height:14px;accent-color:var(--accent);cursor:pointer}
+.src-chk.active{background:#fbe9e3;border-color:var(--accent)}
+
 .results-wrap{display:none}.results-wrap.visible{display:block}
 .results-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:8px}
-.results-count{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700}.results-count span{color:var(--accent)}
+.results-count{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700}.results-count span{color:var(--accent)}
 .controls-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-
-/* SORT */
 .ctrl-group{display:flex;align-items:center;gap:6px}
 .ctrl-label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
 .ctrl-select{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:.83rem;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);cursor:pointer}
-.ctrl-select:focus{outline:none;border-color:var(--accent)}
-
-/* RADIUS SLIDER */
 .radius-wrap{display:flex;align-items:center;gap:7px}
 .radius-lbl{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
 .radius-val{font-size:.82rem;font-weight:700;color:var(--accent);min-width:48px;text-align:right}
@@ -81,13 +78,17 @@ input[type=range]{-webkit-appearance:none;appearance:none;width:110px;height:4px
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2)}
 input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;border:none}
 
-/* MAP */
 .map-container{border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:1rem;height:300px;background:var(--cream)}
-.section-heading{font-size:.76rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:1rem 0 .5rem;padding-bottom:5px;border-bottom:1px solid var(--border)}
-.section-heading:first-child{margin-top:0}
+
+.source-section{margin-top:1.3rem;border-top:2px solid var(--border);padding-top:1rem}
+.source-section:first-child{margin-top:0;border-top:none;padding-top:0}
+.source-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;gap:8px;flex-wrap:wrap}
+.source-title{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.source-badge{font-size:.7rem;padding:2px 9px;border-radius:20px;color:#fff;font-weight:600}
+.source-meta{font-size:.78rem;color:var(--muted)}
+.section-heading{font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:.7rem 0 .45rem;padding-bottom:4px;border-bottom:1px solid var(--border)}
 .other-heading{color:#a09060;border-color:#e0d8c0}
 
-/* 2-COL CARDS */
 .cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:620px){.cards-grid{grid-template-columns:1fr}}
 .result-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:.85rem 1rem;animation:fadeUp .3s ease both;transition:box-shadow .15s,transform .15s;display:flex;flex-direction:column;gap:5px}
@@ -105,12 +106,11 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .rating-line{font-size:.78rem;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
 .rv-link{color:var(--accent2);cursor:pointer;text-decoration:underline;font-size:.75rem}.rv-link:hover{color:var(--accent)}
 .card-actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
-.btn-a{font-size:.73rem;font-weight:500;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--paper);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:3px;transition:background .12s}
+.btn-a{font-size:.73rem;font-weight:500;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--paper);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:3px;transition:background .12s;font-family:'Outfit',sans-serif}
 .btn-a:hover{background:var(--cream)}.btn-a.primary{background:var(--ink);color:#fff;border-color:var(--ink)}.btn-a.primary:hover{background:#2a2a30}
 .map-check{display:flex;align-items:center;gap:4px;font-size:.73rem;color:var(--muted);cursor:pointer;user-select:none;margin-top:3px}
 .map-check input{width:13px;height:13px;accent-color:var(--accent);cursor:pointer}
 
-/* REVIEWS MODAL */
 .rv-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
 .rv-overlay.open{display:flex}
 .rv-panel{background:var(--card);border-radius:14px;width:100%;max-width:520px;max-height:88vh;min-height:0;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.25);overflow:hidden}
@@ -140,7 +140,6 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
   </div>
 </header>
 
-<!-- SETTINGS OVERLAY -->
 <div class="overlay" id="overlay" onclick="if(event.target===this)toggleSettings()">
   <div class="s-panel">
     <div class="s-header">
@@ -172,7 +171,6 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
   </div>
 </div>
 
-<!-- REVIEWS MODAL -->
 <div class="rv-overlay" id="rvOverlay" onclick="if(event.target===this)closeReviews()">
   <div class="rv-panel">
     <div class="rv-head">
@@ -190,15 +188,11 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
   <div class="no-key-msg" id="noKeyMsg">Configure your API keys in &#9881; Settings first.</div>
   <div class="search-card">
     <div class="fields">
-      <div class="field full"><label>Address / City / ZIP / Neighborhood</label><input type="text" id="address" placeholder="e.g. 49127 or 4564 Cleveland Ave., Stevensville MI"/></div>
+      <div class="field"><label>Address / City / ZIP / Neighborhood</label><input type="text" id="address" placeholder="e.g. 49127 or 4564 Cleveland Ave., Stevensville MI"/></div>
       <div class="field"><label>Service Type</label><select id="service"></select></div>
-      <div class="field"><label>Search Source</label><select id="sourceSelect">
-        <option value="google">Google (Local)</option>
-        <option value="taskrabbit">TaskRabbit</option>
-        <option value="thumbtack">Thumbtack</option>
-        <option value="angi">Angi</option>
-        <option value="homeadvisor">HomeAdvisor</option>
-      </select></div>
+      <div class="field"><label>Search Sources (pick one or more)</label>
+        <div class="src-grid" id="srcGrid"></div>
+      </div>
     </div>
     <div class="filter-info" id="filterInfo"></div>
     <button class="search-btn" id="searchBtn" onclick="doSearch()">
@@ -233,17 +227,49 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
   </div>
 </div>
 
-<footer>TaskFinder &middot; Powered by Google Places</footer>
+<footer>TaskFinder &middot; Powered by Google Places + Apify</footer>
 
 <script>
-// ======================= CONFIG =======================
 var DS=['Home cleaning','Handyman / repairs','Moving help','Furniture assembly','Yard work / landscaping','General tasks','Mobile Notary','Dumpster rental','Junk Removal','Storage units'];
-var C={workerUrl:'',mapsKey:'',serpKey:'',minRating:4.7,minReviews:50,maxDrive:20,services:DS.slice(),keysVisible:true,gMapsCalls:0,lastUsageDate:''};
-function lc(){try{var s=localStorage.getItem('tf3_config');if(s)Object.assign(C,JSON.parse(s));}catch(e){}}
-function sc(){localStorage.setItem('tf3_config',JSON.stringify(C));}
+var C={
+  workerUrl:'',mapsKey:'',apifyToken:'',
+  minRating:4.7,minReviews:50,maxDrive:20,
+  services:DS.slice(),
+  selectedSources:['google'],
+  keysVisible:true,
+  gMapsCalls:0,apifyRuns:0,lastUsageDate:''
+};
+function lc(){try{var s=localStorage.getItem('tf4_config');if(s)Object.assign(C,JSON.parse(s));}catch(e){}}
+function sc(){localStorage.setItem('tf4_config',JSON.stringify(C));}
 lc();
 
-// ======================= SETTINGS =======================
+var SOURCES={
+  google:    {name:'Google',     color:'#4285f4', kind:'google'},
+  taskrabbit:{name:'TaskRabbit', color:'#6aa84f', kind:'apify', actor:'tropical_quince~taskrabbit-pro-scraper'},
+  thumbtack: {name:'Thumbtack',  color:'#00b3a4', kind:'apify', actor:'tropical_quince~thumbtack-pro-scraper'},
+  craigslist:{name:'Craigslist', color:'#5d3fd3', kind:'apify', actor:'ivanvs~craigslist-scraper'},
+  angi:      {name:'Angi',       color:'#ff5a5f', kind:'redirect', urlFn:function(svc,city){return'https://www.angi.com/hire/'+encodeURIComponent(svc.toLowerCase().replace(/\s+/g,'-'))+'/?location='+encodeURIComponent(city);}},
+  homeadvisor:{name:'HomeAdvisor',color:'#f5a623',kind:'redirect', urlFn:function(svc,city){return'https://www.homeadvisor.com/task.html?q='+encodeURIComponent(svc)+'&loc='+encodeURIComponent(city);}}
+};
+
+function renderSourceCheckboxes(){
+  var grid=document.getElementById('srcGrid');var html='';
+  Object.keys(SOURCES).forEach(function(k){
+    var s=SOURCES[k];var checked=C.selectedSources.indexOf(k)>-1;
+    html+='<label class="src-chk'+(checked?' active':'')+'" data-src="'+k+'">'
+      +'<input type="checkbox" '+(checked?'checked':'')+' onchange="toggleSource(\''+k+'\',this)"/>'
+      +'<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'+s.color+'"></span>'
+      +esc(s.name)+'</label>';
+  });
+  grid.innerHTML=html;
+}
+function toggleSource(key,cb){
+  if(cb.checked){if(C.selectedSources.indexOf(key)===-1)C.selectedSources.push(key);}
+  else{C.selectedSources=C.selectedSources.filter(function(k){return k!==key;});}
+  var lbl=cb.closest('.src-chk');if(lbl)lbl.classList.toggle('active',cb.checked);
+  sc();
+}
+
 function toggleSettings(){var o=document.getElementById('overlay');o.classList.toggle('open');if(o.classList.contains('open')){renderS();refreshUsage();}}
 function renderS(){
   var ka=document.getElementById('keysArea');
@@ -251,7 +277,7 @@ function renderS(){
     ka.innerHTML=
       '<div class="s-row"><span style="font-size:.85rem;min-width:95px">Worker URL:</span><input type="text" class="s-inp" id="sk1" value="'+(C.workerUrl||'')+'" placeholder="https://your-worker.workers.dev"/></div>'+
       '<div class="s-row"><span style="font-size:.85rem;min-width:95px">Google Maps:</span><input type="password" class="s-inp" id="sk2" value="'+(C.mapsKey||'')+'" placeholder="Google Maps API key"/></div>'+
-      '<div class="s-row"><span style="font-size:.85rem;min-width:95px">SerpAPI:</span><input type="password" class="s-inp" id="sk3" value="'+(C.serpKey||'')+'" placeholder="SerpAPI key (optional)"/></div>'+
+      '<div class="s-row"><span style="font-size:.85rem;min-width:95px">Apify Token:</span><input type="password" class="s-inp" id="sk3" value="'+(C.apifyToken||'')+'" placeholder="Apify API token (for scrapers)"/></div>'+
       '<div class="s-row" style="margin-top:6px"><button class="s-btn s-btn-save" onclick="saveKeys()">Save &amp; Hide</button><span class="s-saved" id="keySaved">&#10003; Saved</span></div>';
   } else {
     ka.innerHTML='<div class="key-hidden">&#128274; Keys saved &nbsp;<button class="s-btn s-btn-add" onclick="C.keysVisible=true;renderS()">Edit</button></div>';
@@ -261,7 +287,7 @@ function renderS(){
   document.getElementById('setMaxDrive').value=C.maxDrive;
   renderChips();updateFI();
 }
-function saveKeys(){C.workerUrl=document.getElementById('sk1').value.trim().replace(/\/$/,'');C.mapsKey=document.getElementById('sk2').value.trim();C.serpKey=document.getElementById('sk3').value.trim();C.keysVisible=false;sc();flash('keySaved');renderS();initGMaps();refreshUsage();}
+function saveKeys(){C.workerUrl=document.getElementById('sk1').value.trim().replace(/\/$/,'');C.mapsKey=document.getElementById('sk2').value.trim();C.apifyToken=document.getElementById('sk3').value.trim();C.keysVisible=false;sc();flash('keySaved');renderS();initGMaps();refreshUsage();}
 function saveReq(){C.minRating=parseFloat(document.getElementById('setMinRating').value)||4.7;C.minReviews=parseInt(document.getElementById('setMinReviews').value)||50;C.maxDrive=parseInt(document.getElementById('setMaxDrive').value)||20;sc();flash('reqSaved');updateFI();}
 function renderChips(){document.getElementById('svcChips').innerHTML=C.services.map(function(s,i){return'<span class="s-chip">'+esc(s)+' <button onclick="rmSvc('+i+')">&times;</button></span>';}).join('');}
 function addSvc(){var inp=document.getElementById('newSvcInput'),v=inp.value.trim();if(!v)return;if(C.services.indexOf(v)===-1)C.services.push(v);inp.value='';sc();renderChips();popSvc();}
@@ -270,52 +296,37 @@ function flash(id){var e=document.getElementById(id);e.classList.add('show');set
 function updateFI(){var e=document.getElementById('filterInfo');if(e)e.textContent='Requirements: Rating \u2265 '+C.minRating+' \u00b7 Reviews \u2265 '+C.minReviews+' \u00b7 Drive \u2264 '+C.maxDrive+' min';}
 function popSvc(){var s=document.getElementById('service'),p=s.value;s.innerHTML='<option value="">Select a service...</option>';C.services.forEach(function(v){var o=document.createElement('option');o.value=v.toLowerCase();o.textContent=v;s.appendChild(o);});s.value=p;}
 
-// ======================= USAGE TRACKING =======================
-function bumpGoogle(n){
-  var today=new Date().toISOString().slice(0,10);
-  if(C.lastUsageDate!==today){C.gMapsCalls=0;C.lastUsageDate=today;}
-  C.gMapsCalls=(C.gMapsCalls||0)+(n||1);
-  sc();
-}
+function bumpGoogle(n){var t=new Date().toISOString().slice(0,10);if(C.lastUsageDate!==t){C.gMapsCalls=0;C.apifyRuns=0;C.lastUsageDate=t;}C.gMapsCalls=(C.gMapsCalls||0)+(n||1);sc();}
+function bumpApify(n){var t=new Date().toISOString().slice(0,10);if(C.lastUsageDate!==t){C.gMapsCalls=0;C.apifyRuns=0;C.lastUsageDate=t;}C.apifyRuns=(C.apifyRuns||0)+(n||1);sc();}
 
 async function refreshUsage(){
-  var area=document.getElementById('usageArea');
-  if(!area)return;
-  var today=new Date().toISOString().slice(0,10);
-  if(C.lastUsageDate!==today){C.gMapsCalls=0;C.lastUsageDate=today;sc();}
-
+  var area=document.getElementById('usageArea');if(!area)return;
+  var t=new Date().toISOString().slice(0,10);
+  if(C.lastUsageDate!==t){C.gMapsCalls=0;C.apifyRuns=0;C.lastUsageDate=t;sc();}
   var html='<div style="margin-bottom:8px"><strong>Google Maps</strong> (today): <span style="color:var(--accent)">'+(C.gMapsCalls||0)+' calls</span></div>';
-
-  if(C.serpKey&&C.workerUrl){
-    html+='<div id="serpUsage" style="color:var(--muted)">Loading SerpAPI usage...</div>';
+  html+='<div style="margin-bottom:8px"><strong>Apify</strong> (today, local count): <span style="color:var(--accent)">'+(C.apifyRuns||0)+' actor runs</span></div>';
+  if(C.apifyToken&&C.workerUrl){
+    html+='<div id="apifyUsage" style="color:var(--muted);font-size:.82rem">Loading Apify monthly usage...</div>';
     area.innerHTML=html;
     try{
-      var d=await px({mode:'serp_account',api_key:C.serpKey});
-      var used=d.this_month_usage||0,limit=d.searches_per_month||0,remaining=d.plan_searches_left||0;
-      document.getElementById('serpUsage').innerHTML='<strong>SerpAPI</strong>: '+used+' / '+limit+' used this month <span style="color:var(--stx)">('+remaining+' remaining)</span>';
+      var d=await pxGet({mode:'apify_account',token:C.apifyToken});
+      if(d&&d.data&&d.data.monthlyUsageUsd!==undefined){
+        document.getElementById('apifyUsage').innerHTML='<strong>Apify monthly</strong>: $'+d.data.monthlyUsageUsd.toFixed(3)+' used this month';
+      } else {
+        document.getElementById('apifyUsage').innerHTML='<span style="color:var(--muted);font-size:.82rem">Apify usage data unavailable</span>';
+      }
     }catch(e){
-      document.getElementById('serpUsage').innerHTML='<strong>SerpAPI</strong>: <span style="color:var(--accent)">could not fetch ('+esc(e.message)+')</span>';
+      document.getElementById('apifyUsage').innerHTML='<strong>Apify</strong>: <span style="color:var(--accent)">'+esc(e.message)+'</span>';
     }
-  } else if(C.serpKey){
-    html+='<div style="color:var(--muted)">Save Worker URL to view SerpAPI usage</div>';
+  } else if(!C.apifyToken){
+    html+='<div style="color:var(--muted);font-size:.82rem">Add Apify token to use scrapers</div>';
     area.innerHTML=html;
-  } else {
-    html+='<div style="color:var(--muted)">Add SerpAPI key in Settings to see its usage</div>';
-    area.innerHTML=html;
-  }
+  } else {area.innerHTML=html;}
 }
 
-// ======================= RADIUS SLIDER =======================
-// Radius slider now controls display highlight only — ALL results always shown
-// Results beyond radius are shown as "dimmed" in the Other Results section
 var currentRadius=50;
-function onRadiusChange(v){
-  currentRadius=parseInt(v);
-  document.getElementById('radiusVal').textContent=currentRadius+' mi';
-  applyFilter();
-}
+function onRadiusChange(v){currentRadius=parseInt(v);document.getElementById('radiusVal').textContent=currentRadius+' mi';applyFilter();}
 
-// ======================= GOOGLE MAPS =======================
 var gmap,gmarkers=[],mapsOk=false,originAddr='',originCoords=null,cardPins={},cardRoutes={};
 
 function initGMaps(){
@@ -341,108 +352,79 @@ function setupMap(lat,lng){
 
 var ROUTE_COLORS=['#c0452a','#2963c8','#1a7a3a','#b06a00','#7b2d8b','#0097a7','#e65100','#37474f'];
 
-async function togglePin(idx){
-  var r=visibleResults[idx];if(!r||!gmap)return;
-  var cb=document.getElementById('mc_'+idx);if(!cb)return;
-
+async function togglePin(gid){
+  var r=findResultByGlobalId(gid);if(!r||!gmap)return;
+  var cb=document.getElementById('mc_'+gid);if(!cb)return;
   if(cb.checked){
     var lat=r.lat,lng=r.lng;
-    if(!lat&&r.address){
-      try{
-        var d=await px({mode:'geocode',address:r.address,key:C.mapsKey});
-        if(d.results&&d.results.length){lat=d.results[0].geometry.location.lat;lng=d.results[0].geometry.location.lng;r.lat=lat;r.lng=lng;}
-      }catch(e){}
-    }
+    if(!lat&&r.address){try{var d=await pxGet({mode:'geocode',address:r.address,key:C.mapsKey});if(d.results&&d.results.length){lat=d.results[0].geometry.location.lat;lng=d.results[0].geometry.location.lng;r.lat=lat;r.lng=lng;}}catch(e){}}
     if(!lat||!lng){cb.checked=false;alert('Could not locate this business.');return;}
-
     var color=ROUTE_COLORS[Object.keys(cardPins).length%ROUTE_COLORS.length];
     var m=new google.maps.Marker({
       position:{lat:lat,lng:lng},map:gmap,title:r.name,
-      label:{text:String(idx+1),color:'#fff',fontSize:'11px',fontWeight:'600'},
+      label:{text:String(Object.keys(cardPins).length+1),color:'#fff',fontSize:'11px',fontWeight:'600'},
       icon:{path:google.maps.SymbolPath.CIRCLE,scale:14,fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
     });
-    cardPins[idx]=m;gmarkers.push(m);
-
-    // Draw route using Routes API
+    cardPins[gid]=m;gmarkers.push(m);
     if(originCoords){
       try{
         var routeResp=await fetch('https://routes.googleapis.com/directions/v2:computeRoutes',{
           method:'POST',
           headers:{'Content-Type':'application/json','X-Goog-Api-Key':C.mapsKey,'X-Goog-FieldMask':'routes.polyline.encodedPolyline'},
-          body:JSON.stringify({
-            origin:{location:{latLng:{latitude:originCoords.lat,longitude:originCoords.lng}}},
-            destination:{location:{latLng:{latitude:lat,longitude:lng}}},
-            travelMode:'DRIVE',routingPreference:'TRAFFIC_AWARE'
-          })
+          body:JSON.stringify({origin:{location:{latLng:{latitude:originCoords.lat,longitude:originCoords.lng}}},destination:{location:{latLng:{latitude:lat,longitude:lng}}},travelMode:'DRIVE',routingPreference:'TRAFFIC_AWARE'})
         });
         var routeData=await routeResp.json();
         if(routeData.routes&&routeData.routes[0]&&routeData.routes[0].polyline){
-          var poly=new google.maps.Polyline({
-            path:google.maps.geometry.encoding.decodePath(routeData.routes[0].polyline.encodedPolyline),
-            map:gmap,strokeColor:color,strokeWeight:4,strokeOpacity:0.75
-          });
-          cardRoutes[idx]=poly;
+          var poly=new google.maps.Polyline({path:google.maps.geometry.encoding.decodePath(routeData.routes[0].polyline.encodedPolyline),map:gmap,strokeColor:color,strokeWeight:4,strokeOpacity:0.75});
+          cardRoutes[gid]=poly;
         }
       }catch(e){console.warn('Route draw failed:',e);}
     }
-
-    var b=new google.maps.LatLngBounds();
-    gmarkers.forEach(function(mk){b.extend(mk.getPosition());});
-    gmap.fitBounds(b);if(gmarkers.length<=2)gmap.setZoom(13);
-
+    var b=new google.maps.LatLngBounds();gmarkers.forEach(function(mk){b.extend(mk.getPosition());});gmap.fitBounds(b);if(gmarkers.length<=2)gmap.setZoom(13);
   } else {
-    if(cardPins[idx]){cardPins[idx].setMap(null);var mi=gmarkers.indexOf(cardPins[idx]);if(mi>-1)gmarkers.splice(mi,1);delete cardPins[idx];}
-    if(cardRoutes[idx]){cardRoutes[idx].setMap(null);delete cardRoutes[idx];}
+    if(cardPins[gid]){cardPins[gid].setMap(null);var mi=gmarkers.indexOf(cardPins[gid]);if(mi>-1)gmarkers.splice(mi,1);delete cardPins[gid];}
+    if(cardRoutes[gid]){cardRoutes[gid].setMap(null);delete cardRoutes[gid];}
   }
 }
 
-// ======================= PROXY =======================
-async function px(params){
+function findResultByGlobalId(gid){for(var src in sourceResults){if(src.indexOf('__')>-1||src.indexOf('_error')>-1)continue;var arr=sourceResults[src]||[];for(var i=0;i<arr.length;i++){if(arr[i]._gid===gid)return arr[i];}}return null;}
+
+async function pxGet(params){
   var qs=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);}).join('&');
   var r=await fetch(C.workerUrl+'?'+qs);
   if(!r.ok)throw new Error('Proxy '+r.status);
-  if(params.mode&&params.mode.indexOf('serp')!==0)bumpGoogle(1);
+  if(params.mode&&params.mode.indexOf('apify')!==0)bumpGoogle(1);
+  return r.json();
+}
+async function pxPost(params,body){
+  var qs=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);}).join('&');
+  var r=await fetch(C.workerUrl+'?'+qs,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});
+  if(!r.ok){var t=await r.text();throw new Error('Proxy '+r.status+': '+t.substring(0,200));}
+  if(params.mode==='apify_run')bumpApify(1);
   return r.json();
 }
 
-// ======================= PLACES SEARCH =======================
-async function searchPlaces(query,lat,lng){
+async function searchPlacesGoogle(query,lat,lng){
   var results=[];
-  var d=await px({mode:'places_search',q:query,key:C.mapsKey,lat:lat,lng:lng,radius:50000});
+  var d=await pxGet({mode:'places_search',q:query,key:C.mapsKey,lat:lat,lng:lng,radius:50000});
   if(d.results)results=results.concat(d.results);
-
-  if(d.next_page_token){
-    await sleep(2000);
-    try{var d2=await px({mode:'places_search',q:query,key:C.mapsKey,pagetoken:d.next_page_token});
-      if(d2.results)results=results.concat(d2.results);}catch(e){}
-  }
-
+  if(d.next_page_token){await sleep(2000);try{var d2=await pxGet({mode:'places_search',q:query,key:C.mapsKey,pagetoken:d.next_page_token});if(d2.results)results=results.concat(d2.results);}catch(e){}}
   return results.map(function(p){
     var loc=p.geometry&&p.geometry.location;
-    return{
-      name:p.name||'Unknown',placeId:p.place_id||null,
+    return{_src:'google',name:p.name||'Unknown',placeId:p.place_id||null,
       address:p.formatted_address||p.vicinity||null,
-      rating:p.rating?parseFloat(p.rating):null,
-      reviews:p.user_ratings_total||0,
-      price:p.price_level?'$'.repeat(p.price_level):null,
-      phone:null,website:null,
+      rating:p.rating?parseFloat(p.rating):null,reviews:p.user_ratings_total||0,
+      price:p.price_level?'$'.repeat(p.price_level):null,phone:null,website:null,
       lat:loc?loc.lat:null,lng:loc?loc.lng:null,
       desc:p.types?p.types.filter(function(t){return t!=='establishment'&&t!=='point_of_interest';}).slice(0,2).map(function(t){return t.replace(/_/g,' ');}).join(', '):'',
       driveMin:null,driveTxt:null,distTxt:null,distMiles:null,
-      open:p.opening_hours?p.opening_hours.open_now:null
-    };
+      open:p.opening_hours?p.opening_hours.open_now:null};
   });
 }
 
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
 
-async function geocodeAddr(addr){
-  try{
-    var d=await px({mode:'geocode',address:addr,key:C.mapsKey});
-    if(d.results&&d.results.length)return d.results[0].geometry.location;
-  }catch(e){console.error('Geocode error:',e);}
-  return null;
-}
+async function geocodeAddr(addr){try{var d=await pxGet({mode:'geocode',address:addr,key:C.mapsKey});if(d.results&&d.results.length)return d.results[0].geometry.location;}catch(e){console.error('Geocode error:',e);}return null;}
 
 async function getDriveTimes(origin,addrs){
   if(!addrs.length)return[];
@@ -450,13 +432,11 @@ async function getDriveTimes(origin,addrs){
   for(var i=0;i<addrs.length;i+=25){
     var batch=addrs.slice(i,i+25);
     try{
-      var d=await px({mode:'distance',origins:origin,destinations:batch.join('|'),key:C.mapsKey});
+      var d=await pxGet({mode:'distance',origins:origin,destinations:batch.join('|'),key:C.mapsKey});
       if(d.rows&&d.rows[0]&&d.rows[0].elements){
         d.rows[0].elements.forEach(function(el){
-          if(el.status==='OK'){
-            var distM=el.distance.value/1609.34;
-            out.push({driveMin:Math.round(el.duration.value/60),driveTxt:el.duration.text,distTxt:el.distance.text,distMiles:distM});
-          } else out.push({driveMin:null,driveTxt:null,distTxt:null,distMiles:null});
+          if(el.status==='OK'){var distM=el.distance.value/1609.34;out.push({driveMin:Math.round(el.duration.value/60),driveTxt:el.duration.text,distTxt:el.distance.text,distMiles:distM});}
+          else out.push({driveMin:null,driveTxt:null,distTxt:null,distMiles:null});
         });
       } else batch.forEach(function(){out.push({driveMin:null,driveTxt:null,distTxt:null,distMiles:null});});
     }catch(e){batch.forEach(function(){out.push({driveMin:null,driveTxt:null,distTxt:null,distMiles:null});});}
@@ -464,296 +444,226 @@ async function getDriveTimes(origin,addrs){
   return out;
 }
 
-// ======================= PLATFORM URLS =======================
-var PLATFORMS={
-  taskrabbit:{
-    name:'TaskRabbit',color:'#6aa84f',domain:'taskrabbit.com',
-    url:function(svc,addr){var city=extractCity(addr);return'https://www.taskrabbit.com/search#?utf8=%E2%9C%93&q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city);}
-  },
-  thumbtack:{
-    name:'Thumbtack',color:'#00b3a4',domain:'thumbtack.com',
-    url:function(svc,addr){var city=extractCity(addr);return'https://www.thumbtack.com/search/?q='+encodeURIComponent(svc)+'&requestPostalCode='+encodeURIComponent(city);}
-  },
-  angi:{
-    name:'Angi',color:'#ff5a5f',domain:'angi.com',
-    url:function(svc,addr){var city=extractCity(addr);return'https://www.angi.com/hire/'+encodeURIComponent(svc.toLowerCase().replace(/\s+/g,'-'))+'/?location='+encodeURIComponent(city);}
-  },
-  homeadvisor:{
-    name:'HomeAdvisor',color:'#f5a623',domain:'homeadvisor.com',
-    url:function(svc,addr){var city=extractCity(addr);return'https://www.homeadvisor.com/task.html?q='+encodeURIComponent(svc)+'&loc='+encodeURIComponent(city);}
-  }
-};
+function extractCity(addr){var p=addr.trim().split(',');if(p.length>=2)return p.slice(-2).join(',').trim();return addr.trim();}
 
-function extractCity(addr){
-  var p=addr.trim().split(',');
-  if(p.length>=2)return p.slice(-2).join(',').trim();
-  return addr.trim();
+function guessCraigslistCity(city){
+  var c=city.toLowerCase();
+  if(c.indexOf('chicago')>-1)return'chicago';
+  if(c.indexOf('new york')>-1||c.indexOf('nyc')>-1||/\bny\b/.test(c))return'newyork';
+  if(c.indexOf('los angeles')>-1||/\bla\b/.test(c))return'losangeles';
+  if(c.indexOf('san francisco')>-1||c.indexOf('sf')>-1||c.indexOf('bay area')>-1)return'sfbay';
+  if(c.indexOf('michigan')>-1||/\bmi\b/.test(c))return'swmi';
+  if(c.indexOf('seattle')>-1)return'seattle';
+  if(c.indexOf('boston')>-1)return'boston';
+  if(c.indexOf('miami')>-1)return'miami';
+  if(c.indexOf('dallas')>-1)return'dallas';
+  if(c.indexOf('houston')>-1)return'houston';
+  if(c.indexOf('atlanta')>-1)return'atlanta';
+  if(c.indexOf('denver')>-1)return'denver';
+  if(c.indexOf('phoenix')>-1)return'phoenix';
+  if(c.indexOf('portland')>-1)return'portland';
+  return'sfbay';
 }
 
-async function openPlatformOrSearch(source,svc,addr){
-  await searchPlatform(source,svc,addr);
-}
-
-async function searchPlatform(source,svc,addr){
-  var p=PLATFORMS[source];if(!p)return;
-  if(!C.serpKey){
-    var url=p.url(svc,addr);
-    var grid=document.getElementById('resultsGrid');
-    document.getElementById('mapContainer').style.display='none';
-    document.getElementById('resultsCount').innerHTML='Search on <span>'+esc(p.name)+'</span>';
-    grid.innerHTML='<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;text-align:center;">'
-      +'<div style="font-size:2rem;margin-bottom:.8rem;">&#128279;</div>'
-      +'<div style="font-family:\'Space Grotesk\',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">'+esc(p.name)+'</div>'
-      +'<div style="font-size:.88rem;color:var(--muted);margin-bottom:1.2rem;">Add a SerpAPI key in Settings to see real results in-app, or click to open '+esc(p.name)+' directly.</div>'
-      +'<a href="'+url+'" target="_blank" rel="noopener" style="display:inline-flex;gap:8px;background:'+p.color+';color:#fff;border-radius:9px;padding:12px 28px;font-size:.95rem;font-weight:600;text-decoration:none;">Open '+esc(p.name)+' &rarr;</a>'
-      +'</div>';
-    document.getElementById('resultsWrap').classList.add('visible');
-    return;
-  }
-
-  var st=document.getElementById('statusText'),sp=document.getElementById('spinner'),btn=document.getElementById('searchBtn'),
-      em=document.getElementById('errorMsg'),rw=document.getElementById('resultsWrap'),grid=document.getElementById('resultsGrid');
-  btn.disabled=true;sp.classList.add('active');st.textContent='Searching '+p.name+'...';
-  rw.classList.remove('visible');grid.innerHTML='';em.classList.remove('show');
-
-  // FIX: Use a cleaner query that SerpAPI handles better
+function buildApifyInput(srcKey,svc,addr){
   var city=extractCity(addr);
-  var query=svc+' '+p.name+' '+city;
-  try{
-    var d=await px({mode:'serp',q:query,api_key:C.serpKey});
-    if(d.error)throw new Error(d.error);
-    var organic=d.organic_results||[];
-
-    // Also try local results if available
-    var localResults=d.local_results||[];
-
-    if(!organic.length&&!localResults.length){
-      // Fallback: try direct platform URL search
-      query=svc+' '+city+' '+p.domain;
-      var d2=await px({mode:'serp',q:query,api_key:C.serpKey});
-      if(!d2.error)organic=(d2.organic_results||[]);
-    }
-
-    if(!organic.length&&!localResults.length){
-      st.textContent='';
-      em.textContent='No '+p.name+' listings found for "'+svc+'" near '+city+'. Try Google (Local) source instead.';
-      em.classList.add('show');
-      btn.disabled=false;sp.classList.remove('active');return;
-    }
-
-    document.getElementById('mapContainer').style.display='none';
-    var total=organic.length+localResults.length;
-    document.getElementById('resultsCount').innerHTML='<span>'+total+'</span> results from '+esc(p.name);
-
-    var html='<div class="cards-grid">';
-    // Render local results first
-    html+=localResults.map(function(o,i){
-      return '<div class="result-card">'
-        +'<div class="card-top"><div class="card-name">'+esc(o.title||o.name||'Untitled')+'</div><div class="badge-num">'+(i+1)+'</div></div>'
-        +(o.address?'<div class="card-desc">'+esc(o.address)+'</div>':'')
-        +'<div class="card-meta"><span class="pill" style="background:'+p.color+';color:#fff">'+esc(p.name)+'</span>'
-        +(o.rating?'<span class="pill pill-neutral">&#9733; '+o.rating+'</span>':'')+'</div>'
-        +(o.phone?'<div class="card-actions"><a class="btn-a primary" href="tel:'+esc(o.phone)+'">&#128222; '+esc(o.phone)+'</a></div>':'')
-        +(o.links&&o.links.website?'<div class="card-actions"><a class="btn-a" href="'+esc(o.links.website)+'" target="_blank">&#127760; View Listing</a></div>':'')
-        +'</div>';
-    }).join('');
-    html+=organic.map(function(o,i){
-      return '<div class="result-card">'
-        +'<div class="card-top"><div class="card-name">'+esc(o.title||'Untitled')+'</div><div class="badge-num">'+(localResults.length+i+1)+'</div></div>'
-        +(o.snippet?'<div class="card-desc">'+esc(o.snippet)+'</div>':'')
-        +'<div class="card-meta"><span class="pill" style="background:'+p.color+';color:#fff">'+esc(p.name)+'</span></div>'
-        +'<div class="card-actions"><a class="btn-a primary" href="'+esc(o.link)+'" target="_blank" rel="noopener">&#127760; View Listing</a></div>'
-        +'</div>';
-    }).join('');
-    html+='</div>';
-    grid.innerHTML=html;
-    rw.classList.add('visible');
-    btn.disabled=false;sp.classList.remove('active');st.textContent='Done — '+total+' results found.';
-    refreshUsage();
-  }catch(e){
-    btn.disabled=false;sp.classList.remove('active');st.textContent='';
-    em.textContent='SerpAPI error: '+e.message;em.classList.add('show');
+  if(srcKey==='taskrabbit'){
+    return{startUrls:[{url:'https://www.taskrabbit.com/search#?utf8=%E2%9C%93&q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city)}],maxItems:25};
   }
+  if(srcKey==='thumbtack'){
+    var zip=(city.match(/\d{5}/)||[''])[0]||city;
+    return{startUrls:[{url:'https://www.thumbtack.com/search/?q='+encodeURIComponent(svc)+'&requestPostalCode='+encodeURIComponent(zip)}],maxItems:25};
+  }
+  if(srcKey==='craigslist'){
+    var clCity=guessCraigslistCity(city);
+    return{startUrls:[{url:'https://'+clCity+'.craigslist.org/search/bbb?query='+encodeURIComponent(svc)}],maxItems:25,proxy:{useApifyProxy:true}};
+  }
+  return{};
 }
 
-var allFetched=[],visibleResults=[],meetsArr=[],othersArr=[];
+async function runApifyActor(srcKey,svc,addr){
+  var src=SOURCES[srcKey];if(!src||src.kind!=='apify')return[];
+  var input=buildApifyInput(srcKey,svc,addr);
+  console.log('[Apify]',srcKey,'input:',input);
+  var data;
+  try{data=await pxPost({mode:'apify_run',actor_id:src.actor,token:C.apifyToken,timeout:'90'},input);}
+  catch(e){console.error('Apify run failed for '+srcKey+':',e);throw e;}
+  console.log('[Apify]',srcKey,'response:',data);
+  if(!Array.isArray(data)){if(data&&data.error)throw new Error(data.error);return[];}
+  return data.map(function(item){return normalizeApifyItem(srcKey,item);}).filter(Boolean);
+}
 
-function normAddr(r){var c=r.trim(),p=c.split(',');if(p.length>=3)return p.slice(-2).join(',').trim();return c;}
-function dedup(arr){var s={};return arr.filter(function(x){var k=x.placeId||x.name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,25);if(s[k])return false;s[k]=true;return true;});}
+function normalizeApifyItem(srcKey,item){
+  if(!item||typeof item!=='object')return null;
+  var out={
+    _src:srcKey,
+    name:item.name||item.title||item.taskerName||item.businessName||'Untitled',
+    address:item.address||item.location||item.serviceArea||null,
+    rating:null,reviews:0,price:null,phone:null,website:item.url||item.link||null,
+    lat:item.latitude||item.lat||null,lng:item.longitude||item.lng||null,
+    desc:item.description||item.snippet||item.bio||item.summary||'',
+    driveMin:null,driveTxt:null,distTxt:null,distMiles:null,open:null
+  };
+  if(item.rating){var rt=parseFloat(item.rating);if(!isNaN(rt))out.rating=rt;}
+  if(item.reviewsCount||item.reviewCount||item.numReviews)out.reviews=parseInt(item.reviewsCount||item.reviewCount||item.numReviews)||0;
+  if(item.price||item.hourlyRate||item.priceRange)out.price=String(item.price||item.hourlyRate||item.priceRange);
+  if(item.phone||item.phoneNumber)out.phone=item.phone||item.phoneNumber;
+  return out;
+}
+
+var sourceResults={};
+var globalIdCounter=0;
+
+function applyFilter(){
+  var by=document.getElementById('liveFilter').value;
+  var radiusMiles=currentRadius;
+  Object.keys(sourceResults).forEach(function(srcKey){
+    if(srcKey.indexOf('__')>-1||srcKey.indexOf('_error')>-1)return;
+    var arr=sourceResults[srcKey]||[];
+    var meets=[],others=[];
+    arr.forEach(function(r){
+      if(r._redirect){meets.push(r);return;}
+      var pr=r.rating!==null&&r.rating>=C.minRating;
+      var pv=r.reviews>=C.minReviews;
+      var pd=r.driveMin===null||r.driveMin<=C.maxDrive;
+      var inR=r.distMiles===null||r.distMiles===undefined||r.distMiles<=radiusMiles;
+      if(pr&&pv&&pd&&inR)meets.push(r);else others.push(r);
+    });
+    sourceResults[srcKey+'__meets']=sortArr(meets,by);
+    sourceResults[srcKey+'__others']=sortArr(others,by);
+  });
+  renderAllSections();updateResultsCount();
+  Object.keys(cardPins).forEach(function(gid){var still=findResultByGlobalId(gid);if(!still){cardPins[gid].setMap(null);delete cardPins[gid];if(cardRoutes[gid]){cardRoutes[gid].setMap(null);delete cardRoutes[gid];}}});
+}
 
 function sortArr(arr,by){
   return arr.slice().sort(function(a,b){
     if(by==='rating')return(b.rating||0)-(a.rating||0);
     if(by==='reviews')return(b.reviews||0)-(a.reviews||0);
-    if(by==='distance'){
-      var da=a.distMiles!==null&&a.distMiles!==undefined?a.distMiles:9999;
-      var db=b.distMiles!==null&&b.distMiles!==undefined?b.distMiles:9999;
-      return da-db;
-    }
+    if(by==='distance'){var da=a.distMiles!==null&&a.distMiles!==undefined?a.distMiles:9999;var db=b.distMiles!==null&&b.distMiles!==undefined?b.distMiles:9999;return da-db;}
     return 0;
   });
 }
 
-// ======================= LIVE FILTER + RADIUS =======================
-// FIX: Show ALL results always. Radius slider dims/highlights but never hides.
-function applyFilter(){
-  var by=document.getElementById('liveFilter').value;
-  var radiusMiles=currentRadius;
-
-  // Split meets/others based on requirements — no radius hiding
-  meetsArr=[];othersArr=[];
-  allFetched.forEach(function(r){
-    var pr=r.rating!==null&&r.rating>=C.minRating;
-    var pv=r.reviews>=C.minReviews;
-    var pd=r.driveMin===null||r.driveMin<=C.maxDrive;
-    // Within radius OR no distance data → qualifies for meets (if rating/reviews ok)
-    var inR=r.distMiles===null||r.distMiles===undefined||r.distMiles<=radiusMiles;
-    if(pr&&pv&&pd&&inR)meetsArr.push(r);else othersArr.push(r);
-  });
-
-  meetsArr=sortArr(meetsArr,by);
-  othersArr=sortArr(othersArr,by);
-  visibleResults=meetsArr.concat(othersArr);
-
-  // Clear pins that are no longer in visible list
-  Object.keys(cardPins).forEach(function(k){
-    var stillVisible=visibleResults.some(function(r,i){return i===parseInt(k);});
-    if(!stillVisible&&cardPins[k]){
-      cardPins[k].setMap(null);
-      if(cardRoutes[k])cardRoutes[k].setMap(null);
-      delete cardPins[k];delete cardRoutes[k];
-    }
-  });
-
+function updateResultsCount(){
   var cnt=document.getElementById('resultsCount');
+  var total=0,meetsTotal=0;
+  Object.keys(sourceResults).forEach(function(k){
+    if(k.indexOf('__')>-1||k.indexOf('_error')>-1)return;
+    total+=sourceResults[k].length;meetsTotal+=(sourceResults[k+'__meets']||[]).length;
+  });
   var sel=document.getElementById('service');
   var svcLabel=sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'';
-  cnt.innerHTML='<span>'+allFetched.length+'</span> providers &mdash; '+esc(svcLabel)
-    +' &mdash; <span style="font-size:.85rem;font-weight:400;color:var(--muted)">'
-    +meetsArr.length+' meet requirements within '+radiusMiles+' mi</span>';
-
-  renderGrid(meetsArr,othersArr);
+  cnt.innerHTML='<span>'+total+'</span> total \u2014 '+esc(svcLabel)+' <span style="font-size:.85rem;font-weight:400;color:var(--muted)">('+meetsTotal+' meet requirements within '+currentRadius+' mi)</span>';
 }
 
-// ======================= MAIN SEARCH =======================
 async function doSearch(){
   var address=document.getElementById('address').value.trim(),service=document.getElementById('service').value;
   var st=document.getElementById('statusText'),sp=document.getElementById('spinner'),btn=document.getElementById('searchBtn'),
     em=document.getElementById('errorMsg'),nk=document.getElementById('noKeyMsg'),
     rw=document.getElementById('resultsWrap'),grid=document.getElementById('resultsGrid');
-
   nk.classList.remove('show');em.classList.remove('show');
   if(!address){st.textContent='Enter an address.';return;}
   if(!service){st.textContent='Select a service.';return;}
+  if(!C.selectedSources.length){st.textContent='Pick at least one source.';return;}
 
-  originAddr=address;originCoords=null;cardPins={};allFetched=[];meetsArr=[];othersArr=[];visibleResults=[];
   var svcLabel=document.getElementById('service').options[document.getElementById('service').selectedIndex].text;
+  originAddr=address;originCoords=null;cardPins={};sourceResults={};globalIdCounter=0;
 
-  var source=document.getElementById('sourceSelect').value;
-  if(source!=='google'){
-    btn.disabled=false;sp.classList.remove('active');st.textContent='';
-    rw.classList.remove('visible');grid.innerHTML='';
-    openPlatformOrSearch(source,svcLabel,address);
-    return;
-  }
+  var needsGoogle=C.selectedSources.indexOf('google')>-1;
+  var needsApify=C.selectedSources.some(function(k){return SOURCES[k]&&SOURCES[k].kind==='apify';});
+  if((needsGoogle||needsApify)&&!C.workerUrl){nk.classList.add('show');return;}
+  if(needsGoogle&&!C.mapsKey){nk.classList.add('show');return;}
+  if(needsApify&&!C.apifyToken){em.textContent='Apify token required for TaskRabbit/Thumbtack/Craigslist. Add it in Settings.';em.classList.add('show');return;}
 
-  if(!C.workerUrl||!C.mapsKey){nk.classList.add('show');return;}
   btn.disabled=true;sp.classList.add('active');rw.classList.remove('visible');grid.innerHTML='';
   document.getElementById('mapContainer').style.display='none';
 
-  st.textContent='Locating your address...';
-  originCoords=await geocodeAddr(address);
-  if(!originCoords){
-    btn.disabled=false;sp.classList.remove('active');
-    em.textContent='Could not locate that address. Try a full address or city, state.';em.classList.add('show');return;
-  }
-
-  st.textContent='Searching Google Places for '+svcLabel+'...';
-  var all=[];
-  try{all=await searchPlaces(svcLabel,originCoords.lat,originCoords.lng);}catch(e){
-    btn.disabled=false;sp.classList.remove('active');
-    em.textContent='Search failed: '+e.message;em.classList.add('show');return;
-  }
-  all=dedup(all);
-
-  if(!all.length){
-    btn.disabled=false;sp.classList.remove('active');
-    em.textContent='No results found. Try a different address or service type.';em.classList.add('show');return;
-  }
-
-  st.textContent='Calculating drive times for '+all.length+' results...';
-  var addrs=all.map(function(r){return r.address||r.name;});
-  var times=await getDriveTimes(address,addrs);
-  times.forEach(function(t,i){if(i<all.length){all[i].driveMin=t.driveMin;all[i].driveTxt=t.driveTxt;all[i].distTxt=t.distTxt;all[i].distMiles=t.distMiles;}});
-
-  allFetched=all;
-
-  if(mapsOk)setupMap(originCoords.lat,originCoords.lng);
-  else if(C.mapsKey)initGMaps();
-
+  if(C.mapsKey&&C.workerUrl){st.textContent='Locating your address...';originCoords=await geocodeAddr(address);}
   rw.classList.add('visible');
+
+  st.textContent='Searching '+C.selectedSources.length+' source'+(C.selectedSources.length>1?'s':'')+'...';
+  var promises=C.selectedSources.map(function(srcKey){return runSource(srcKey,svcLabel,address);});
+  await Promise.all(promises);
+
+  if(needsGoogle&&originCoords&&mapsOk)setupMap(originCoords.lat,originCoords.lng);
+  else if(C.mapsKey&&!mapsOk)initGMaps();
+
   applyFilter();
+  btn.disabled=false;sp.classList.remove('active');st.textContent='Done.';
 
-  btn.disabled=false;sp.classList.remove('active');
-  st.textContent='Done — '+allFetched.length+' results found. Loading phones...';
-
-  // Fetch phones in background, re-render when done
-  fetchPhonesBackground(all, function(){
-    applyFilter();
-    st.textContent='Done — '+allFetched.length+' results found.';
-  });
+  if(sourceResults.google&&sourceResults.google.length){
+    fetchPhonesBackground(sourceResults.google,function(){applyFilter();});
+  }
 }
 
-// ======================= BACKGROUND PHONE FETCH =======================
-// Fetches place details for each result, updates phone & re-renders incrementally
-async function fetchPhonesBackground(results, onDone){
-  console.log('[Phones] Starting fetch for', results.length, 'results');
-  var limit=Math.min(results.length, 30);
-  for(var i=0;i<limit;i++){
-    var r=results[i];
-    if(r.phone){console.log('[Phones]', i, r.name, '- already has phone');continue;}
+async function runSource(srcKey,svc,addr){
+  var src=SOURCES[srcKey];if(!src){sourceResults[srcKey]=[];return;}
+
+  if(src.kind==='google'){
+    if(!originCoords){sourceResults.google=[];return;}
     try{
-      var pid=r.placeId;
-      if(!pid){
-        console.log('[Phones]', i, r.name, '- no placeId, finding...');
-        var fRes=await px({mode:'places_find',q:r.name+(r.address?' '+r.address:''),key:C.mapsKey});
-        if(fRes.candidates&&fRes.candidates.length){pid=fRes.candidates[0].place_id;r.placeId=pid;}
+      var all=await searchPlacesGoogle(svc,originCoords.lat,originCoords.lng);
+      all=dedup(all);
+      if(all.length){
+        var addrs=all.map(function(r){return r.address||r.name;});
+        var times=await getDriveTimes(addr,addrs);
+        times.forEach(function(t,i){if(i<all.length){all[i].driveMin=t.driveMin;all[i].driveTxt=t.driveTxt;all[i].distTxt=t.distTxt;all[i].distMiles=t.distMiles;}});
       }
-      if(!pid){console.log('[Phones]', i, r.name, '- still no pid');continue;}
-      var det=await px({mode:'places_details',place_id:pid,key:C.mapsKey});
-      var res=det.result;
-      if(res&&res.formatted_phone_number){
-        r.phone=res.formatted_phone_number;
-        r.phones=[r.phone];
-        console.log('[Phones]', i, r.name, '✓', r.phone);
-        // Re-render so the new phone appears immediately
-        applyFilter();
-      } else {
-        console.log('[Phones]', i, r.name, '- details OK but no phone in response', res);
-      }
-      if(res&&res.website&&!r.website)r.website=res.website;
-    }catch(e){console.warn('[Phones] error for', r.name, e);}
+      all.forEach(function(r){r._gid='g'+(globalIdCounter++);});
+      sourceResults.google=all;
+    }catch(e){console.error('Google search failed:',e);sourceResults.google=[];sourceResults.google_error=e.message;}
+    return;
   }
-  console.log('[Phones] Done');
-  if(onDone)onDone();
+
+  if(src.kind==='apify'){
+    try{
+      var arr=await runApifyActor(srcKey,svc,addr);
+      if(arr.length&&originCoords&&C.mapsKey){
+        var hasAddr=arr.filter(function(r){return r.address;});
+        if(hasAddr.length){
+          var times=await getDriveTimes(addr,hasAddr.map(function(r){return r.address;}));
+          hasAddr.forEach(function(r,i){if(times[i]){r.driveMin=times[i].driveMin;r.driveTxt=times[i].driveTxt;r.distTxt=times[i].distTxt;r.distMiles=times[i].distMiles;}});
+        }
+      }
+      arr.forEach(function(r){r._gid=srcKey[0]+(globalIdCounter++);});
+      sourceResults[srcKey]=arr;
+    }catch(e){console.error(srcKey+' failed:',e);sourceResults[srcKey]=[];sourceResults[srcKey+'_error']=e.message;}
+    return;
+  }
+
+  if(src.kind==='redirect'){
+    var city=extractCity(addr);
+    sourceResults[srcKey]=[{_src:srcKey,_gid:srcKey[0]+(globalIdCounter++),_redirect:true,name:src.name+' search',website:src.urlFn(svc,city),address:null,rating:null,reviews:0,phone:null,desc:'Click to view '+src.name+' results in a new tab',driveMin:null,driveTxt:null,distTxt:null,distMiles:null,open:null}];
+    return;
+  }
 }
 
-// ======================= RENDER =======================
-function renderGrid(meets,others){
+function dedup(arr){var s={};return arr.filter(function(x){var k=x.placeId||x.name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,25);if(s[k])return false;s[k]=true;return true;});}
+
+function renderAllSections(){
   var html='';
-  if(meets.length){
-    html+='<div class="section-heading">&#10003; Meets Requirements ('+meets.length+')</div><div class="cards-grid">';
-    html+=meets.map(function(r,i){return renderCard(r,i,false);}).join('');
+  C.selectedSources.forEach(function(srcKey){
+    var src=SOURCES[srcKey];if(!src)return;
+    var meets=sourceResults[srcKey+'__meets']||[];
+    var others=sourceResults[srcKey+'__others']||[];
+    var raw=sourceResults[srcKey]||[];
+    var err=sourceResults[srcKey+'_error'];
+    html+='<div class="source-section">';
+    html+='<div class="source-header">'
+      +'<div class="source-title"><span class="source-badge" style="background:'+src.color+'">'+esc(src.name)+'</span><span>'+raw.length+' result'+(raw.length===1?'':'s')+'</span></div>'
+      +'<div class="source-meta">'+meets.length+' meet requirements</div>'
+      +'</div>';
+    if(err){
+      html+='<div style="background:#fff3f0;border:1px solid #f0c8c0;border-radius:10px;padding:.7rem;font-size:.83rem;color:var(--accent)">Error: '+esc(err)+'</div>';
+    } else if(!raw.length){
+      html+='<div style="padding:1rem;text-align:center;color:var(--muted);font-size:.85rem">No results.</div>';
+    } else {
+      if(meets.length){html+='<div class="section-heading">&#10003; Meets Requirements ('+meets.length+')</div><div class="cards-grid">';html+=meets.map(function(r,i){return renderCard(r,i+1,false);}).join('');html+='</div>';}
+      if(others.length){html+='<div class="section-heading other-heading">&#128203; Other Results ('+others.length+')</div><div class="cards-grid">';html+=others.map(function(r,i){return renderCard(r,meets.length+i+1,true);}).join('');html+='</div>';}
+    }
     html+='</div>';
-  }
-  if(others.length){
-    html+='<div class="section-heading other-heading">&#128203; Other Results ('+others.length+')</div><div class="cards-grid">';
-    html+=others.map(function(r,i){return renderCard(r,meets.length+i,true);}).join('');
-    html+='</div>';
-  }
-  if(!meets.length&&!others.length){
-    html='<div style="padding:2rem;text-align:center;color:var(--muted);font-size:.9rem">No results found.</div>';
-  }
+  });
   document.getElementById('resultsGrid').innerHTML=html;
 }
 
@@ -761,10 +671,17 @@ function starsH(r){if(!r)return'';var n=parseFloat(r),f=Math.floor(n),h=n%1>=.5?
 
 function renderCard(r,idx,dimmed){
   var delay=(idx%10*25)+'ms',cls='result-card'+(dimmed?' dimmed':'');
+  if(r._redirect){
+    return '<div class="'+cls+'" style="animation-delay:'+delay+'">'
+      +'<div class="card-top"><div class="card-name">'+esc(r.name)+'</div></div>'
+      +'<div class="card-desc">'+esc(r.desc)+'</div>'
+      +'<div class="card-actions"><a class="btn-a primary" href="'+esc(r.website)+'" target="_blank" rel="noopener">&#127760; Open</a></div>'
+      +'</div>';
+  }
   var rh=r.rating
-    ?'<span class="stars">'+starsH(r.rating)+'</span><strong>'+r.rating.toFixed(1)+'</strong> <span class="rv-link" onclick="openReviews('+idx+')">('+r.reviews.toLocaleString()+')</span>'
+    ?'<span class="stars">'+starsH(r.rating)+'</span><strong>'+r.rating.toFixed(1)+'</strong> <span class="rv-link" onclick="openReviews(\''+r._gid+'\')">('+r.reviews.toLocaleString()+')</span>'
     :'<span style="color:var(--muted)">No rating yet</span>';
-  var pills='<span class="pill pill-local">Local</span>';
+  var pills='<span class="pill pill-local">'+esc(SOURCES[r._src]?SOURCES[r._src].name:r._src)+'</span>';
   if(r.driveTxt)pills+='<span class="pill pill-drive">\uD83D\uDE97 '+esc(r.driveTxt)+'</span>';
   if(r.distTxt)pills+='<span class="pill pill-neutral">'+esc(r.distTxt)+'</span>';
   if(r.price)pills+='<span class="pill pill-neutral">'+esc(r.price)+'</span>';
@@ -774,10 +691,10 @@ function renderCard(r,idx,dimmed){
   var phones=r.phones&&r.phones.length?r.phones:(r.phone?[r.phone]:[]);
   phones.forEach(function(ph){acts+='<button class="btn-a primary" onclick="copyPhone(\''+ph.replace(/'/g,'')+'\',this)" title="Click to copy">&#128222; '+esc(ph)+'</button>';});
   if(r.website)acts+='<a class="btn-a" href="'+esc(r.website)+'" target="_blank">&#127760; Site</a>';
-  if(r.address)acts+='<a class="btn-a" href="https://maps.google.com/maps/dir/?api=1&origin='+encodeURIComponent(originAddr)+'&destination='+encodeURIComponent(r.address)+'" target="_blank">&#128205; Directions</a>';
-  var chk='<label class="map-check"><input type="checkbox" id="mc_'+idx+'" onchange="togglePin('+idx+')"/> Show on map</label>';
+  if(r.address&&r._src==='google')acts+='<a class="btn-a" href="https://maps.google.com/maps/dir/?api=1&origin='+encodeURIComponent(originAddr)+'&destination='+encodeURIComponent(r.address)+'" target="_blank">&#128205; Directions</a>';
+  var chk=(r._src==='google'||r.lat)?'<label class="map-check"><input type="checkbox" id="mc_'+r._gid+'" onchange="togglePin(\''+r._gid+'\')"/> Show on map</label>':'';
   return '<div class="'+cls+'" style="animation-delay:'+delay+'">'
-    +'<div class="card-top"><div class="card-name">'+esc(r.name)+'</div><div class="badge-num">'+(idx+1)+'</div></div>'
+    +'<div class="card-top"><div class="card-name">'+esc(r.name)+'</div><div class="badge-num">'+idx+'</div></div>'
     +(r.desc?'<div class="card-desc">'+esc(r.desc)+'</div>':'')
     +'<div class="card-meta">'+pills+'</div>'
     +'<div class="rating-line">'+rh+'</div>'
@@ -785,51 +702,55 @@ function renderCard(r,idx,dimmed){
     +chk+'</div>';
 }
 
-// ======================= REVIEWS =======================
-async function openReviews(idx){
-  var r=visibleResults[idx];if(!r)return;
+async function fetchPhonesBackground(results,onDone){
+  var limit=Math.min(results.length,30);
+  for(var i=0;i<limit;i++){
+    var r=results[i];if(r.phone)continue;
+    try{
+      var pid=r.placeId;
+      if(!pid){var fRes=await pxGet({mode:'places_find',q:r.name+(r.address?' '+r.address:''),key:C.mapsKey});if(fRes.candidates&&fRes.candidates.length){pid=fRes.candidates[0].place_id;r.placeId=pid;}}
+      if(!pid)continue;
+      var det=await pxGet({mode:'places_details',place_id:pid,key:C.mapsKey});
+      var res=det.result;
+      if(res&&res.formatted_phone_number){r.phone=res.formatted_phone_number;r.phones=[r.phone];applyFilter();}
+      if(res&&res.website&&!r.website)r.website=res.website;
+    }catch(e){}
+  }
+  if(onDone)onDone();
+}
+
+async function openReviews(gid){
+  var r=findResultByGlobalId(gid);if(!r)return;
   document.getElementById('rvTitle').textContent=r.name;
   document.getElementById('rvSummary').textContent='';
   document.getElementById('rvBody').innerHTML='<div class="rv-loading">&#8987; Loading reviews...</div>';
   document.getElementById('rvOverlay').classList.add('open');
+  if(r._src!=='google'){
+    document.getElementById('rvBody').innerHTML='<div class="rv-none">Reviews are only available for Google results.'+(r.website?'<br><br><a href="'+esc(r.website)+'" target="_blank" style="color:var(--accent2)">Visit listing</a>':'')+'</div>';
+    return;
+  }
   try{
     var pid=r.placeId;
-    if(!pid){
-      var fRes=await px({mode:'places_find',q:r.name+(r.address?' '+r.address:''),key:C.mapsKey});
-      if(fRes.candidates&&fRes.candidates.length)pid=fRes.candidates[0].place_id;
-    }
+    if(!pid){var fRes=await pxGet({mode:'places_find',q:r.name+(r.address?' '+r.address:''),key:C.mapsKey});if(fRes.candidates&&fRes.candidates.length)pid=fRes.candidates[0].place_id;}
     if(!pid){showNoReviews(r);return;}
-    var det=await px({mode:'places_details',place_id:pid,key:C.mapsKey});
+    var det=await pxGet({mode:'places_details',place_id:pid,key:C.mapsKey});
     var res=det.result;if(!res){showNoReviews(r);return;}
-    if(res.formatted_phone_number&&!r.phone){r.phone=res.formatted_phone_number;if(!r.phones)r.phones=[r.phone];}
-    if(res.formatted_phone_number&&r.phones&&r.phones.indexOf(res.formatted_phone_number)===-1)r.phones.push(res.formatted_phone_number);
+    if(res.formatted_phone_number&&!r.phone){r.phone=res.formatted_phone_number;r.phones=[r.phone];}
     if(res.website&&!r.website)r.website=res.website;
     var rvs=res.reviews||[];
     if(!rvs.length){showNoReviews(r);return;}
-    document.getElementById('rvSummary').textContent=
-      (res.rating?'\u2605 '+res.rating+' overall':'')+
-      (res.user_ratings_total?' \u00b7 '+res.user_ratings_total.toLocaleString()+' total reviews':'');
+    document.getElementById('rvSummary').textContent=(res.rating?'\u2605 '+res.rating+' overall':'')+(res.user_ratings_total?' \u00b7 '+res.user_ratings_total.toLocaleString()+' total reviews':'');
     document.getElementById('rvBody').innerHTML=rvs.map(function(rv){
-      return'<div class="rv-item">'
-        +'<div class="rv-author">'+esc(rv.author_name||'Anonymous')+'</div>'
-        +'<div class="rv-date">'+esc(rv.relative_time_description||'')+'</div>'
-        +(rv.rating?'<div class="rv-stars">'+starsH(rv.rating)+' '+rv.rating+'</div>':'')
-        +'<div class="rv-text">'+esc(rv.text||'No written review')+'</div>'
-        +'</div>';
+      return'<div class="rv-item"><div class="rv-author">'+esc(rv.author_name||'Anonymous')+'</div><div class="rv-date">'+esc(rv.relative_time_description||'')+'</div>'+(rv.rating?'<div class="rv-stars">'+starsH(rv.rating)+' '+rv.rating+'</div>':'')+'<div class="rv-text">'+esc(rv.text||'No written review')+'</div></div>';
     }).join('');
-  }catch(e){
-    document.getElementById('rvBody').innerHTML='<div class="rv-none">Error: '+esc(e.message)+'</div>';
-  }
+  }catch(e){document.getElementById('rvBody').innerHTML='<div class="rv-none">Error: '+esc(e.message)+'</div>';}
 }
-function showNoReviews(r){
-  document.getElementById('rvBody').innerHTML='<div class="rv-none">No Google reviews found.'+(r.website?'<br><br><a href="'+esc(r.website)+'" target="_blank" style="color:var(--accent2)">Visit their website</a>':'')+'</div>';
-}
+function showNoReviews(r){document.getElementById('rvBody').innerHTML='<div class="rv-none">No Google reviews found.'+(r.website?'<br><br><a href="'+esc(r.website)+'" target="_blank" style="color:var(--accent2)">Visit their website</a>':'')+'</div>';}
 function closeReviews(){document.getElementById('rvOverlay').classList.remove('open');}
 function copyPhone(ph,btn){navigator.clipboard.writeText(ph).then(function(){var orig=btn.innerHTML;btn.innerHTML='&#10003; Copied!';setTimeout(function(){btn.innerHTML=orig;},1500);}).catch(function(){alert('Copy failed. Number: '+ph);});}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// ======================= INIT =======================
-popSvc();updateFI();initGMaps();
+popSvc();updateFI();initGMaps();renderSourceCheckboxes();
 </script>
 </body>
-</html>v
+</html>
