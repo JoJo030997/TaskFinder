@@ -772,7 +772,7 @@ function renderCard(r,idx,dimmed){
   else if(r.open===false)pills+='<span class="pill pill-closed">Closed</span>';
   var acts='';
   var phones=r.phones&&r.phones.length?r.phones:(r.phone?[r.phone]:[]);
-  phones.forEach(function(ph){acts+='<a class="btn-a primary" href="tel:'+esc(ph)+'">&#128222; '+esc(ph)+'</a><button class="btn-a" onclick="copyPhone(\''+ph.replace(/'/g,'')+'\',this)" title="Copy">&#128203;</button>';});
+  phones.forEach(function(ph){acts+='<button class="btn-a primary" onclick="copyPhone(\''+ph.replace(/'/g,'')+'\',this)" title="Click to copy">&#128222; '+esc(ph)+'</button>';});
   if(r.website)acts+='<a class="btn-a" href="'+esc(r.website)+'" target="_blank">&#127760; Site</a>';
   if(r.address)acts+='<a class="btn-a" href="https://maps.google.com/maps/dir/?api=1&origin='+encodeURIComponent(originAddr)+'&destination='+encodeURIComponent(r.address)+'" target="_blank">&#128205; Directions</a>';
   var chk='<label class="map-check"><input type="checkbox" id="mc_'+idx+'" onchange="togglePin('+idx+')"/> Show on map</label>';
@@ -825,11 +825,11 @@ function showNoReviews(r){
   document.getElementById('rvBody').innerHTML='<div class="rv-none">No Google reviews found.'+(r.website?'<br><br><a href="'+esc(r.website)+'" target="_blank" style="color:var(--accent2)">Visit their website</a>':'')+'</div>';
 }
 function closeReviews(){document.getElementById('rvOverlay').classList.remove('open');}
-function copyPhone(ph,btn){navigator.clipboard.writeText(ph).then(function(){var orig=btn.innerHTML;btn.innerHTML='&#10003;';btn.style.color='var(--stx)';setTimeout(function(){btn.innerHTML=orig;btn.style.color='';},1500);}).catch(function(){});}
+function copyPhone(ph,btn){navigator.clipboard.writeText(ph).then(function(){var orig=btn.innerHTML;btn.innerHTML='&#10003; Copied!';setTimeout(function(){btn.innerHTML=orig;},1500);}).catch(function(){alert('Copy failed. Number: '+ph);});}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // ======================= INIT =======================
 popSvc();updateFI();initGMaps();
 </script>
 </body>
-</html>
+</html>v
