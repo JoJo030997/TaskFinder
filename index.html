@@ -65,6 +65,10 @@ input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
 .src-chk.active{background:#fbe9e3;border-color:var(--accent)}
 
 .results-wrap{display:none}.results-wrap.visible{display:block}
+.results-layout{display:grid;grid-template-columns:1fr 380px;gap:14px;align-items:start}
+.results-left{min-width:0}
+.results-right{position:sticky;top:12px;height:calc(100vh - 140px);min-height:320px}
+@media(max-width:800px){.results-layout{grid-template-columns:1fr}.results-right{position:static;height:320px;margin-bottom:1rem}}
 .results-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:8px}
 .results-count{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700}.results-count span{color:var(--accent)}
 .controls-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -78,7 +82,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;width:110px;height:4px
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2)}
 input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;border:none}
 
-.map-container{border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:1rem;height:300px;background:var(--cream)}
+.map-container{border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--cream);height:100%;min-height:320px}
 
 .source-section{margin-top:1.3rem;border-top:2px solid var(--border);padding-top:1rem}
 .source-section:first-child{margin-top:0;border-top:none;padding-top:0}
@@ -221,8 +225,14 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
         </div>
       </div>
     </div>
-    <div class="map-container" id="mapContainer" style="display:none"></div>
-    <div id="resultsGrid"></div>
+    <div class="results-layout">
+      <div class="results-left">
+        <div id="resultsGrid"></div>
+      </div>
+      <div class="results-right" id="mapSidebar" style="display:none">
+        <div class="map-container" id="mapContainer" style="height:100%"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -349,7 +359,8 @@ function initGMaps(){
 window.onMR=function(){mapsOk=true;};
 
 function setupMap(lat,lng){
-  var c=document.getElementById('mapContainer');c.style.display='block';
+  var s=document.getElementById('mapSidebar');if(s)s.style.display='block';
+  var c=document.getElementById('mapContainer');
   gmap=new google.maps.Map(c,{center:{lat:lat,lng:lng},zoom:11,
     styles:[{featureType:'poi',stylers:[{visibility:'off'}]},{featureType:'transit',stylers:[{visibility:'simplified'}]}]});
   gmarkers.forEach(function(m){m.setMap(null);});gmarkers=[];
@@ -677,7 +688,8 @@ async function doSearch(){
   if(needsApify&&!C.apifyToken){em.textContent='Apify token required for TaskRabbit & Thumbtack. Add it in ⚙️ Settings.';em.classList.add('show');return;}
 
   btn.disabled=true;sp.classList.add('active');rw.classList.remove('visible');grid.innerHTML='';
-  document.getElementById('mapContainer').style.display='none';
+  document.getElementById('mapContainer').style.display='';
+  var ms=document.getElementById('mapSidebar');if(ms)ms.style.display='none';
 
   if(C.mapsKey&&C.workerUrl){st.textContent='Locating your address...';originCoords=await geocodeAddr(address);}
   rw.classList.add('visible');
