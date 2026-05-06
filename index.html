@@ -244,8 +244,8 @@ lc();
 
 var SOURCES={
   google:    {name:'Google',     color:'#4285f4', kind:'google'},
-  taskrabbit:{name:'TaskRabbit', color:'#6aa84f', kind:'redirect', urlFn:function(svc,city){return'https://www.taskrabbit.com/search#?utf8=%E2%9C%93&q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city);}},
-  thumbtack: {name:'Thumbtack',  color:'#00b3a4', kind:'redirect', urlFn:function(svc,city){return'https://www.thumbtack.com/search/?q='+encodeURIComponent(svc)+'&requestPostalCode='+encodeURIComponent(city);}},
+  taskrabbit:{name:'TaskRabbit', color:'#6aa84f', kind:'apify', actor:'fortuitous_pirate~taskrabbit-scraper'},
+  thumbtack: {name:'Thumbtack',  color:'#00b3a4', kind:'apify', actor:'easyapi~thumbtack-pro-listing-scraper'},
   craigslist:{name:'Craigslist', color:'#5d3fd3', kind:'craigslist'}
 };
 
@@ -274,7 +274,7 @@ function renderS(){
     ka.innerHTML=
       '<div class="s-row"><span style="font-size:.85rem;min-width:95px">Worker URL:</span><input type="text" class="s-inp" id="sk1" value="'+(C.workerUrl||'')+'" placeholder="https://your-worker.workers.dev"/></div>'+
       '<div class="s-row"><span style="font-size:.85rem;min-width:95px">Google Maps:</span><input type="password" class="s-inp" id="sk2" value="'+(C.mapsKey||'')+'" placeholder="Google Maps API key"/></div>'+
-      
+      '<div class="s-row"><span style="font-size:.85rem;min-width:95px">Apify Token:</span><input type="password" class="s-inp" id="sk3" value="'+(C.apifyToken||'')+'" placeholder="Apify token (TaskRabbit &amp; Thumbtack)"/></div>'+
       '<div class="s-row" style="margin-top:6px"><button class="s-btn s-btn-save" onclick="saveKeys()">Save &amp; Hide</button><span class="s-saved" id="keySaved">&#10003; Saved</span></div>';
   } else {
     ka.innerHTML='<div class="key-hidden">&#128274; Keys saved &nbsp;<button class="s-btn s-btn-add" onclick="C.keysVisible=true;renderS()">Edit</button></div>';
@@ -284,7 +284,7 @@ function renderS(){
   document.getElementById('setMaxDrive').value=C.maxDrive;
   renderChips();updateFI();
 }
-function saveKeys(){C.workerUrl=document.getElementById('sk1').value.trim().replace(/\/$/,'');C.mapsKey=document.getElementById('sk2').value.trim();C.keysVisible=false;sc();flash('keySaved');renderS();initGMaps();refreshUsage();}
+function saveKeys(){C.workerUrl=document.getElementById('sk1').value.trim().replace(/\/$/,'');C.mapsKey=document.getElementById('sk2').value.trim();C.apifyToken=(document.getElementById('sk3')?document.getElementById('sk3').value.trim():C.apifyToken||'');C.keysVisible=false;sc();flash('keySaved');renderS();initGMaps();refreshUsage();}
 function saveReq(){C.minRating=parseFloat(document.getElementById('setMinRating').value)||4.7;C.minReviews=parseInt(document.getElementById('setMinReviews').value)||50;C.maxDrive=parseInt(document.getElementById('setMaxDrive').value)||20;sc();flash('reqSaved');updateFI();}
 function renderChips(){document.getElementById('svcChips').innerHTML=C.services.map(function(s,i){return'<span class="s-chip">'+esc(s)+' <button onclick="rmSvc('+i+')">&times;</button></span>';}).join('');}
 function addSvc(){var inp=document.getElementById('newSvcInput'),v=inp.value.trim();if(!v)return;if(C.services.indexOf(v)===-1)C.services.push(v);inp.value='';sc();renderChips();popSvc();}
@@ -306,7 +306,7 @@ async function refreshUsage(){
   parts.push('<span>&#127760; Google: <strong style="color:#7eb8f7">'+(C.gMapsCalls||0)+'</strong> calls today</span>');
 
   hu.innerHTML=parts.join('<span style="opacity:.3"> | </span>');
-  if(false&&C.apifyToken&&C.workerUrl){ // Apify removed
+  if(C.apifyToken&&C.workerUrl){
     parts.push('<span id="huApify" style="color:#a09888">Apify: loading...</span>');
     hu.innerHTML=parts.join('<span style="opacity:.3">|</span>');
     try{
@@ -478,17 +478,47 @@ function guessCraigslistCity(city){
 function buildApifyInput(srcKey,svc,addr){
   var city=extractCity(addr);
   if(srcKey==='taskrabbit'){
-    return{startUrls:[{url:'https://www.taskrabbit.com/search#?utf8=%E2%9C%93&q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city)}],maxItems:25};
+    // fortuitous_pirate~taskrabbit-scraper: takes locations (slugs) + services (slugs)
+    var locSlug=cityToTaskRabbitSlug(city);
+    var svcSlug=svcToTaskRabbitSlug(svc);
+    return{
+      locations:[locSlug],
+      services:[svcSlug],
+      scrapeReviews:true,
+      scrapeServiceInfo:true
+    };
   }
   if(srcKey==='thumbtack'){
-    var zip=(city.match(/\d{5}/)||[''])[0]||city;
-    return{startUrls:[{url:'https://www.thumbtack.com/search/?q='+encodeURIComponent(svc)+'&requestPostalCode='+encodeURIComponent(zip)}],maxItems:25};
-  }
-  if(srcKey==='craigslist'){
-    var clCity=guessCraigslistCity(city);
-    return{startUrls:[{url:'https://'+clCity+'.craigslist.org/search/bbb?query='+encodeURIComponent(svc)}],maxItems:25,proxy:{useApifyProxy:true}};
+    // easyapi~thumbtack-pro-listing-scraper: takes startUrls
+    // Extract zip from full address first, then fall back to city
+    var fullAddr=addr||'';
+    var zip=(fullAddr.match(/\d{5}/)||city.match(/\d{5}/)||[''])[0];
+    var ttUrl=zip
+      ?'https://www.thumbtack.com/search/?q='+encodeURIComponent(svc)+'&requestPostalCode='+encodeURIComponent(zip)
+      :'https://www.thumbtack.com/search/?q='+encodeURIComponent(svc)+'&location='+encodeURIComponent(city);
+    return{startUrls:[{url:ttUrl}],maxItems:20};
   }
   return{};
+}
+
+// Convert city string to TaskRabbit location slug format
+function cityToTaskRabbitSlug(city){
+  var c=city.toLowerCase().trim();
+  // Remove state abbreviation and zip
+  c=c.replace(/,?\s*[a-z]{2}\s*\d{5}.*$/,'').replace(/,?\s*[a-z]{2}$/,'').trim();
+  // Common mappings
+  var map={'new york':'new-york-city','new york city':'new-york-city','los angeles':'los-angeles','san francisco':'san-francisco','washington dc':'washington-dc','washington':'washington-dc','chicago':'chicago','boston':'boston','seattle':'seattle','miami':'miami','dallas':'dallas','houston':'houston','atlanta':'atlanta','denver':'denver','phoenix':'phoenix','portland':'portland','austin':'austin','las vegas':'las-vegas','minneapolis':'minneapolis','detroit':'detroit','stevensville':'chicago','southwest michigan':'chicago','michigan':'chicago'};
+  for(var k in map){if(c.indexOf(k)>-1)return map[k];}
+  // Generic slugify
+  return c.replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+}
+
+// Convert service name to TaskRabbit service slug
+function svcToTaskRabbitSlug(svc){
+  var s=svc.toLowerCase().trim();
+  var map={'home cleaning':'home-cleaning','handyman':'handyman','handyman / repairs':'handyman','moving help':'help-moving','furniture assembly':'assemble-furniture','yard work':'yard-work','yard work / landscaping':'yard-work','general tasks':'general-tasks','mobile notary':'notary','dumpster rental':'junk-removal','junk removal':'junk-removal','storage units':'moving-and-storage'};
+  if(map[s])return map[s];
+  return s.replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 }
 
 async function runApifyActor(srcKey,svc,addr){
@@ -505,18 +535,75 @@ async function runApifyActor(srcKey,svc,addr){
 
 function normalizeApifyItem(srcKey,item){
   if(!item||typeof item!=='object')return null;
+
+  // TaskRabbit-specific normalization
+  if(srcKey==='taskrabbit'&&item.dataType==='tasker'){
+    var rt=parseFloat(item.averageRating||0);
+    var parts=[];
+    if(item.tasksCount)parts.push(item.tasksCount.toLocaleString()+' tasks done');
+    if(item.isElite)parts.push('Elite tasker');
+    if(item.bio)parts.push(item.bio);
+    var profileUrl=item.profileUrl||(item.taskerId?'https://www.taskrabbit.com/profile/'+item.taskerId:null);
+    return{_taskerId:item.taskerId||null,
+      _src:'taskrabbit',
+      name:item.name||'Unknown Tasker',
+      address:item.location||null,
+      rating:(!isNaN(rt)&&rt>0)?rt:null,
+      reviews:parseInt(item.reviewsCount||0)||0,
+      price:item.hourlyRate?'$'+item.hourlyRate+'/hr':null,
+      phone:null,
+      website:profileUrl,
+      lat:null,lng:null,
+      desc:parts.join(' · ').substring(0,220),
+      driveMin:null,driveTxt:null,distTxt:null,distMiles:null,open:null
+    };
+  }
+
+  // Thumbtack-specific normalization
+  if(srcKey==='thumbtack'){
+    var rt=parseFloat(item.rating||0);
+    // Build desc from businessFacts + latest review
+    var parts=[];
+    if(item.isTopPro)parts.push('Top Pro');
+    if(item.serviceCategories)parts.push(item.serviceCategories.split(',')[0].trim());
+    if(Array.isArray(item.businessFacts))parts=parts.concat(item.businessFacts.slice(0,2));
+    var desc=parts.join(' · ');
+    if(item.reviewText){
+      var rt2=item.reviewText.replace(/^[^"]*"/,'').replace(/"[^"]*$/,'').substring(0,120);
+      if(rt2)desc+=(desc?' — ':'')+'“'+rt2+'...”';
+    }
+    return{
+      _src:'thumbtack',
+      name:item.businessName||'Unknown Business',
+      address:null,
+      rating:(!isNaN(rt)&&rt>0)?rt:null,
+      reviews:parseInt(item.numReviews||0)||0,
+      price:item.price||null,
+      phone:null,
+      website:item.url||null,
+      _isTopPro:item.isTopPro||false,
+      lat:null,lng:null,
+      desc:desc.substring(0,250),
+      driveMin:null,driveTxt:null,distTxt:null,distMiles:null,open:null
+    };
+  }
+
+  // Generic fallback
   var out={
     _src:srcKey,
-    name:item.name||item.title||item.taskerName||item.businessName||'Untitled',
-    address:item.address||item.location||item.serviceArea||null,
-    rating:null,reviews:0,price:null,phone:null,website:item.url||item.link||null,
+    name:item.name||item.businessName||item.title||'Untitled',
+    address:item.city||item.location||item.address||null,
+    rating:null,reviews:0,price:null,phone:null,
+    website:item.profileUrl||item.url||item.link||null,
     lat:item.latitude||item.lat||null,lng:item.longitude||item.lng||null,
-    desc:item.description||item.snippet||item.bio||item.summary||'',
+    desc:item.bio||item.description||item.snippet||'',
     driveMin:null,driveTxt:null,distTxt:null,distMiles:null,open:null
   };
-  if(item.rating){var rt=parseFloat(item.rating);if(!isNaN(rt))out.rating=rt;}
-  if(item.reviewsCount||item.reviewCount||item.numReviews)out.reviews=parseInt(item.reviewsCount||item.reviewCount||item.numReviews)||0;
-  if(item.price||item.hourlyRate||item.priceRange)out.price=String(item.price||item.hourlyRate||item.priceRange);
+  var rt=parseFloat(item.rating||item.averageRating||item.starRating||0);
+  if(!isNaN(rt)&&rt>0)out.rating=rt;
+  out.reviews=parseInt(item.reviewsCount||item.numReviews||item.reviewCount||0)||0;
+  if(item.hourlyRate)out.price='$'+item.hourlyRate+'/hr';
+  else if(item.price)out.price=String(item.price);
   if(item.phone||item.phoneNumber)out.phone=item.phone||item.phoneNumber;
   return out;
 }
@@ -585,7 +672,7 @@ async function doSearch(){
   var needsCraigslist=C.selectedSources.indexOf('craigslist')>-1;
   if((needsGoogle||needsApify)&&!C.workerUrl){nk.classList.add('show');return;}
   if(needsGoogle&&!C.mapsKey){nk.classList.add('show');return;}
-  if(needsApify&&!C.apifyToken){em.textContent='Apify token required. Add it in Settings.';em.classList.add('show');return;}
+  if(needsApify&&!C.apifyToken){em.textContent='Apify token required for TaskRabbit & Thumbtack. Add it in ⚙️ Settings.';em.classList.add('show');return;}
 
   btn.disabled=true;sp.classList.add('active');rw.classList.remove('visible');grid.innerHTML='';
   document.getElementById('mapContainer').style.display='none';
@@ -638,6 +725,7 @@ async function runSource(srcKey,svc,addr){
           hasAddr.forEach(function(r,i){if(times[i]){r.driveMin=times[i].driveMin;r.driveTxt=times[i].driveTxt;r.distTxt=times[i].distTxt;r.distMiles=times[i].distMiles;}});
         }
       }
+      arr=dedup(arr);
       arr.forEach(function(r){r._gid=srcKey[0]+(globalIdCounter++);});
       sourceResults[srcKey]=arr;
     }catch(e){console.error(srcKey+' failed:',e);sourceResults[srcKey]=[];sourceResults[srcKey+'_error']=e.message;}
@@ -677,7 +765,7 @@ async function runSource(srcKey,svc,addr){
   }
 }
 
-function dedup(arr){var s={};return arr.filter(function(x){var k=x.placeId||x.name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,25);if(s[k])return false;s[k]=true;return true;});}
+function dedup(arr){var s={};return arr.filter(function(x){var k=x.placeId||(x._taskerId?'tr'+x._taskerId:null)||x.name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,25);if(s[k])return false;s[k]=true;return true;});}
 
 function renderAllSections(){
   var html='';
@@ -720,6 +808,7 @@ function renderCard(r,idx,dimmed){
     ?'<span class="stars">'+starsH(r.rating)+'</span><strong>'+r.rating.toFixed(1)+'</strong> <span class="rv-link" onclick="openReviews(\''+r._gid+'\')">('+r.reviews.toLocaleString()+')</span>'
     :'<span style="color:var(--muted)">No rating yet</span>';
   var pills='<span class="pill pill-local">'+esc(SOURCES[r._src]?SOURCES[r._src].name:r._src)+'</span>';
+  if(r._isTopPro)pills+='<span class="pill" style="background:#ffd700;color:#333">&#11088; Top Pro</span>';
   if(r.driveTxt)pills+='<span class="pill pill-drive">\uD83D\uDE97 '+esc(r.driveTxt)+'</span>';
   if(r.distTxt)pills+='<span class="pill pill-neutral">'+esc(r.distTxt)+'</span>';
   if(r.price)pills+='<span class="pill pill-neutral">'+esc(r.price)+'</span>';
