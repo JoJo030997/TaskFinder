@@ -9,11 +9,11 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--ink:#101014;--paper:#f5f3ef;--cream:#eae7e0;--accent:#c0452a;--accent2:#2963c8;--muted:#78756e;--border:#d6d1c9;--card:#fff;--sbg:#e8f5ec;--stx:#1a7a3a;--pbg:#e8eef8;--ptx:#1a4a7a;--wbg:#fff4e8;--wtx:#b06a00;--shadow:0 2px 12px rgba(0,0,0,.07)}
 body{font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
-.page-body{display:flex;flex:1;height:calc(100vh - 62px);overflow:hidden}
-.left-col{flex:0 0 480px;overflow-y:auto;overflow-x:hidden;padding:1.2rem;display:flex;flex-direction:column;gap:.8rem}
-.right-col{flex:1;min-width:0;height:100%;position:relative;background:var(--cream)}
-#mapContainer{width:100%;height:100%;border-radius:0}
-@media(max-width:860px){.page-body{flex-direction:column;height:auto}.left-col{flex:none;width:100%;overflow-y:visible;padding:1rem}.right-col{height:50vw;min-height:260px;max-height:480px}}
+.page-body{display:flex !important;flex-direction:row !important;width:100%;height:calc(100vh - 90px);overflow:hidden;align-items:stretch}
+.left-col{flex:0 0 480px !important;width:480px;max-width:480px;overflow-y:auto;overflow-x:hidden;padding:1.2rem;display:flex;flex-direction:column;gap:.8rem;box-sizing:border-box}
+.right-col{flex:1 1 auto !important;min-width:0;height:100%;position:relative;background:var(--cream);overflow:hidden}
+#mapContainer{width:100%;height:100%;border-radius:0;position:relative}
+@media(max-width:860px){.page-body{flex-direction:column !important;height:auto;width:100%}.left-col{flex:none !important;width:100% !important;max-width:100% !important;overflow-y:visible;padding:1rem}.right-col{height:50vw;min-height:260px;max-height:480px;width:100%}}
 
 header{background:var(--ink);padding:1.4rem 1.5rem;position:relative;overflow:hidden}
 header::before{content:'';position:absolute;top:-80px;right:-60px;width:240px;height:240px;border-radius:50%;background:var(--accent);opacity:.12}
@@ -247,7 +247,7 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
     </div>
   </div>
 
-  <div class="right-col" id="mapSidebar" style="background:var(--cream)">
+  <div class="right-col" id="mapSidebar" style="background:var(--cream);min-width:200px">
     <div class="map-container" id="mapContainer" style="height:100%"><div id="mapPlaceholder" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.9rem;flex-direction:column;gap:8px;text-align:center;padding:2rem"><span style="font-size:2rem">🗺️</span><span>Check &ldquo;Show on map&rdquo;<br>on any result to see it here</span></div></div>
   </div>
 </div>
