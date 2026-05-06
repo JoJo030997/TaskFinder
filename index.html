@@ -67,10 +67,10 @@ input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
 .results-wrap{display:none}.results-wrap.visible{display:block}
 .results-layout{display:grid;grid-template-columns:1fr 420px;gap:14px;align-items:start}
 .results-left{min-width:0}
-.results-right{position:sticky;top:12px;width:420px;height:420px;min-height:200px;min-width:280px;max-width:700px}
-.map-resize-handle{width:100%;height:8px;cursor:ns-resize;display:flex;align-items:center;justify-content:center;margin-top:4px;opacity:.5}
-.map-resize-handle:hover{opacity:1}
-.map-resize-handle::before{content:'';width:40px;height:4px;border-radius:2px;background:var(--muted)}
+.results-right{position:sticky;top:12px;width:420px;height:420px;min-height:200px;min-width:280px;max-width:700px;position:relative}
+#mapSidebar{position:sticky;top:12px}
+.map-resize-handle{position:absolute;bottom:0;right:0;width:36px;height:36px;cursor:nwse-resize;z-index:10;opacity:.7;background:linear-gradient(135deg,transparent 40%,var(--muted) 40%,var(--muted) 50%,transparent 50%,transparent 60%,var(--muted) 60%,var(--muted) 70%,transparent 70%,transparent 80%,var(--muted) 80%,var(--muted) 90%,transparent 90%);border-radius:0 0 11px 0}
+.map-resize-handle:hover{opacity:1;background:linear-gradient(135deg,transparent 40%,var(--accent) 40%,var(--accent) 50%,transparent 50%,transparent 60%,var(--accent) 60%,var(--accent) 70%,transparent 70%,transparent 80%,var(--accent) 80%,var(--accent) 90%,transparent 90%)}
 @media(max-width:900px){.results-layout{grid-template-columns:1fr}.results-right{position:static;width:100%;height:320px;margin-bottom:1rem}}
 .results-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:8px}
 .results-count{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700}.results-count span{color:var(--accent)}
@@ -232,7 +232,7 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
       <div class="results-left">
         <div id="resultsGrid"></div>
       </div>
-      <div class="results-right" id="mapSidebar" style="display:none">
+      <div class="results-right" id="mapSidebar" style="display:none;position:relative">
         <div class="map-container" id="mapContainer" style="height:100%"></div>
         <div class="map-resize-handle" id="mapResizeHandle" title="Drag to resize"></div>
       </div>
@@ -897,19 +897,21 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 
 // Map resize drag
 (function(){
-  var handle=null,sidebar=null,startY=0,startH=0;
+  var handle=null,sidebar=null,startX=0,startY=0,startW=0,startH=0;
   document.addEventListener('mousedown',function(e){
     handle=document.getElementById('mapResizeHandle');
     if(!handle||!handle.contains(e.target))return;
     sidebar=document.getElementById('mapSidebar');
-    startY=e.clientY;startH=sidebar.offsetHeight;
+    startX=e.clientX;startY=e.clientY;
+    startW=sidebar.offsetWidth;startH=sidebar.offsetHeight;
     document.body.style.userSelect='none';
     document.addEventListener('mousemove',onDrag);
     document.addEventListener('mouseup',onUp);
   });
   function onDrag(e){
+    var newW=Math.max(280,Math.min(700,startW+(e.clientX-startX)));
     var newH=Math.max(200,Math.min(700,startH+(e.clientY-startY)));
-    sidebar.style.height=newH+'px';
+    sidebar.style.width=newW+'px';sidebar.style.height=newH+'px';
     if(window.google&&window.gmap)google.maps.event.trigger(gmap,'resize');
   }
   function onUp(){document.body.style.userSelect='';document.removeEventListener('mousemove',onDrag);document.removeEventListener('mouseup',onUp);}
@@ -918,11 +920,17 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
     handle=document.getElementById('mapResizeHandle');
     if(!handle||!handle.contains(e.target))return;
     sidebar=document.getElementById('mapSidebar');
-    startY=e.touches[0].clientY;startH=sidebar.offsetHeight;
+    startX=e.touches[0].clientX;startY=e.touches[0].clientY;
+    startW=sidebar.offsetWidth;startH=sidebar.offsetHeight;
     document.addEventListener('touchmove',onTDrag,{passive:false});
     document.addEventListener('touchend',onTUp);
   });
-  function onTDrag(e){e.preventDefault();var newH=Math.max(200,Math.min(700,startH+(e.touches[0].clientY-startY)));sidebar.style.height=newH+'px';if(window.google&&window.gmap)google.maps.event.trigger(gmap,'resize');}
+  function onTDrag(e){e.preventDefault();
+    var newW=Math.max(280,Math.min(700,startW+(e.touches[0].clientX-startX)));
+    var newH=Math.max(200,Math.min(700,startH+(e.touches[0].clientY-startY)));
+    sidebar.style.width=newW+'px';sidebar.style.height=newH+'px';
+    if(window.google&&window.gmap)google.maps.event.trigger(gmap,'resize');
+  }
   function onTUp(){document.removeEventListener('touchmove',onTDrag);document.removeEventListener('touchend',onTUp);}
 })();
 popSvc();updateFI();initGMaps();renderSourceCheckboxes();refreshUsage();
