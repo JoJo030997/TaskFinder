@@ -10,10 +10,10 @@
 :root{--ink:#101014;--paper:#f5f3ef;--cream:#eae7e0;--accent:#c0452a;--accent2:#2963c8;--muted:#78756e;--border:#d6d1c9;--card:#fff;--sbg:#e8f5ec;--stx:#1a7a3a;--pbg:#e8eef8;--ptx:#1a4a7a;--wbg:#fff4e8;--wtx:#b06a00;--shadow:0 2px 12px rgba(0,0,0,.07)}
 body{font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
 .page-body{display:flex;flex:1;overflow:hidden;height:calc(100vh - 62px)}
-.left-col{flex:0 0 480px;overflow-y:auto;padding:1.2rem;display:flex;flex-direction:column;gap:.8rem}
-.right-col{flex:1;min-width:0;position:relative;background:var(--cream)}
+.left-col{flex:0 0 480px;overflow-y:auto;overflow-x:hidden;padding:1.2rem;display:flex;flex-direction:column;gap:.8rem}
+.right-col{flex:1;min-width:0;position:sticky;top:0;height:calc(100vh - 62px);background:var(--cream);align-self:flex-start}
 #mapContainer{width:100%;height:100%;border-radius:0}
-@media(max-width:860px){.page-body{flex-direction:column;height:auto}.left-col{flex:none;width:100%;max-height:none;padding:1rem}.right-col{height:50vw;min-height:260px;max-height:480px}}
+@media(max-width:860px){.page-body{flex-direction:column;height:auto;overflow:visible}.left-col{flex:none;width:100%;overflow-y:visible;padding:1rem}.right-col{position:static;height:50vw;min-height:260px;max-height:480px}}
 
 header{background:var(--ink);padding:1.4rem 1.5rem;position:relative;overflow:hidden}
 header::before{content:'';position:absolute;top:-80px;right:-60px;width:240px;height:240px;border-radius:50%;background:var(--accent);opacity:.12}
@@ -226,6 +226,7 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
             <input type="range" id="radiusSlider" min="5" max="100" step="5" value="50" oninput="onRadiusChange(this.value)"/>
             <span class="radius-val" id="radiusVal">50 mi</span>
           </div>
+          <button class="btn-showall" id="btnShowAll" onclick="toggleShowAll()">&#128205; Show All Pins</button>
         </div>
       </div>
       <div id="resultsGrid"></div>
@@ -682,7 +683,7 @@ async function doSearch(){
   if(!C.selectedSources.length){st.textContent='Pick at least one source.';return;}
 
   var svcLabel=document.getElementById('service').options[document.getElementById('service').selectedIndex].text;
-  originAddr=address;originCoords=null;cardPins={};sourceResults={};globalIdCounter=0;
+  originAddr=address;originCoords=null;cardPins={};sourceResults={};globalIdCounter=0;showAllActive=false;clearAllPins();var bsa=document.getElementById('btnShowAll');if(bsa){bsa.classList.remove('active');bsa.innerHTML='&#128205; Show All Pins';}showAllActive=false;clearAllPins();var btnSA=document.getElementById('btnShowAll');if(btnSA){btnSA.classList.remove('active');btnSA.textContent='📍 Show All Pins';}
 
   var needsGoogle=C.selectedSources.indexOf('google')>-1;
   var needsApify=C.selectedSources.some(function(k){return SOURCES[k]&&SOURCES[k].kind==='apify';});
@@ -897,6 +898,100 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 
 // Rerender map on browser resize
 window.addEventListener('resize',function(){if(window.google&&window.gmap)google.maps.event.trigger(gmap,'resize');});
+// ======================= SHOW ALL PINS =======================
+var showAllActive=false;
+var showAllMarkers=[];
+
+function toggleShowAll(){
+  showAllActive=!showAllActive;
+  var btn=document.getElementById('btnShowAll');
+  if(btn){btn.classList.toggle('active',showAllActive);btn.textContent=showAllActive?'❌ Hide All Pins':'📍 Show All Pins';}
+  if(showAllActive)renderAllPins();
+  else clearAllPins();
+}
+
+function clearAllPins(){
+  showAllMarkers.forEach(function(m){m.setMap(null);});
+  showAllMarkers=[];
+}
+
+function renderAllPins(){
+  clearAllPins();
+  if(!gmap||!mapsOk)return;
+  var bounds=new google.maps.LatLngBounds();
+  // Add origin pin
+  if(originCoords){
+    var om=new google.maps.Marker({position:{lat:originCoords.lat,lng:originCoords.lng},map:gmap,icon:{url:'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'},title:'Your location'});
+    showAllMarkers.push(om);bounds.extend(om.getPosition());
+  }
+  // Add a pin for every visible result that has coords
+  var allVisible=[];
+  Object.keys(sourceResults).forEach(function(k){
+    if(k.indexOf('__')>-1||k.indexOf('_error')>-1)return;
+    var meets=sourceResults[k+'__meets']||[];
+    var others=sourceResults[k+'__others']||[];
+    meets.concat(others).forEach(function(r){allVisible.push(r);});
+  });
+  allVisible.forEach(function(r,i){
+    var lat=r.lat,lng=r.lng;
+    if(!lat||!lng)return;
+    var color=ROUTE_COLORS[i%ROUTE_COLORS.length];
+    var m=new google.maps.Marker({
+      position:{lat:lat,lng:lng},map:gmap,title:r.name,
+      label:{text:String(r._cardIdx||i+1),color:'#fff',fontSize:'10px',fontWeight:'600'},
+      icon:{path:google.maps.SymbolPath.CIRCLE,scale:13,fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
+    });
+    showAllMarkers.push(m);bounds.extend(m.getPosition());
+  });
+  if(showAllMarkers.length>1)gmap.fitBounds(bounds);
+}
+
+// ======================= SHOW ALL PINS =======================
+var showAllActive=false;
+var showAllMarkers=[];
+
+function toggleShowAll(){
+  showAllActive=!showAllActive;
+  var btn=document.getElementById('btnShowAll');
+  if(btn){btn.classList.toggle('active',showAllActive);btn.innerHTML=showAllActive?'&#10060; Hide All Pins':'&#128205; Show All Pins';}
+  if(showAllActive)renderAllPins();
+  else clearAllPins();
+}
+
+function clearAllPins(){
+  showAllMarkers.forEach(function(m){m.setMap(null);});
+  showAllMarkers=[];
+}
+
+function renderAllPins(){
+  clearAllPins();
+  if(!gmap||!mapsOk){alert('Run a search first to load the map.');showAllActive=false;var btn=document.getElementById('btnShowAll');if(btn){btn.classList.remove('active');btn.innerHTML='&#128205; Show All Pins';}return;}
+  var bounds=new google.maps.LatLngBounds();
+  if(originCoords){
+    var om=new google.maps.Marker({position:{lat:originCoords.lat,lng:originCoords.lng},map:gmap,icon:{url:'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'},title:'Your location',zIndex:1000});
+    showAllMarkers.push(om);bounds.extend(om.getPosition());
+  }
+  var allVisible=[];
+  Object.keys(sourceResults).forEach(function(k){
+    if(k.indexOf('__')>-1||k.indexOf('_error')>-1)return;
+    var meets=sourceResults[k+'__meets']||[];
+    var others=sourceResults[k+'__others']||[];
+    meets.concat(others).forEach(function(r){if(r._cardIdx&&(r.lat||r.lng))allVisible.push(r);});
+  });
+  allVisible.forEach(function(r){
+    if(!r.lat||!r.lng)return;
+    var color=ROUTE_COLORS[(r._cardIdx-1)%ROUTE_COLORS.length];
+    var m=new google.maps.Marker({
+      position:{lat:r.lat,lng:r.lng},map:gmap,title:r.name,
+      label:{text:String(r._cardIdx),color:'#fff',fontSize:'10px',fontWeight:'600'},
+      icon:{path:google.maps.SymbolPath.CIRCLE,scale:13,fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
+    });
+    showAllMarkers.push(m);bounds.extend(m.getPosition());
+  });
+  if(showAllMarkers.length>1)gmap.fitBounds(bounds);
+  else if(originCoords)gmap.setCenter({lat:originCoords.lat,lng:originCoords.lng});
+}
+
 popSvc();updateFI();initGMaps();renderSourceCheckboxes();refreshUsage();
 </script>
 </body>
