@@ -67,7 +67,10 @@ input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
 .results-wrap{display:none}.results-wrap.visible{display:block}
 .results-layout{display:grid;grid-template-columns:1fr 420px;gap:14px;align-items:start}
 .results-left{min-width:0}
-.results-right{position:sticky;top:12px;width:420px;height:420px}
+.results-right{position:sticky;top:12px;width:420px;height:420px;min-height:200px;min-width:280px;max-width:700px}
+.map-resize-handle{width:100%;height:8px;cursor:ns-resize;display:flex;align-items:center;justify-content:center;margin-top:4px;opacity:.5}
+.map-resize-handle:hover{opacity:1}
+.map-resize-handle::before{content:'';width:40px;height:4px;border-radius:2px;background:var(--muted)}
 @media(max-width:900px){.results-layout{grid-template-columns:1fr}.results-right{position:static;width:100%;height:320px;margin-bottom:1rem}}
 .results-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:8px}
 .results-count{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700}.results-count span{color:var(--accent)}
@@ -231,6 +234,7 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
       </div>
       <div class="results-right" id="mapSidebar" style="display:none">
         <div class="map-container" id="mapContainer" style="height:100%"></div>
+        <div class="map-resize-handle" id="mapResizeHandle" title="Drag to resize"></div>
       </div>
     </div>
   </div>
@@ -891,6 +895,36 @@ function closeReviews(){document.getElementById('rvOverlay').classList.remove('o
 function copyPhone(ph,btn){navigator.clipboard.writeText(ph).then(function(){var orig=btn.innerHTML;btn.innerHTML='&#10003; Copied!';setTimeout(function(){btn.innerHTML=orig;},1500);}).catch(function(){alert('Copy failed. Number: '+ph);});}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
+// Map resize drag
+(function(){
+  var handle=null,sidebar=null,startY=0,startH=0;
+  document.addEventListener('mousedown',function(e){
+    handle=document.getElementById('mapResizeHandle');
+    if(!handle||!handle.contains(e.target))return;
+    sidebar=document.getElementById('mapSidebar');
+    startY=e.clientY;startH=sidebar.offsetHeight;
+    document.body.style.userSelect='none';
+    document.addEventListener('mousemove',onDrag);
+    document.addEventListener('mouseup',onUp);
+  });
+  function onDrag(e){
+    var newH=Math.max(200,Math.min(700,startH+(e.clientY-startY)));
+    sidebar.style.height=newH+'px';
+    if(window.google&&window.gmap)google.maps.event.trigger(gmap,'resize');
+  }
+  function onUp(){document.body.style.userSelect='';document.removeEventListener('mousemove',onDrag);document.removeEventListener('mouseup',onUp);}
+  // Touch support
+  document.addEventListener('touchstart',function(e){
+    handle=document.getElementById('mapResizeHandle');
+    if(!handle||!handle.contains(e.target))return;
+    sidebar=document.getElementById('mapSidebar');
+    startY=e.touches[0].clientY;startH=sidebar.offsetHeight;
+    document.addEventListener('touchmove',onTDrag,{passive:false});
+    document.addEventListener('touchend',onTUp);
+  });
+  function onTDrag(e){e.preventDefault();var newH=Math.max(200,Math.min(700,startH+(e.touches[0].clientY-startY)));sidebar.style.height=newH+'px';if(window.google&&window.gmap)google.maps.event.trigger(gmap,'resize');}
+  function onTUp(){document.removeEventListener('touchmove',onTDrag);document.removeEventListener('touchend',onTUp);}
+})();
 popSvc();updateFI();initGMaps();renderSourceCheckboxes();refreshUsage();
 </script>
 </body>
