@@ -415,7 +415,7 @@ async function refreshUsage(){
       chips.push(ah);
     }
     if(d.gemini&&d.gemini.available){
-      chips.push('<span class="usage-chip">\u2728 Gemini: <strong>1500/day</strong> free</span>');
+      chips.push('<span class="usage-chip">\u2728 AI: <strong>30/min</strong> free (Groq)</span>');
     }
     hu.innerHTML=chips.join('');
   }catch(e){console.warn('refreshUsage:',e.message);}
