@@ -140,7 +140,7 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
 
 <header>
   <div class="h-inner">
-    <div><div class="logo">Task<span>Finder</span></div><div class="tagline">Find local service providers near any address</div></div>
+    <div><div class="logo">Task<span>Finder</span> <span style="font-size:.65rem;font-weight:400;color:#a09888;letter-spacing:.05em;vertical-align:middle">v2.4</span></div><div class="tagline">Find local service providers near any address</div></div>
     <div style="display:flex;align-items:center;gap:10px">
       <div id="headerUsage" style="font-size:.72rem;color:#a09888;display:flex;gap:14px;align-items:center"></div>
       <button class="gear-btn" onclick="toggleSettings()">&#9881;</button>
@@ -390,7 +390,7 @@ function initGMaps(){
   if(mapsOk||!C.mapsKey)return;
   if(typeof google!=='undefined'&&google.maps){mapsOk=true;return;}
   var s=document.createElement('script');
-  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(C.mapsKey)+'&libraries=geometry&loading=async&callback=onMR';
+  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(C.mapsKey)+'&libraries=geometry,marker&v=beta&loading=async&callback=onMR';
   s.async=true;document.body.appendChild(s);
 }
 window.onMR=function(){
@@ -400,8 +400,9 @@ window.onMR=function(){
   var c=document.getElementById('mapContainer');
   if(c&&!gmap){
     gmap=new google.maps.Map(c,{
-      center:{lat:39.8283,lng:-98.5795}, // center of US
+      center:{lat:39.8283,lng:-98.5795},
       zoom:4,
+      mapId:'taskfinder_map',
       styles:[{featureType:'poi',stylers:[{visibility:'off'}]},{featureType:'transit',stylers:[{visibility:'simplified'}]}]
     });
   }
@@ -409,7 +410,9 @@ window.onMR=function(){
   if(originCoords&&gmap){
     gmap.setCenter({lat:originCoords.lat,lng:originCoords.lng});
     gmap.setZoom(11);
-    var om=new google.maps.Marker({position:{lat:originCoords.lat,lng:originCoords.lng},map:gmap,icon:{url:'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'},title:'Your location'});
+    var omEl2=document.createElement('div');
+    omEl2.style.cssText='width:14px;height:14px;border-radius:50%;background:#4285f4;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)';
+    var om=new google.maps.marker.AdvancedMarkerElement({position:{lat:originCoords.lat,lng:originCoords.lng},map:gmap,title:'Your location',content:omEl2});
     gmarkers.push(om);
   }
 };
@@ -421,8 +424,9 @@ function setupMap(lat,lng){
   gmarkers.forEach(function(m){m.setMap(null);});gmarkers=[];
   Object.keys(cardRoutes).forEach(function(k){if(cardRoutes[k])cardRoutes[k].setMap(null);});
   cardPins={};cardRoutes={};
-  var om=new google.maps.Marker({position:{lat:lat,lng:lng},map:gmap,
-    icon:{url:'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'},title:'Your location'});
+  var omEl=document.createElement('div');
+  omEl.style.cssText='width:14px;height:14px;border-radius:50%;background:#4285f4;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)';
+  var om=new google.maps.marker.AdvancedMarkerElement({position:{lat:lat,lng:lng},map:gmap,title:'Your location',content:omEl});
   gmarkers.push(om);
 }
 
@@ -438,11 +442,10 @@ async function togglePin(gid){
     var color=ROUTE_COLORS[Object.keys(cardPins).length%ROUTE_COLORS.length];
     // Get the card number from the checkbox id stored on the result
     var cardNum=r._cardIdx||String(Object.keys(cardPins).length+1);
-    var m=new google.maps.Marker({
-      position:{lat:lat,lng:lng},map:gmap,title:r.name,
-      label:{text:String(cardNum),color:'#fff',fontSize:'11px',fontWeight:'600'},
-      icon:{path:google.maps.SymbolPath.CIRCLE,scale:14,fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
-    });
+    var pinEl=document.createElement('div');
+    pinEl.style.cssText='width:28px;height:28px;border-radius:50%;background:'+color+';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;font-family:sans-serif';
+    pinEl.textContent=String(cardNum);
+    var m=new google.maps.marker.AdvancedMarkerElement({position:{lat:lat,lng:lng},map:gmap,title:r.name,content:pinEl});
     cardPins[gid]=m;gmarkers.push(m);
     if(originCoords){
       try{
@@ -572,13 +575,59 @@ function buildApifyInput(srcKey,svc,addr){
 // Convert city string to TaskRabbit location slug format
 function cityToTaskRabbitSlug(city){
   var c=city.toLowerCase().trim();
-  // Remove state abbreviation and zip
-  c=c.replace(/,?\s*[a-z]{2}\s*\d{5}.*$/,'').replace(/,?\s*[a-z]{2}$/,'').trim();
-  // Common mappings
-  var map={'new york':'new-york-city','new york city':'new-york-city','los angeles':'los-angeles','san francisco':'san-francisco','washington dc':'washington-dc','washington':'washington-dc','chicago':'chicago','boston':'boston','seattle':'seattle','miami':'miami','dallas':'dallas','houston':'houston','atlanta':'atlanta','denver':'denver','phoenix':'phoenix','portland':'portland','austin':'austin','las vegas':'las-vegas','minneapolis':'minneapolis','detroit':'detroit','stevensville':'chicago','southwest michigan':'chicago','michigan':'chicago'};
+  // Remove zip codes, state abbrevs, country
+  c=c.replace(/,?\s*usa?\s*$/i,'').replace(/,?\s*[a-z]{2}\s*\d{5}.*$/,'').replace(/,?\s*[a-z]{2}$/,'').trim();
+
+  // Full TaskRabbit supported city list (as of 2025)
+  var map={
+    // Major metros
+    'new york':'new-york-city','new york city':'new-york-city','nyc':'new-york-city',
+    'los angeles':'los-angeles','la':'los-angeles','west la':'los-angeles',
+    'san francisco':'san-francisco','sf':'san-francisco','bay area':'san-francisco',
+    'chicago':'chicago','chicagoland':'chicago',
+    'boston':'boston','cambridge':'boston','somerville':'boston',
+    'washington':'washington-dc','washington dc':'washington-dc','dc':'washington-dc',
+    'alexandria':'washington-dc','arlington':'washington-dc','falls church':'washington-dc',
+    'bethesda':'washington-dc','silver spring':'washington-dc','tysons':'washington-dc',
+    'seattle':'seattle','bellevue':'seattle','redmond':'seattle','kirkland':'seattle',
+    'miami':'miami','fort lauderdale':'miami','boca raton':'miami',
+    'dallas':'dallas','fort worth':'dallas','plano':'dallas','irving':'dallas',
+    'houston':'houston','sugar land':'houston','the woodlands':'houston',
+    'atlanta':'atlanta','marietta':'atlanta','decatur':'atlanta','sandy springs':'atlanta',
+    // Virginia / DC area
+    'newnan':'atlanta','grantville':'atlanta','moreland':'atlanta','coweta':'atlanta',
+    'denver':'denver','boulder':'denver','aurora':'denver',
+    'phoenix':'phoenix','scottsdale':'phoenix','tempe':'phoenix','mesa':'phoenix',
+    'portland':'portland','beaverton':'portland',
+    'austin':'austin','round rock':'austin','cedar park':'austin',
+    'las vegas':'las-vegas','henderson':'las-vegas',
+    'minneapolis':'minneapolis','st paul':'minneapolis',
+    'detroit':'detroit','ann arbor':'detroit','troy':'detroit',
+    'san diego':'san-diego',
+    'san jose':'san-jose','silicon valley':'san-jose','santa clara':'san-jose','sunnyvale':'san-jose','palo alto':'san-jose',
+    'nashville':'nashville','brentwood':'nashville',
+    'charlotte':'charlotte','raleigh':'raleigh','durham':'raleigh',
+    'sacramento':'sacramento',
+    'orlando':'orlando','tampa':'tampa','st petersburg':'tampa',
+    'san antonio':'san-antonio',
+    'philadelphia':'philadelphia','philly':'philadelphia',
+    'pittsburgh':'pittsburgh',
+    'salt lake city':'salt-lake-city','salt lake':'salt-lake-city',
+    'new orleans':'new-orleans',
+    'kansas city':'kansas-city',
+    'cincinnati':'cincinnati','cleveland':'cleveland','columbus':'columbus',
+    'richmond':'richmond','norfolk':'richmond','virginia beach':'richmond',
+    // Michigan fallbacks
+    'stevensville':'chicago','michigan':'chicago','southwest michigan':'chicago',
+    'grand rapids':'detroit','lansing':'detroit','kalamazoo':'chicago',
+    // Default major nearby city for unknown suburbs
+  };
+
   for(var k in map){if(c.indexOf(k)>-1)return map[k];}
-  // Generic slugify
-  return c.replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  // Last resort: slugify and hope TR supports it
+  var slug=c.replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  console.warn('[TaskRabbit] Unknown city slug for "'+city+'" -> trying "'+slug+'"');
+  return slug;
 }
 
 // Convert service name to TaskRabbit service slug
@@ -592,13 +641,20 @@ function svcToTaskRabbitSlug(svc){
 async function runApifyActor(srcKey,svc,addr){
   var src=SOURCES[srcKey];if(!src||src.kind!=='apify')return[];
   var input=buildApifyInput(srcKey,svc,addr);
-  console.log('[Apify]',srcKey,'input:',input);
+  console.log('[Apify] '+srcKey+' actor:',src.actor,'input:',JSON.stringify(input));
   var data;
-  try{data=await pxPost({mode:'apify_run',actor_id:src.actor,token:C.apifyToken,timeout:'90'},input);}
-  catch(e){console.error('Apify run failed for '+srcKey+':',e);throw e;}
-  console.log('[Apify]',srcKey,'response:',data);
-  if(!Array.isArray(data)){if(data&&data.error)throw new Error(data.error);return[];}
-  return data.map(function(item){return normalizeApifyItem(srcKey,item);}).filter(Boolean);
+  try{data=await pxPost({mode:'apify_run',actor_id:src.actor,token:C.apifyToken,timeout:'120'},input);}
+  catch(e){console.error('[Apify] run failed for '+srcKey+':',e.message);throw e;}
+  console.log('[Apify] '+srcKey+' raw response type:',typeof data,'isArray:',Array.isArray(data),'length:',Array.isArray(data)?data.length:'N/A');
+  if(Array.isArray(data)&&data.length>0)console.log('[Apify] '+srcKey+' first item keys:',Object.keys(data[0]));
+  if(!Array.isArray(data)){
+    console.error('[Apify] '+srcKey+' non-array response:',data);
+    if(data&&data.error)throw new Error(data.error);
+    return[];
+  }
+  var normalized=data.map(function(item){return normalizeApifyItem(srcKey,item);}).filter(Boolean);
+  console.log('[Apify] '+srcKey+' normalized:',normalized.length,'results');
+  return normalized;
 }
 
 function normalizeApifyItem(srcKey,item){
@@ -692,6 +748,12 @@ function applyFilter(){
     var meets=[],others=[];
     arr.forEach(function(r){
       if(r._redirect){meets.push(r);return;}
+      // Craigslist never has ratings — put all in meets if within radius
+      if(r._src==='craigslist'){
+        var inR=r.distMiles===null||r.distMiles===undefined||r.distMiles<=radiusMiles;
+        if(inR)meets.push(r);else others.push(r);
+        return;
+      }
       var pr=r.rating!==null&&r.rating>=C.minRating;
       var pv=r.reviews>=C.minReviews;
       var pd=r.driveMin===null||r.driveMin<=C.maxDrive;
@@ -1028,8 +1090,10 @@ function renderAllPins(){
   if(!gmap||!mapsOk){alert('Run a search first to load the map.');showAllActive=false;var btn=document.getElementById('btnShowAll');if(btn){btn.classList.remove('active');btn.innerHTML='&#128205; Show All Pins';}return;}
   var bounds=new google.maps.LatLngBounds();
   if(originCoords){
-    var om=new google.maps.Marker({position:{lat:originCoords.lat,lng:originCoords.lng},map:gmap,icon:{url:'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'},title:'Your location',zIndex:1000});
-    showAllMarkers.push(om);bounds.extend(om.getPosition());
+    var saEl=document.createElement('div');
+    saEl.style.cssText='width:14px;height:14px;border-radius:50%;background:#4285f4;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)';
+    var om=new google.maps.marker.AdvancedMarkerElement({position:{lat:originCoords.lat,lng:originCoords.lng},map:gmap,title:'Your location',content:saEl});
+    showAllMarkers.push(om);bounds.extend(new google.maps.LatLng(originCoords.lat,originCoords.lng));
   }
   var allVisible=[];
   Object.keys(sourceResults).forEach(function(k){
@@ -1041,12 +1105,11 @@ function renderAllPins(){
   allVisible.forEach(function(r){
     if(!r.lat||!r.lng)return;
     var color=ROUTE_COLORS[(r._cardIdx-1)%ROUTE_COLORS.length];
-    var m=new google.maps.Marker({
-      position:{lat:r.lat,lng:r.lng},map:gmap,title:r.name,
-      label:{text:String(r._cardIdx),color:'#fff',fontSize:'10px',fontWeight:'600'},
-      icon:{path:google.maps.SymbolPath.CIRCLE,scale:13,fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
-    });
-    showAllMarkers.push(m);bounds.extend(m.getPosition());
+    var saPin=document.createElement('div');
+    saPin.style.cssText='width:26px;height:26px;border-radius:50%;background:'+color+';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;font-family:sans-serif';
+    saPin.textContent=String(r._cardIdx);
+    var m=new google.maps.marker.AdvancedMarkerElement({position:{lat:r.lat,lng:r.lng},map:gmap,title:r.name,content:saPin});
+    showAllMarkers.push(m);bounds.extend(new google.maps.LatLng(r.lat,r.lng));
   });
   if(showAllMarkers.length>1)gmap.fitBounds(bounds);
   else if(originCoords)gmap.setCenter({lat:originCoords.lat,lng:originCoords.lng});
