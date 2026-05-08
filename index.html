@@ -135,6 +135,12 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 
 footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);border-top:1px solid var(--border);margin-top:2rem}
 /* LOGIN */
+.usage-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:.7rem;white-space:nowrap}
+.usage-chip strong{font-weight:600;color:#fff}
+.usage-chip.warn{background:rgba(245,166,35,.15);border-color:rgba(245,166,35,.3);color:#f5a623}
+.usage-chip.warn strong{color:#f5a623}
+.usage-chip.danger{background:rgba(192,69,42,.18);border-color:rgba(192,69,42,.4);color:#ff8060}
+.usage-chip.danger strong{color:#ff8060}
 .login-screen{position:fixed;inset:0;background:var(--ink);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem}
 .login-box{background:var(--card);border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:360px;box-shadow:0 8px 40px rgba(0,0,0,.4)}
 .login-logo{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;color:#fff;letter-spacing:-.03em;text-align:center;margin-bottom:2rem}
@@ -150,11 +156,12 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
 <body>
 
 <header>
-  <div class="h-inner">
-    <div><div class="logo">Task<span>Finder</span> <span style="font-size:.65rem;font-weight:400;color:#a09888;letter-spacing:.05em;vertical-align:middle">v2.4</span></div><div class="tagline">Find local service providers near any address</div></div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <div id="headerUsage" style="font-size:.72rem;color:#a09888;display:flex;gap:14px;align-items:center"></div>
-      <button class="gear-btn" onclick="toggleSettings()" title="Settings">&#9881;</button><button onclick="logout()" style="background:none;border:none;color:#a09888;font-size:.75rem;cursor:pointer;font-family:'Outfit',sans-serif;text-decoration:underline" title="Sign out">Sign out</button>
+  <div class="h-inner" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem">
+    <div><div class="logo">Task<span>Finder</span> <span style="font-size:.65rem;font-weight:400;color:#a09888;letter-spacing:.05em;vertical-align:middle">v3.0</span></div><div class="tagline">Find local service providers near any address</div></div>
+    <div id="headerUsage" style="display:flex;gap:8px;align-items:center;font-size:.7rem;color:#a09888;justify-content:center;flex-wrap:wrap"></div>
+    <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
+      <button class="gear-btn" onclick="toggleSettings()" title="Settings">⚙</button>
+      <button onclick="logout()" style="background:none;border:none;color:#a09888;font-size:.75rem;cursor:pointer;font-family:'Outfit',sans-serif;text-decoration:underline" title="Sign out">Sign out</button>
     </div>
   </div>
 </header>
@@ -254,7 +261,8 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
           <button class="btn-showall" id="btnShowAll" onclick="toggleShowAll()">&#128205; Show All Pins</button>
         </div>
       </div>
-      <div id="resultsGrid"></div>
+      <div id="searchSummary" style="display:none"></div>
+        <div id="resultsGrid"></div>
     </div>
   </div>
 
@@ -279,7 +287,7 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
 <script>
 var DS=['Home cleaning','Handyman / repairs','Moving help','Furniture assembly','Yard work / landscaping','General tasks','Mobile Notary','Dumpster rental','Junk Removal','Storage units'];
 var C={
-  workerUrl:'',mapsKey:'',apifyToken:'',
+  workerUrl:'',mapsKey:'',apifyToken:'',geminiKey:'',
   minRating:4.7,minReviews:50,maxDrive:20,
   services:DS.slice(),
   selectedSources:['google'],
@@ -330,9 +338,8 @@ function renderS(){
   if(C.keysVisible||!C.mapsKey){
     ka.innerHTML=
       '<div class="s-row"><span style="font-size:.85rem;min-width:95px">Worker URL:</span><input type="text" class="s-inp" id="sk1" value="'+(C.workerUrl||'')+'" placeholder="https://your-worker.workers.dev"/></div>'+
-      '<div class="s-row"><span style="font-size:.85rem;min-width:95px">Google Maps:</span><input type="password" class="s-inp" id="sk2" value="'+(C.mapsKey||'')+'" placeholder="Google Maps API key"/></div>'+
-      '<div class="s-row"><span style="font-size:.85rem;min-width:95px">Apify Token:</span><input type="password" class="s-inp" id="sk3" value="'+(C.apifyToken||'')+'" placeholder="Apify token (TaskRabbit &amp; Thumbtack)"/></div>'+
-      '<div class="s-row" style="margin-top:6px"><button class="s-btn s-btn-save" onclick="saveKeys()">Save &amp; Hide</button><span class="s-saved" id="keySaved">&#10003; Saved</span></div>';
+      '<div style="font-size:.78rem;color:var(--muted);background:var(--cream);padding:8px 10px;border-radius:7px;margin-top:6px">\u{1F510} Google Maps, Apify, and Gemini keys are managed in the Cloudflare Worker (server-side). They never touch this browser. Update them in the Worker dashboard.</div>'+
+      '<div class="s-row" style="margin-top:6px"><button class="s-btn s-btn-save" onclick="saveKeys()">Save Worker URL</button><span class="s-saved" id="keySaved">✓ Saved</span></div>';
   } else {
     ka.innerHTML='<div class="key-hidden">&#128274; Keys saved &nbsp;<button class="s-btn s-btn-add" onclick="C.keysVisible=true;renderS()">Edit</button></div>';
   }
@@ -341,7 +348,7 @@ function renderS(){
   document.getElementById('setMaxDrive').value=C.maxDrive;
   renderChips();updateFI();
 }
-function saveKeys(){C.workerUrl=document.getElementById('sk1').value.trim().replace(/\/$/,'');C.mapsKey=document.getElementById('sk2').value.trim();C.apifyToken=(document.getElementById('sk3')?document.getElementById('sk3').value.trim():C.apifyToken||'');C.keysVisible=false;sc();flash('keySaved');renderS();initGMaps();refreshUsage();}
+function saveKeys(){C.workerUrl=document.getElementById('sk1').value.trim().replace(/\/$/,'');localStorage.setItem('tf_worker_url',C.workerUrl);C.keysVisible=false;sc();flash('keySaved');renderS();refreshUsage();}
 function saveReq(){C.minRating=parseFloat(document.getElementById('setMinRating').value)||4.7;C.minReviews=parseInt(document.getElementById('setMinReviews').value)||50;C.maxDrive=parseInt(document.getElementById('setMaxDrive').value)||20;sc();flash('reqSaved');updateFI();}
 function renderChips(){document.getElementById('svcChips').innerHTML=C.services.map(function(s,i){return'<span class="s-chip">'+esc(s)+' <button onclick="rmSvc('+i+')">&times;</button></span>';}).join('');}
 function addSvc(){var inp=document.getElementById('newSvcInput'),v=inp.value.trim();if(!v)return;if(C.services.indexOf(v)===-1)C.services.push(v);inp.value='';sc();renderChips();popSvc();}
@@ -375,41 +382,38 @@ function bumpGoogle(n){var t=new Date().toISOString().slice(0,10);if(C.lastUsage
 function bumpApify(n){var t=new Date().toISOString().slice(0,10);if(C.lastUsageDate!==t){C.gMapsCalls=0;C.apifyRuns=0;C.lastUsageDate=t;}C.apifyRuns=(C.apifyRuns||0)+(n||1);sc();}
 
 async function refreshUsage(){
-  var t=new Date().toISOString().slice(0,10);
-  if(C.lastUsageDate!==t){C.gMapsCalls=0;C.apifyRuns=0;C.lastUsageDate=t;sc();}
   var hu=document.getElementById('headerUsage');if(!hu)return;
-
-  // Base: always show Google calls
-  var parts=[];
-  parts.push('<span>&#127760; Google: <strong style="color:#7eb8f7">'+(C.gMapsCalls||0)+'</strong> calls today</span>');
-
-  hu.innerHTML=parts.join('<span style="opacity:.3"> | </span>');
-  if(C.apifyToken&&C.workerUrl){
-    parts.push('<span id="huApify" style="color:#a09888">Apify: loading...</span>');
-    hu.innerHTML=parts.join('<span style="opacity:.3">|</span>');
-    try{
-      var d=await pxGet({mode:'apify_account',token:C.apifyToken});
-      var apifyHtml='';
-      if(d&&d.data&&d.data.monthlyUsageUsd!==undefined){
-        var used=d.data.monthlyUsageUsd;
-        var limit=5; // free tier default, rough estimate
-        var pct=Math.min(100,(used/limit)*100);
-        var warn=pct>=80;
-        var color=warn?'#f5a623':pct>=60?'#e0c040':'#7eb8f7';
-        apifyHtml='<span style="color:'+color+'">Apify: $'+used.toFixed(3)+'/mo'+(warn?' &#9888;':'')+'</span>';
-      } else {
-        apifyHtml='<span style="color:#a09888">Apify: connected</span>';
-      }
-      var el=document.getElementById('huApify');if(el)el.outerHTML=apifyHtml;
-    }catch(e){
-      var el=document.getElementById('huApify');if(el)el.outerHTML='<span style="color:var(--accent)">Apify: error</span>';
+  if(!C.workerUrl||!SESSION.token){hu.innerHTML='';return;}
+  try{
+    var d=await pxGet({mode:'usage'});
+    if(!d)return;
+    var chips=[];
+    if(d.google&&d.google.available){
+      var todayCalls=d.google.today||0;
+      var freeRem=d.google.freeRemaining;
+      var cls='usage-chip';
+      if(freeRem!==null&&freeRem<50)cls+=' warn';
+      if(freeRem!==null&&freeRem<10)cls+=' danger';
+      var h='<span class="'+cls+'">\u{1F30D} Google: <strong>'+todayCalls.toLocaleString()+'</strong> today';
+      if(freeRem!==null)h+=' · $'+freeRem.toFixed(2)+' / $300';
+      h+='</span>';
+      chips.push(h);
     }
-  } else if(C.apifyToken){
-    parts.push('<span style="color:#a09888">Apify: set Worker URL</span>');
-    hu.innerHTML=parts.join('<span style="opacity:.3">|</span>');
-  } else {
-    hu.innerHTML=parts.join('<span style="opacity:.3">|</span>');
-  }
+    if(d.apify&&d.apify.available){
+      var ac='usage-chip',monthly=d.apify.monthly,rem=d.apify.freeRemaining;
+      if(rem!==null&&rem<1)ac+=' warn';
+      if(rem!==null&&rem<0.25)ac+=' danger';
+      var ah='<span class="'+ac+'">\u{1F50E} Apify: ';
+      if(monthly!==null){ah+='<strong>$'+monthly.toFixed(3)+'</strong>';if(rem!==null)ah+=' · $'+rem.toFixed(2)+' / $5';}
+      else ah+='<strong>connected</strong>';
+      ah+='</span>';
+      chips.push(ah);
+    }
+    if(d.gemini&&d.gemini.available){
+      chips.push('<span class="usage-chip">✨ Gemini: <strong>1500/day</strong></span>');
+    }
+    hu.innerHTML=chips.join('');
+  }catch(e){console.warn('refreshUsage:',e.message);}
 }
 
 var currentRadius=50;
@@ -496,17 +500,21 @@ async function togglePin(gid){
 function findResultByGlobalId(gid){for(var src in sourceResults){if(src.indexOf('__')>-1||src.indexOf('_error')>-1)continue;var arr=sourceResults[src]||[];for(var i=0;i<arr.length;i++){if(arr[i]._gid===gid)return arr[i];}}return null;}
 
 async function pxGet(params){
+  if(SESSION.token)params.token=SESSION.token;
+  delete params.key;
   var qs=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);}).join('&');
-  var r=await fetch(C.workerUrl+'?'+qs);
+  var r=await fetch(C.workerUrl+'?'+qs,{headers:{'X-Auth-Token':SESSION.token||''}});
+  if(r.status===401){alert('Session expired. Please sign in again.');logout();return;}
   if(!r.ok)throw new Error('Proxy '+r.status);
-  if(params.mode&&params.mode.indexOf('apify')!==0)bumpGoogle(1);
   return r.json();
 }
 async function pxPost(params,body){
+  if(SESSION.token)params.token=SESSION.token;
+  delete params.key;
   var qs=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);}).join('&');
-  var r=await fetch(C.workerUrl+'?'+qs,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});
+  var r=await fetch(C.workerUrl+'?'+qs,{method:'POST',headers:{'Content-Type':'application/json','X-Auth-Token':SESSION.token||''},body:JSON.stringify(body||{})});
+  if(r.status===401){alert('Session expired. Please sign in again.');logout();return;}
   if(!r.ok){var t=await r.text();throw new Error('Proxy '+r.status+': '+t.substring(0,200));}
-  if(params.mode==='apify_run')bumpApify(1);
   return r.json();
 }
 
@@ -825,14 +833,11 @@ async function doSearch(){
   if(!C.selectedSources.length){st.textContent='Pick at least one source.';return;}
 
   var svcLabel=svcQuery;
-  originAddr=address;originCoords=null;cardPins={};sourceResults={};globalIdCounter=0;showAllActive=false;clearAllPins();var bsa=document.getElementById('btnShowAll');if(bsa){bsa.classList.remove('active');bsa.innerHTML='&#128205; Show All Pins';}showAllActive=false;clearAllPins();var btnSA=document.getElementById('btnShowAll');if(btnSA){btnSA.classList.remove('active');btnSA.textContent='📍 Show All Pins';}
+  originAddr=address;originCoords=null;cardPins={};sourceResults={};globalIdCounter=0;showAllActive=false;clearAllPins();var ss=document.getElementById('searchSummary');if(ss)ss.style.display='none';var bsa=document.getElementById('btnShowAll');if(bsa){bsa.classList.remove('active');bsa.innerHTML='&#128205; Show All Pins';}showAllActive=false;clearAllPins();var btnSA=document.getElementById('btnShowAll');if(btnSA){btnSA.classList.remove('active');btnSA.textContent='📍 Show All Pins';}
 
   var needsGoogle=C.selectedSources.indexOf('google')>-1;
-  var needsApify=C.selectedSources.some(function(k){return SOURCES[k]&&SOURCES[k].kind==='apify';});
-  var needsCraigslist=C.selectedSources.indexOf('craigslist')>-1;
-  if((needsGoogle||needsApify)&&!C.workerUrl){nk.classList.add('show');return;}
-  if(needsGoogle&&!C.mapsKey){nk.classList.add('show');return;}
-  if(needsApify&&!C.apifyToken){em.textContent='Apify token required for TaskRabbit & Thumbtack. Add it in ⚙️ Settings.';em.classList.add('show');return;}
+  // Worker validates feature availability
+  if(!C.workerUrl){nk.classList.add('show');return;}
 
   btn.disabled=true;sp.classList.add('active');rw.classList.remove('visible');grid.innerHTML='';
   // map always visible in right col
@@ -854,6 +859,82 @@ async function doSearch(){
   if(sourceResults.google&&sourceResults.google.length){
     fetchPhonesBackground(sourceResults.google,function(){applyFilter();});
   }
+
+  // Generate AI summary if Gemini key is configured
+  if(SERVER_CONFIG.hasGemini)generateSearchSummary(svcQuery,address);
+}
+
+// ======================= SEARCH SUMMARY =======================
+async function generateSearchSummary(svcQuery,address){
+  var box=document.getElementById('searchSummary');if(!box)return;
+  box.style.display='block';
+  box.className='search-summary';
+  box.innerHTML='<div class="search-summary-label">&#10024; AI Summary</div><div class="search-summary-content search-summary-loading">Analyzing results...</div>';
+
+  // Collect top results across all sources
+  var topResults=[];
+  Object.keys(sourceResults).forEach(function(k){
+    if(k.indexOf('__')>-1||k.indexOf('_error')>-1)return;
+    var meets=sourceResults[k+'__meets']||[];
+    var others=sourceResults[k+'__others']||[];
+    // Take up to 5 meets first, then fill with others up to 8 per source
+    meets.slice(0,5).concat(others.slice(0,3)).forEach(function(r){
+      if(r._redirect)return;
+      topResults.push(r);
+    });
+  });
+  if(!topResults.length){box.style.display='none';return;}
+
+  // Build prompt with structured business data
+  var prompt='You are a helpful advisor analyzing service provider search results. Write a SHORT summary (under 150 words) that:\n';
+  prompt+='1. States how many providers were found and what the user is looking for\n';
+  prompt+='2. Highlights 2-4 standout options with their key strengths (rating, drive time, specialty, price)\n';
+  prompt+='3. Gives ONE practical recommendation on how to approach choosing\n';
+  prompt+='Be concise, specific, and use a friendly but professional tone. No filler. Reference businesses by name.\n\n';
+  prompt+='User search: "'+svcQuery+'" near '+address+'\n\n';
+  prompt+='Top results found:\n';
+  topResults.slice(0,15).forEach(function(r,i){
+    var line=(i+1)+'. '+r.name;
+    var bits=[];
+    if(r.rating)bits.push(r.rating+'★ ('+r.reviews+' reviews)');
+    if(r.driveTxt)bits.push(r.driveTxt+' away');
+    if(r.distTxt)bits.push(r.distTxt);
+    if(r.price)bits.push('Price: '+r.price);
+    if(r.desc)bits.push(r.desc.substring(0,100));
+    var src=SOURCES[r._src]?SOURCES[r._src].name:r._src;
+    bits.push('via '+src);
+    if(bits.length)line+=' — '+bits.join(' · ');
+    prompt+=line+'\n';
+  });
+
+  try{
+    var resp=await fetch(C.workerUrl+'?mode=gemini&token='+encodeURIComponent(SESSION.token),{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt:prompt})
+    });
+    var d=await resp.json();
+    if(d.error){
+      box.innerHTML='<div class="search-summary-label">&#10024; AI Summary</div><div style="color:var(--accent);font-size:.83rem">Could not generate summary: '+esc(d.error)+'</div>';
+      return;
+    }
+    if(d.text){
+      var text=d.text.trim();
+      var needsCollapse=text.length>350;
+      box.innerHTML='<div class="search-summary-label">&#10024; AI Summary</div>'+
+        '<div class="search-summary-content">'+esc(text)+'</div>'+
+        (needsCollapse?'<div class="search-summary-toggle" onclick="toggleSummary(this)">Show less</div>':'');
+    } else {
+      box.style.display='none';
+    }
+  }catch(e){
+    box.innerHTML='<div class="search-summary-label">&#10024; AI Summary</div><div style="color:var(--accent);font-size:.83rem">Error: '+esc(e.message)+'</div>';
+  }
+}
+
+function toggleSummary(btn){
+  var box=btn.closest('.search-summary');
+  var isCollapsed=box.classList.toggle('collapsed');
+  btn.textContent=isCollapsed?'Show more':'Show less';
 }
 
 async function runSource(srcKey,svc,addr){
@@ -991,6 +1072,7 @@ function renderCard(r,idx,dimmed){
     +'<div class="card-meta">'+pills+'</div>'
     +'<div class="rating-line">'+rh+'</div>'
     +(acts?'<div class="card-actions">'+acts+'</div>':'')
+    +(SERVER_CONFIG.hasGemini?'<div class="insight-toggle" onclick="toggleInsight(\''+r._gid+'\',this)"><span class="insight-arrow">&#9656;</span> Why this fits</div><div class="insight-content" id="insight_'+r._gid+'"></div>':'')
     +chk+'</div>';
 }
 
@@ -1137,6 +1219,58 @@ function renderAllPins(){
   else if(originCoords)gmap.setCenter({lat:originCoords.lat,lng:originCoords.lng});
 }
 
+// ======================= AI INSIGHT =======================
+async function toggleInsight(gid,btn){
+  var box=document.getElementById('insight_'+gid);
+  if(!box)return;
+  var isOpen=box.classList.contains('show');
+  if(isOpen){box.classList.remove('show');btn.classList.remove('open');return;}
+  
+  btn.classList.add('open');box.classList.add('show');
+  
+  // If already loaded, just show
+  if(box.dataset.loaded){return;}
+  
+  var r=findResultByGlobalId(gid);if(!r){box.textContent='Result not found.';return;}
+  
+  box.innerHTML='<span class="insight-loading">✨ Generating insight...</span>';
+  
+  // Build a context-rich prompt
+  var sel=document.getElementById('service');
+  var svcQuery=getServiceQuery();
+  var userAddr=document.getElementById('address').value.trim();
+  
+  var prompt='You are helping someone find a service provider. Based on this business info, write 2-3 short sentences explaining why this provider could be a good fit for the user\'s need. Be specific and practical. Avoid filler. Only mention what is supported by the data.\n\n';
+  prompt+='User needs: '+svcQuery+'\n';
+  prompt+='User location: '+userAddr+'\n\n';
+  prompt+='Business: '+r.name+'\n';
+  if(r.address)prompt+='Address/Area: '+r.address+'\n';
+  if(r.rating)prompt+='Rating: '+r.rating+' ('+r.reviews+' reviews)\n';
+  if(r.driveTxt)prompt+='Drive time from user: '+r.driveTxt+'\n';
+  if(r.price)prompt+='Price info: '+r.price+'\n';
+  if(r.desc)prompt+='Description/categories: '+r.desc+'\n';
+  if(r.website)prompt+='Website: '+r.website+'\n';
+  if(r.phone)prompt+='Phone: '+r.phone+'\n';
+  prompt+='Source: '+(SOURCES[r._src]?SOURCES[r._src].name:r._src)+'\n';
+  
+  try{
+    var resp=await fetch(C.workerUrl+'?mode=gemini&token='+encodeURIComponent(SESSION.token),{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt:prompt})
+    });
+    var d=await resp.json();
+    if(d.error){box.innerHTML='<span style="color:var(--accent)">Error: '+esc(d.error)+'</span>';return;}
+    if(d.text){
+      box.textContent=d.text;
+      box.dataset.loaded='1';
+    } else {
+      box.innerHTML='<span style="color:var(--muted)">No insight generated.</span>';
+    }
+  }catch(e){
+    box.innerHTML='<span style="color:var(--accent)">Error: '+esc(e.message)+'</span>';
+  }
+}
+
 // ======================= AUTH =======================
 var SESSION={token:null,role:null};
 
@@ -1145,17 +1279,18 @@ function getWorkerUrl(){
   return C.workerUrl||localStorage.getItem('tf_worker_url')||'';
 }
 
+var SERVER_CONFIG={};
+
 async function doLogin(){
   var pwd=document.getElementById('loginPwd').value;
   var err=document.getElementById('loginErr');
   var btn=document.querySelector('.login-btn');
   if(!pwd){err.textContent='Enter a password.';return;}
-  
+
   var workerUrl=getWorkerUrl();
   if(!workerUrl){
-    // If no worker URL yet, prompt for it
-    workerUrl=prompt('Enter your Worker URL first (e.g. https://your-worker.workers.dev):');
-    if(!workerUrl){err.textContent='Worker URL required to login.';return;}
+    workerUrl=prompt('Enter Worker URL (e.g. https://your-worker.workers.dev):');
+    if(!workerUrl){err.textContent='Worker URL required.';return;}
     workerUrl=workerUrl.trim().replace(/\/$/,'');
     localStorage.setItem('tf_worker_url',workerUrl);
     C.workerUrl=workerUrl;sc();
@@ -1172,18 +1307,30 @@ async function doLogin(){
       SESSION.token=d.token;SESSION.role=d.role;
       sessionStorage.setItem('tf_token',d.token);
       sessionStorage.setItem('tf_role',d.role);
-      applyRole(d.role);
-      document.getElementById('loginScreen').style.display='none';
-      popSvc();updateFI();initGMaps();renderSourceCheckboxes();refreshUsage();
+      await initApp(d.role);
     } else {
       err.textContent='Incorrect password. Try again.';
       btn.textContent='Sign In';btn.disabled=false;
       document.getElementById('loginPwd').value='';
     }
   }catch(e){
-    err.textContent='Could not connect to server. Check Worker URL.';
+    err.textContent='Could not connect to server.';
     btn.textContent='Sign In';btn.disabled=false;
   }
+}
+
+async function initApp(role){
+  try{
+    var cfg=await pxGet({mode:'config'});
+    if(cfg){
+      SERVER_CONFIG=cfg;
+      if(cfg.mapsKey){C.mapsKey=cfg.mapsKey;sc();}
+    }
+  }catch(e){console.warn('config fetch failed:',e);}
+  applyRole(role);
+  document.getElementById('loginScreen').style.display='none';
+  popSvc();updateFI();initGMaps();renderSourceCheckboxes();refreshUsage();
+  if(!window._usageInterval)window._usageInterval=setInterval(refreshUsage,30000);
 }
 
 function applyRole(role){
@@ -1202,16 +1349,13 @@ function applyRole(role){
   }
 }
 
-function checkSession(){
+async function checkSession(){
   var token=sessionStorage.getItem('tf_token');
   var role=sessionStorage.getItem('tf_role');
   if(token&&role){
     SESSION.token=token;SESSION.role=role;
-    applyRole(role);
-    document.getElementById('loginScreen').style.display='none';
-    popSvc();updateFI();initGMaps();renderSourceCheckboxes();refreshUsage();
+    await initApp(role);
   }
-  // else: login screen stays visible
 }
 
 function logout(){
