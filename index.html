@@ -154,7 +154,7 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
     <div><div class="logo">Task<span>Finder</span> <span style="font-size:.65rem;font-weight:400;color:#a09888;letter-spacing:.05em;vertical-align:middle">v2.4</span></div><div class="tagline">Find local service providers near any address</div></div>
     <div style="display:flex;align-items:center;gap:10px">
       <div id="headerUsage" style="font-size:.72rem;color:#a09888;display:flex;gap:14px;align-items:center"></div>
-      <button class="gear-btn" onclick="toggleSettings()" title="Settings">&#9881;</button><button onclick="logout()" style="background:rgba(255,255,255,.1);border:none;color:#a09888;padding:4px 10px;border-radius:8px;font-size:.75rem;cursor:pointer;font-family:'Outfit',sans-serif" title="Sign out">&#128682;</button>
+      <button class="gear-btn" onclick="toggleSettings()" title="Settings">&#9881;</button><button onclick="logout()" style="background:none;border:none;color:#a09888;font-size:.75rem;cursor:pointer;font-family:'Outfit',sans-serif;text-decoration:underline" title="Sign out">Sign out</button>
     </div>
   </div>
 </header>
@@ -318,6 +318,15 @@ function toggleSource(key,cb){
 function toggleSettings(){var o=document.getElementById('overlay');o.classList.toggle('open');if(o.classList.contains('open')){renderS();}}
 function renderS(){
   var ka=document.getElementById('keysArea');
+  // Hide API keys section entirely for non-admin users
+  if(SESSION.role&&SESSION.role!=='admin'){
+    ka.innerHTML='<div style="font-size:.83rem;color:var(--muted);padding:6px 0">&#128274; API keys managed by admin.</div>';
+    document.getElementById('setMinRating').value=C.minRating;
+    document.getElementById('setMinReviews').value=C.minReviews;
+    document.getElementById('setMaxDrive').value=C.maxDrive;
+    renderChips();updateFI();
+    return;
+  }
   if(C.keysVisible||!C.mapsKey){
     ka.innerHTML=
       '<div class="s-row"><span style="font-size:.85rem;min-width:95px">Worker URL:</span><input type="text" class="s-inp" id="sk1" value="'+(C.workerUrl||'')+'" placeholder="https://your-worker.workers.dev"/></div>'+
@@ -1179,9 +1188,7 @@ async function doLogin(){
 
 function applyRole(role){
   SESSION.role=role;
-  // Hide gear/settings button for non-admin
-  var gear=document.querySelector('.gear-btn');
-  if(gear)gear.style.display=role==='admin'?'':'none';
+  // Gear always visible - API keys hidden for non-admin via renderS()
   // Add role indicator to header
   var hu=document.getElementById('headerUsage');
   if(hu){
