@@ -134,6 +134,17 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .rv-loading,.rv-none{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.88rem}
 
 footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);border-top:1px solid var(--border);margin-top:2rem}
+/* LOGIN */
+.login-screen{position:fixed;inset:0;background:var(--ink);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem}
+.login-box{background:var(--card);border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:360px;box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.login-logo{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;color:#fff;letter-spacing:-.03em;text-align:center;margin-bottom:2rem}
+.login-logo span{color:var(--accent)}
+.login-title{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:1.2rem;text-align:center}
+.login-inp{width:100%;border:1px solid var(--border);border-radius:8px;padding:11px 14px;font-size:.95rem;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);margin-bottom:10px}
+.login-inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(192,69,42,.1)}
+.login-btn{width:100%;background:var(--ink);color:#fff;border:none;border-radius:9px;padding:12px;font-size:.95rem;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;margin-top:4px}
+.login-btn:hover{background:#2a2a30}
+.login-err{font-size:.82rem;color:var(--accent);text-align:center;min-height:18px;margin-top:6px}
 </style>
 </head>
 <body>
@@ -143,7 +154,7 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
     <div><div class="logo">Task<span>Finder</span> <span style="font-size:.65rem;font-weight:400;color:#a09888;letter-spacing:.05em;vertical-align:middle">v2.4</span></div><div class="tagline">Find local service providers near any address</div></div>
     <div style="display:flex;align-items:center;gap:10px">
       <div id="headerUsage" style="font-size:.72rem;color:#a09888;display:flex;gap:14px;align-items:center"></div>
-      <button class="gear-btn" onclick="toggleSettings()">&#9881;</button>
+      <button class="gear-btn" onclick="toggleSettings()" title="Settings">&#9881;</button><button onclick="logout()" style="background:rgba(255,255,255,.1);border:none;color:#a09888;padding:4px 10px;border-radius:8px;font-size:.75rem;cursor:pointer;font-family:'Outfit',sans-serif" title="Sign out">&#128682;</button>
     </div>
   </div>
 </header>
@@ -253,6 +264,17 @@ footer{text-align:center;padding:1.4rem;font-size:.72rem;color:var(--muted);bord
 </div>
 
 <footer style="flex-shrink:0">TaskFinder &middot; Powered by Google Places + Apify</footer>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-logo">Task<span>Finder</span></div>
+  <div class="login-box">
+    <div class="login-title">Sign In</div>
+    <input type="password" class="login-inp" id="loginPwd" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
 
 <script>
 var DS=['Home cleaning','Handyman / repairs','Moving help','Furniture assembly','Yard work / landscaping','General tasks','Mobile Notary','Dumpster rental','Junk Removal','Storage units'];
@@ -390,7 +412,7 @@ function initGMaps(){
   if(mapsOk||!C.mapsKey)return;
   if(typeof google!=='undefined'&&google.maps){mapsOk=true;return;}
   var s=document.createElement('script');
-  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(C.mapsKey)+'&libraries=geometry,marker&v=beta&loading=async&callback=onMR';
+  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(C.mapsKey)+'&libraries=geometry&loading=async&callback=onMR';
   s.async=true;document.body.appendChild(s);
 }
 window.onMR=function(){
@@ -402,7 +424,6 @@ window.onMR=function(){
     gmap=new google.maps.Map(c,{
       center:{lat:39.8283,lng:-98.5795},
       zoom:4,
-      mapId:'taskfinder_map',
       styles:[{featureType:'poi',stylers:[{visibility:'off'}]},{featureType:'transit',stylers:[{visibility:'simplified'}]}]
     });
   }
@@ -410,9 +431,7 @@ window.onMR=function(){
   if(originCoords&&gmap){
     gmap.setCenter({lat:originCoords.lat,lng:originCoords.lng});
     gmap.setZoom(11);
-    var omEl2=document.createElement('div');
-    omEl2.style.cssText='width:14px;height:14px;border-radius:50%;background:#4285f4;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)';
-    var om=new google.maps.marker.AdvancedMarkerElement({position:{lat:originCoords.lat,lng:originCoords.lng},map:gmap,title:'Your location',content:omEl2});
+    var om=new google.maps.Marker({position:{lat:originCoords.lat,lng:originCoords.lng},map:gmap,icon:{url:'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'},title:'Your location'});
     gmarkers.push(om);
   }
 };
@@ -424,9 +443,7 @@ function setupMap(lat,lng){
   gmarkers.forEach(function(m){m.setMap(null);});gmarkers=[];
   Object.keys(cardRoutes).forEach(function(k){if(cardRoutes[k])cardRoutes[k].setMap(null);});
   cardPins={};cardRoutes={};
-  var omEl=document.createElement('div');
-  omEl.style.cssText='width:14px;height:14px;border-radius:50%;background:#4285f4;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)';
-  var om=new google.maps.marker.AdvancedMarkerElement({position:{lat:lat,lng:lng},map:gmap,title:'Your location',content:omEl});
+  var om=new google.maps.Marker({position:{lat:lat,lng:lng},map:gmap,icon:{url:'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'},title:'Your location'});
   gmarkers.push(om);
 }
 
@@ -442,10 +459,9 @@ async function togglePin(gid){
     var color=ROUTE_COLORS[Object.keys(cardPins).length%ROUTE_COLORS.length];
     // Get the card number from the checkbox id stored on the result
     var cardNum=r._cardIdx||String(Object.keys(cardPins).length+1);
-    var pinEl=document.createElement('div');
-    pinEl.style.cssText='width:28px;height:28px;border-radius:50%;background:'+color+';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;font-family:sans-serif';
-    pinEl.textContent=String(cardNum);
-    var m=new google.maps.marker.AdvancedMarkerElement({position:{lat:lat,lng:lng},map:gmap,title:r.name,content:pinEl});
+    var m=new google.maps.Marker({position:{lat:lat,lng:lng},map:gmap,title:r.name,
+      label:{text:String(cardNum),color:'#fff',fontSize:'11px',fontWeight:'600'},
+      icon:{path:google.maps.SymbolPath.CIRCLE,scale:14,fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2}});
     cardPins[gid]=m;gmarkers.push(m);
     if(originCoords){
       try{
@@ -1090,9 +1106,7 @@ function renderAllPins(){
   if(!gmap||!mapsOk){alert('Run a search first to load the map.');showAllActive=false;var btn=document.getElementById('btnShowAll');if(btn){btn.classList.remove('active');btn.innerHTML='&#128205; Show All Pins';}return;}
   var bounds=new google.maps.LatLngBounds();
   if(originCoords){
-    var saEl=document.createElement('div');
-    saEl.style.cssText='width:14px;height:14px;border-radius:50%;background:#4285f4;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)';
-    var om=new google.maps.marker.AdvancedMarkerElement({position:{lat:originCoords.lat,lng:originCoords.lng},map:gmap,title:'Your location',content:saEl});
+    var om=new google.maps.Marker({position:{lat:originCoords.lat,lng:originCoords.lng},map:gmap,icon:{url:'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'},title:'Your location'});
     showAllMarkers.push(om);bounds.extend(new google.maps.LatLng(originCoords.lat,originCoords.lng));
   }
   var allVisible=[];
@@ -1105,17 +1119,103 @@ function renderAllPins(){
   allVisible.forEach(function(r){
     if(!r.lat||!r.lng)return;
     var color=ROUTE_COLORS[(r._cardIdx-1)%ROUTE_COLORS.length];
-    var saPin=document.createElement('div');
-    saPin.style.cssText='width:26px;height:26px;border-radius:50%;background:'+color+';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;font-family:sans-serif';
-    saPin.textContent=String(r._cardIdx);
-    var m=new google.maps.marker.AdvancedMarkerElement({position:{lat:r.lat,lng:r.lng},map:gmap,title:r.name,content:saPin});
+    var m=new google.maps.Marker({position:{lat:r.lat,lng:r.lng},map:gmap,title:r.name,
+      label:{text:String(r._cardIdx),color:'#fff',fontSize:'10px',fontWeight:'600'},
+      icon:{path:google.maps.SymbolPath.CIRCLE,scale:13,fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2}});
     showAllMarkers.push(m);bounds.extend(new google.maps.LatLng(r.lat,r.lng));
   });
   if(showAllMarkers.length>1)gmap.fitBounds(bounds);
   else if(originCoords)gmap.setCenter({lat:originCoords.lat,lng:originCoords.lng});
 }
 
-popSvc();updateFI();initGMaps();renderSourceCheckboxes();refreshUsage();
+// ======================= AUTH =======================
+var SESSION={token:null,role:null};
+
+function getWorkerUrl(){
+  // Worker URL needed for auth - try from config first, fallback to prompt
+  return C.workerUrl||localStorage.getItem('tf_worker_url')||'';
+}
+
+async function doLogin(){
+  var pwd=document.getElementById('loginPwd').value;
+  var err=document.getElementById('loginErr');
+  var btn=document.querySelector('.login-btn');
+  if(!pwd){err.textContent='Enter a password.';return;}
+  
+  var workerUrl=getWorkerUrl();
+  if(!workerUrl){
+    // If no worker URL yet, prompt for it
+    workerUrl=prompt('Enter your Worker URL first (e.g. https://your-worker.workers.dev):');
+    if(!workerUrl){err.textContent='Worker URL required to login.';return;}
+    workerUrl=workerUrl.trim().replace(/\/$/,'');
+    localStorage.setItem('tf_worker_url',workerUrl);
+    C.workerUrl=workerUrl;sc();
+  }
+
+  btn.textContent='Signing in...';btn.disabled=true;
+  try{
+    var r=await fetch(workerUrl+'?mode=auth&action=login',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({password:pwd})
+    });
+    var d=await r.json();
+    if(d.success){
+      SESSION.token=d.token;SESSION.role=d.role;
+      sessionStorage.setItem('tf_token',d.token);
+      sessionStorage.setItem('tf_role',d.role);
+      applyRole(d.role);
+      document.getElementById('loginScreen').style.display='none';
+      popSvc();updateFI();initGMaps();renderSourceCheckboxes();refreshUsage();
+    } else {
+      err.textContent='Incorrect password. Try again.';
+      btn.textContent='Sign In';btn.disabled=false;
+      document.getElementById('loginPwd').value='';
+    }
+  }catch(e){
+    err.textContent='Could not connect to server. Check Worker URL.';
+    btn.textContent='Sign In';btn.disabled=false;
+  }
+}
+
+function applyRole(role){
+  SESSION.role=role;
+  // Hide gear/settings button for non-admin
+  var gear=document.querySelector('.gear-btn');
+  if(gear)gear.style.display=role==='admin'?'':'none';
+  // Add role indicator to header
+  var hu=document.getElementById('headerUsage');
+  if(hu){
+    var roleChip='<span style="padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:600;background:'+(role==='admin'?'var(--accent)':'#2963c8')+';color:#fff">'+
+      (role==='admin'?'Admin':'User')+'</span>';
+    // Only add if not already there
+    if(!document.getElementById('roleChip')){
+      var chip=document.createElement('span');chip.id='roleChip';chip.innerHTML=roleChip;
+      hu.prepend(chip);
+    }
+  }
+}
+
+function checkSession(){
+  var token=sessionStorage.getItem('tf_token');
+  var role=sessionStorage.getItem('tf_role');
+  if(token&&role){
+    SESSION.token=token;SESSION.role=role;
+    applyRole(role);
+    document.getElementById('loginScreen').style.display='none';
+    popSvc();updateFI();initGMaps();renderSourceCheckboxes();refreshUsage();
+  }
+  // else: login screen stays visible
+}
+
+function logout(){
+  sessionStorage.removeItem('tf_token');
+  sessionStorage.removeItem('tf_role');
+  SESSION={token:null,role:null};
+  location.reload();
+}
+
+// Add logout button to gear area for admin
+checkSession();
 </script>
 </body>
 </html>
