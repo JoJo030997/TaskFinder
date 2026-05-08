@@ -394,23 +394,28 @@ async function refreshUsage(){
       var cls='usage-chip';
       if(freeRem!==null&&freeRem<50)cls+=' warn';
       if(freeRem!==null&&freeRem<10)cls+=' danger';
-      var h='<span class="'+cls+'">\u{1F30D} Google: <strong>'+todayCalls.toLocaleString()+'</strong> today';
-      if(freeRem!==null)h+=' · $'+freeRem.toFixed(2)+' / $300';
-      h+='</span>';
-      chips.push(h);
+      var gh='<span class="'+cls+'">\u{1F30D} Google: <strong>'+todayCalls.toLocaleString()+'</strong> today';
+      if(freeRem!==null)gh+=' \u00b7 $'+freeRem.toFixed(2)+' / $300';
+      else gh+=' \u00b7 $300 / $300';
+      gh+='</span>';
+      chips.push(gh);
     }
     if(d.apify&&d.apify.available){
       var ac='usage-chip',monthly=d.apify.monthly,rem=d.apify.freeRemaining;
       if(rem!==null&&rem<1)ac+=' warn';
       if(rem!==null&&rem<0.25)ac+=' danger';
       var ah='<span class="'+ac+'">\u{1F50E} Apify: ';
-      if(monthly!==null){ah+='<strong>$'+monthly.toFixed(3)+'</strong>';if(rem!==null)ah+=' · $'+rem.toFixed(2)+' / $5';}
-      else ah+='<strong>connected</strong>';
+      if(monthly!==null){
+        ah+='<strong>$'+monthly.toFixed(3)+'</strong>';
+        if(rem!==null)ah+=' \u00b7 $'+rem.toFixed(2)+' / $5';
+      } else {
+        ah+='<strong>$0.000</strong> \u00b7 $5.00 / $5';
+      }
       ah+='</span>';
       chips.push(ah);
     }
     if(d.gemini&&d.gemini.available){
-      chips.push('<span class="usage-chip">✨ Gemini: <strong>1500/day</strong></span>');
+      chips.push('<span class="usage-chip">\u2728 Gemini: <strong>1500/day</strong> free</span>');
     }
     hu.innerHTML=chips.join('');
   }catch(e){console.warn('refreshUsage:',e.message);}
